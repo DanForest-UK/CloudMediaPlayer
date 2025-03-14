@@ -1,0 +1,17 @@
+# .NET build artifacts
+bin/
+obj/
+
+# Angular build artifacts
+dist/
+node_modules/
+.angular/
+
+# IDE files
+.vs/
+.vscode/
+*.user
+
+# SSL certificates
+*.pem
+*.key

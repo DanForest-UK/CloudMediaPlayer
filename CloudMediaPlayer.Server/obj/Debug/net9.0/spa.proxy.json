@@ -1,0 +1,10 @@
+{
+"SpaProxyServer": {
+"ServerUrl": "https://localhost:55956",
+"RedirectUrl": "",
+"LaunchCommand": "npm start",
+"WorkingDirectory": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\..\\cloudmediaplayer.client",
+"MaxTimeoutInSeconds": "120",
+"KeepRunning": "false"
+}
+}

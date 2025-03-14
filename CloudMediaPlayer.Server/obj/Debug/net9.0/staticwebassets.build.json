@@ -1,0 +1,2414 @@
+{
+  "Version": 1,
+  "Hash": "lihi/lyySyBQ7wBRTL6CJ2v/jPT64CAamA3dIR2Kbms=",
+  "Source": "CloudMediaPlayer.Server",
+  "BasePath": "_content/CloudMediaPlayer.Server",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [
+    {
+      "Identity": "C:\\Dan\\Git\\CloudMediaPlayer\\cloudmediaplayer.client\\cloudmediaplayer.client.esproj",
+      "Version": 2,
+      "Source": "cloudmediaplayer.client",
+      "GetPublishAssetsTargets": "GetCurrentProjectPublishStaticWebAssetItems",
+      "AdditionalPublishProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalPublishPropertiesToRemove": "WebPublishProfileFile;TargetFramework",
+      "GetBuildAssetsTargets": "GetCurrentProjectBuildStaticWebAssetItems",
+      "AdditionalBuildProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalBuildPropertiesToRemove": "WebPublishProfileFile;TargetFramework"
+    }
+  ],
+  "DiscoveryPatterns": [
+    {
+      "Name": "CloudMediaPlayer.Server\\wwwroot",
+      "Source": "CloudMediaPlayer.Server",
+      "ContentRoot": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\",
+      "BasePath": "_content/CloudMediaPlayer.Server",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\1ngl2q34h2-vagikyz9qx.gz",
+      "SourceId": "CloudMediaPlayer.Server",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\",
+      "BasePath": "_content/CloudMediaPlayer.Server",
+      "RelativePath": "browser/favicon#[.{fingerprint=vagikyz9qx}]?.ico.gz",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\favicon.ico",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "Fingerprint": "7hqb4lxq1m",
+      "Integrity": "NR1FQBEucAvKbsWGsjKa7GDjwTNvmXgzs4TApstPfTA=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\favicon.ico"
+    },
+    {
+      "Identity": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\8htsaytp00-okboh3mxq3.gz",
+      "SourceId": "CloudMediaPlayer.Server",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\",
+      "BasePath": "_content/CloudMediaPlayer.Server",
+      "RelativePath": "browser/main-AKNCFTCO#[.{fingerprint=okboh3mxq3}]?.js.gz",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\main-AKNCFTCO.js",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "Fingerprint": "x6h0dyfmvp",
+      "Integrity": "90NKpztnNjb9CIuh0fZFOHSG/6wxgK2qdbYFyVOExas=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\main-AKNCFTCO.js"
+    },
+    {
+      "Identity": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\d8nf5f42f4-w7qwo5wg31.gz",
+      "SourceId": "CloudMediaPlayer.Server",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\",
+      "BasePath": "_content/CloudMediaPlayer.Server",
+      "RelativePath": "browser/index#[.{fingerprint=w7qwo5wg31}]?.html.gz",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\index.html",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "Fingerprint": "t9wbmqvvxv",
+      "Integrity": "IabqgytbcO46C+mnK/ild/24A/sR+jjKRUtbcgPZ+Jc=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\index.html"
+    },
+    {
+      "Identity": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\eii9wrvdqz-ajy2hkq1ho.gz",
+      "SourceId": "CloudMediaPlayer.Server",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\",
+      "BasePath": "_content/CloudMediaPlayer.Server",
+      "RelativePath": "3rdpartylicenses#[.{fingerprint=ajy2hkq1ho}]?.txt.gz",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\3rdpartylicenses.txt",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "Fingerprint": "di31lzta7n",
+      "Integrity": "BbnlGosDNPAoMN8Q2FxnF/QsoSQAxEQZjx0o070ZVb4=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\3rdpartylicenses.txt"
+    },
+    {
+      "Identity": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\q3znocrbd8-5ipweew5fc.gz",
+      "SourceId": "CloudMediaPlayer.Server",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\",
+      "BasePath": "_content/CloudMediaPlayer.Server",
+      "RelativePath": "browser/styles-5INURTSO#[.{fingerprint=5ipweew5fc}]?.css.gz",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\styles-5INURTSO.css",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "Fingerprint": "5ipweew5fc",
+      "Integrity": "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\styles-5INURTSO.css"
+    },
+    {
+      "Identity": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\xsxb1ff2s8-tvy3j3n584.gz",
+      "SourceId": "CloudMediaPlayer.Server",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\",
+      "BasePath": "_content/CloudMediaPlayer.Server",
+      "RelativePath": "prerendered-routes#[.{fingerprint=tvy3j3n584}]?.json.gz",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\prerendered-routes.json",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "Fingerprint": "yg2qtoqmwx",
+      "Integrity": "/rMhsS1OzHDccjKmgNwxzRIpevRcg7dA1xD1YeDF6yw=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\prerendered-routes.json"
+    },
+    {
+      "Identity": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\z1vsfhzk52-39tegmrjtp.gz",
+      "SourceId": "CloudMediaPlayer.Server",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\",
+      "BasePath": "_content/CloudMediaPlayer.Server",
+      "RelativePath": "browser/polyfills-FFHMD2TL#[.{fingerprint=39tegmrjtp}]?.js.gz",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\polyfills-FFHMD2TL.js",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "Fingerprint": "hpbgzmjzdr",
+      "Integrity": "RaqgnGK2lZB0zOrqtAiqrts0bpDxpLDmecAXRRXDm5o=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\polyfills-FFHMD2TL.js"
+    },
+    {
+      "Identity": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\3rdpartylicenses.txt",
+      "SourceId": "CloudMediaPlayer.Server",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\",
+      "BasePath": "_content/CloudMediaPlayer.Server",
+      "RelativePath": "3rdpartylicenses#[.{fingerprint}]?.txt",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "ajy2hkq1ho",
+      "Integrity": "qoPuZCUhPC6pKuBbBKRBsdf9YAUIf1jQ3lN5Q4JsESs=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\3rdpartylicenses.txt"
+    },
+    {
+      "Identity": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\favicon.ico",
+      "SourceId": "CloudMediaPlayer.Server",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\",
+      "BasePath": "_content/CloudMediaPlayer.Server",
+      "RelativePath": "browser/favicon#[.{fingerprint}]?.ico",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "vagikyz9qx",
+      "Integrity": "+RAr6AKXwFKSB2B75Sd7T5C8qJ1lmI+hdxuRx4lOgV8=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\browser\\favicon.ico"
+    },
+    {
+      "Identity": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\index.html",
+      "SourceId": "CloudMediaPlayer.Server",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\",
+      "BasePath": "_content/CloudMediaPlayer.Server",
+      "RelativePath": "browser/index#[.{fingerprint}]?.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "w7qwo5wg31",
+      "Integrity": "RGefY+HJhknmzGdkkNLrv5/pAMXch+8Qdi14mZF02Mk=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\browser\\index.html"
+    },
+    {
+      "Identity": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\main-AKNCFTCO.js",
+      "SourceId": "CloudMediaPlayer.Server",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\",
+      "BasePath": "_content/CloudMediaPlayer.Server",
+      "RelativePath": "browser/main-AKNCFTCO#[.{fingerprint}]?.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "okboh3mxq3",
+      "Integrity": "mI3s7Z3fVoYgRwlWKsfnd3qzp9bs6EMfiVxl/Bs2iK8=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\browser\\main-AKNCFTCO.js"
+    },
+    {
+      "Identity": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\polyfills-FFHMD2TL.js",
+      "SourceId": "CloudMediaPlayer.Server",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\",
+      "BasePath": "_content/CloudMediaPlayer.Server",
+      "RelativePath": "browser/polyfills-FFHMD2TL#[.{fingerprint}]?.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "39tegmrjtp",
+      "Integrity": "adzqBFZD3Q3pmKPNDMu7RrRr/yZRqHpWxzwo6yCOj5g=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\browser\\polyfills-FFHMD2TL.js"
+    },
+    {
+      "Identity": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\styles-5INURTSO.css",
+      "SourceId": "CloudMediaPlayer.Server",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\",
+      "BasePath": "_content/CloudMediaPlayer.Server",
+      "RelativePath": "browser/styles-5INURTSO#[.{fingerprint}]?.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "5ipweew5fc",
+      "Integrity": "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\browser\\styles-5INURTSO.css"
+    },
+    {
+      "Identity": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\prerendered-routes.json",
+      "SourceId": "CloudMediaPlayer.Server",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\",
+      "BasePath": "_content/CloudMediaPlayer.Server",
+      "RelativePath": "prerendered-routes#[.{fingerprint}]?.json",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "tvy3j3n584",
+      "Integrity": "p53cyKEVGQ6cGUee02kUdBp9HbdPChFTUp78gHJVBf4=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\prerendered-routes.json"
+    }
+  ],
+  "Endpoints": [
+    {
+      "Route": "3rdpartylicenses.ajy2hkq1ho.txt",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\eii9wrvdqz-ajy2hkq1ho.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000205718988"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "4860"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"BbnlGosDNPAoMN8Q2FxnF/QsoSQAxEQZjx0o070ZVb4=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/plain"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"qoPuZCUhPC6pKuBbBKRBsdf9YAUIf1jQ3lN5Q4JsESs=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "ajy2hkq1ho"
+        },
+        {
+          "Name": "label",
+          "Value": "3rdpartylicenses.txt"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-qoPuZCUhPC6pKuBbBKRBsdf9YAUIf1jQ3lN5Q4JsESs="
+        }
+      ]
+    },
+    {
+      "Route": "3rdpartylicenses.ajy2hkq1ho.txt",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\3rdpartylicenses.txt",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "18173"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/plain"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"qoPuZCUhPC6pKuBbBKRBsdf9YAUIf1jQ3lN5Q4JsESs=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "ajy2hkq1ho"
+        },
+        {
+          "Name": "label",
+          "Value": "3rdpartylicenses.txt"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-qoPuZCUhPC6pKuBbBKRBsdf9YAUIf1jQ3lN5Q4JsESs="
+        }
+      ]
+    },
+    {
+      "Route": "3rdpartylicenses.ajy2hkq1ho.txt.gz",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\eii9wrvdqz-ajy2hkq1ho.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "4860"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/plain"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"BbnlGosDNPAoMN8Q2FxnF/QsoSQAxEQZjx0o070ZVb4=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "ajy2hkq1ho"
+        },
+        {
+          "Name": "label",
+          "Value": "3rdpartylicenses.txt.gz"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-BbnlGosDNPAoMN8Q2FxnF/QsoSQAxEQZjx0o070ZVb4="
+        }
+      ]
+    },
+    {
+      "Route": "3rdpartylicenses.txt",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\eii9wrvdqz-ajy2hkq1ho.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000205718988"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "4860"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"BbnlGosDNPAoMN8Q2FxnF/QsoSQAxEQZjx0o070ZVb4=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/plain"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"qoPuZCUhPC6pKuBbBKRBsdf9YAUIf1jQ3lN5Q4JsESs=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-qoPuZCUhPC6pKuBbBKRBsdf9YAUIf1jQ3lN5Q4JsESs="
+        }
+      ]
+    },
+    {
+      "Route": "3rdpartylicenses.txt",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\3rdpartylicenses.txt",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "18173"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/plain"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"qoPuZCUhPC6pKuBbBKRBsdf9YAUIf1jQ3lN5Q4JsESs=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-qoPuZCUhPC6pKuBbBKRBsdf9YAUIf1jQ3lN5Q4JsESs="
+        }
+      ]
+    },
+    {
+      "Route": "3rdpartylicenses.txt.gz",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\eii9wrvdqz-ajy2hkq1ho.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "4860"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/plain"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"BbnlGosDNPAoMN8Q2FxnF/QsoSQAxEQZjx0o070ZVb4=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-BbnlGosDNPAoMN8Q2FxnF/QsoSQAxEQZjx0o070ZVb4="
+        }
+      ]
+    },
+    {
+      "Route": "browser/favicon.ico",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\1ngl2q34h2-vagikyz9qx.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000235682300"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "4242"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"NR1FQBEucAvKbsWGsjKa7GDjwTNvmXgzs4TApstPfTA=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 09 Mar 2025 11:34:21 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/x-icon"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"+RAr6AKXwFKSB2B75Sd7T5C8qJ1lmI+hdxuRx4lOgV8=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-+RAr6AKXwFKSB2B75Sd7T5C8qJ1lmI+hdxuRx4lOgV8="
+        }
+      ]
+    },
+    {
+      "Route": "browser/favicon.ico",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\favicon.ico",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "15086"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/x-icon"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"+RAr6AKXwFKSB2B75Sd7T5C8qJ1lmI+hdxuRx4lOgV8=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 09 Mar 2025 11:34:21 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-+RAr6AKXwFKSB2B75Sd7T5C8qJ1lmI+hdxuRx4lOgV8="
+        }
+      ]
+    },
+    {
+      "Route": "browser/favicon.ico.gz",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\1ngl2q34h2-vagikyz9qx.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "4242"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/x-icon"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"NR1FQBEucAvKbsWGsjKa7GDjwTNvmXgzs4TApstPfTA=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 09 Mar 2025 11:34:21 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-NR1FQBEucAvKbsWGsjKa7GDjwTNvmXgzs4TApstPfTA="
+        }
+      ]
+    },
+    {
+      "Route": "browser/favicon.vagikyz9qx.ico",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\1ngl2q34h2-vagikyz9qx.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000235682300"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "4242"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"NR1FQBEucAvKbsWGsjKa7GDjwTNvmXgzs4TApstPfTA=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 09 Mar 2025 11:34:21 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/x-icon"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"+RAr6AKXwFKSB2B75Sd7T5C8qJ1lmI+hdxuRx4lOgV8=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "vagikyz9qx"
+        },
+        {
+          "Name": "label",
+          "Value": "browser/favicon.ico"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-+RAr6AKXwFKSB2B75Sd7T5C8qJ1lmI+hdxuRx4lOgV8="
+        }
+      ]
+    },
+    {
+      "Route": "browser/favicon.vagikyz9qx.ico",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\favicon.ico",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "15086"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/x-icon"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"+RAr6AKXwFKSB2B75Sd7T5C8qJ1lmI+hdxuRx4lOgV8=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 09 Mar 2025 11:34:21 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "vagikyz9qx"
+        },
+        {
+          "Name": "label",
+          "Value": "browser/favicon.ico"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-+RAr6AKXwFKSB2B75Sd7T5C8qJ1lmI+hdxuRx4lOgV8="
+        }
+      ]
+    },
+    {
+      "Route": "browser/favicon.vagikyz9qx.ico.gz",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\1ngl2q34h2-vagikyz9qx.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "4242"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/x-icon"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"NR1FQBEucAvKbsWGsjKa7GDjwTNvmXgzs4TApstPfTA=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 09 Mar 2025 11:34:21 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "vagikyz9qx"
+        },
+        {
+          "Name": "label",
+          "Value": "browser/favicon.ico.gz"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-NR1FQBEucAvKbsWGsjKa7GDjwTNvmXgzs4TApstPfTA="
+        }
+      ]
+    },
+    {
+      "Route": "browser/index.html",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\d8nf5f42f4-w7qwo5wg31.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.003105590062"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "321"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"IabqgytbcO46C+mnK/ild/24A/sR+jjKRUtbcgPZ+Jc=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/html"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"RGefY+HJhknmzGdkkNLrv5/pAMXch+8Qdi14mZF02Mk=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-RGefY+HJhknmzGdkkNLrv5/pAMXch+8Qdi14mZF02Mk="
+        }
+      ]
+    },
+    {
+      "Route": "browser/index.html",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\index.html",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "508"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/html"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"RGefY+HJhknmzGdkkNLrv5/pAMXch+8Qdi14mZF02Mk=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-RGefY+HJhknmzGdkkNLrv5/pAMXch+8Qdi14mZF02Mk="
+        }
+      ]
+    },
+    {
+      "Route": "browser/index.html.gz",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\d8nf5f42f4-w7qwo5wg31.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "321"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/html"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"IabqgytbcO46C+mnK/ild/24A/sR+jjKRUtbcgPZ+Jc=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-IabqgytbcO46C+mnK/ild/24A/sR+jjKRUtbcgPZ+Jc="
+        }
+      ]
+    },
+    {
+      "Route": "browser/index.w7qwo5wg31.html",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\d8nf5f42f4-w7qwo5wg31.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.003105590062"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "321"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"IabqgytbcO46C+mnK/ild/24A/sR+jjKRUtbcgPZ+Jc=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/html"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"RGefY+HJhknmzGdkkNLrv5/pAMXch+8Qdi14mZF02Mk=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "w7qwo5wg31"
+        },
+        {
+          "Name": "label",
+          "Value": "browser/index.html"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-RGefY+HJhknmzGdkkNLrv5/pAMXch+8Qdi14mZF02Mk="
+        }
+      ]
+    },
+    {
+      "Route": "browser/index.w7qwo5wg31.html",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\index.html",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "508"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/html"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"RGefY+HJhknmzGdkkNLrv5/pAMXch+8Qdi14mZF02Mk=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "w7qwo5wg31"
+        },
+        {
+          "Name": "label",
+          "Value": "browser/index.html"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-RGefY+HJhknmzGdkkNLrv5/pAMXch+8Qdi14mZF02Mk="
+        }
+      ]
+    },
+    {
+      "Route": "browser/index.w7qwo5wg31.html.gz",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\d8nf5f42f4-w7qwo5wg31.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "321"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/html"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"IabqgytbcO46C+mnK/ild/24A/sR+jjKRUtbcgPZ+Jc=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "w7qwo5wg31"
+        },
+        {
+          "Name": "label",
+          "Value": "browser/index.html.gz"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-IabqgytbcO46C+mnK/ild/24A/sR+jjKRUtbcgPZ+Jc="
+        }
+      ]
+    },
+    {
+      "Route": "browser/main-AKNCFTCO.js",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\8htsaytp00-okboh3mxq3.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000014305538"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "69902"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"90NKpztnNjb9CIuh0fZFOHSG/6wxgK2qdbYFyVOExas=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"mI3s7Z3fVoYgRwlWKsfnd3qzp9bs6EMfiVxl/Bs2iK8=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-mI3s7Z3fVoYgRwlWKsfnd3qzp9bs6EMfiVxl/Bs2iK8="
+        }
+      ]
+    },
+    {
+      "Route": "browser/main-AKNCFTCO.js",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\main-AKNCFTCO.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "233064"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"mI3s7Z3fVoYgRwlWKsfnd3qzp9bs6EMfiVxl/Bs2iK8=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-mI3s7Z3fVoYgRwlWKsfnd3qzp9bs6EMfiVxl/Bs2iK8="
+        }
+      ]
+    },
+    {
+      "Route": "browser/main-AKNCFTCO.js.gz",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\8htsaytp00-okboh3mxq3.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "69902"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"90NKpztnNjb9CIuh0fZFOHSG/6wxgK2qdbYFyVOExas=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-90NKpztnNjb9CIuh0fZFOHSG/6wxgK2qdbYFyVOExas="
+        }
+      ]
+    },
+    {
+      "Route": "browser/main-AKNCFTCO.okboh3mxq3.js",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\8htsaytp00-okboh3mxq3.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000014305538"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "69902"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"90NKpztnNjb9CIuh0fZFOHSG/6wxgK2qdbYFyVOExas=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"mI3s7Z3fVoYgRwlWKsfnd3qzp9bs6EMfiVxl/Bs2iK8=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "okboh3mxq3"
+        },
+        {
+          "Name": "label",
+          "Value": "browser/main-AKNCFTCO.js"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-mI3s7Z3fVoYgRwlWKsfnd3qzp9bs6EMfiVxl/Bs2iK8="
+        }
+      ]
+    },
+    {
+      "Route": "browser/main-AKNCFTCO.okboh3mxq3.js",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\main-AKNCFTCO.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "233064"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"mI3s7Z3fVoYgRwlWKsfnd3qzp9bs6EMfiVxl/Bs2iK8=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "okboh3mxq3"
+        },
+        {
+          "Name": "label",
+          "Value": "browser/main-AKNCFTCO.js"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-mI3s7Z3fVoYgRwlWKsfnd3qzp9bs6EMfiVxl/Bs2iK8="
+        }
+      ]
+    },
+    {
+      "Route": "browser/main-AKNCFTCO.okboh3mxq3.js.gz",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\8htsaytp00-okboh3mxq3.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "69902"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"90NKpztnNjb9CIuh0fZFOHSG/6wxgK2qdbYFyVOExas=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "okboh3mxq3"
+        },
+        {
+          "Name": "label",
+          "Value": "browser/main-AKNCFTCO.js.gz"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-90NKpztnNjb9CIuh0fZFOHSG/6wxgK2qdbYFyVOExas="
+        }
+      ]
+    },
+    {
+      "Route": "browser/polyfills-FFHMD2TL.39tegmrjtp.js",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\z1vsfhzk52-39tegmrjtp.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000080580177"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "12409"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"RaqgnGK2lZB0zOrqtAiqrts0bpDxpLDmecAXRRXDm5o=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"adzqBFZD3Q3pmKPNDMu7RrRr/yZRqHpWxzwo6yCOj5g=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "39tegmrjtp"
+        },
+        {
+          "Name": "label",
+          "Value": "browser/polyfills-FFHMD2TL.js"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-adzqBFZD3Q3pmKPNDMu7RrRr/yZRqHpWxzwo6yCOj5g="
+        }
+      ]
+    },
+    {
+      "Route": "browser/polyfills-FFHMD2TL.39tegmrjtp.js",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\polyfills-FFHMD2TL.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "34519"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"adzqBFZD3Q3pmKPNDMu7RrRr/yZRqHpWxzwo6yCOj5g=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "39tegmrjtp"
+        },
+        {
+          "Name": "label",
+          "Value": "browser/polyfills-FFHMD2TL.js"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-adzqBFZD3Q3pmKPNDMu7RrRr/yZRqHpWxzwo6yCOj5g="
+        }
+      ]
+    },
+    {
+      "Route": "browser/polyfills-FFHMD2TL.39tegmrjtp.js.gz",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\z1vsfhzk52-39tegmrjtp.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "12409"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"RaqgnGK2lZB0zOrqtAiqrts0bpDxpLDmecAXRRXDm5o=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "39tegmrjtp"
+        },
+        {
+          "Name": "label",
+          "Value": "browser/polyfills-FFHMD2TL.js.gz"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-RaqgnGK2lZB0zOrqtAiqrts0bpDxpLDmecAXRRXDm5o="
+        }
+      ]
+    },
+    {
+      "Route": "browser/polyfills-FFHMD2TL.js",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\z1vsfhzk52-39tegmrjtp.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000080580177"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "12409"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"RaqgnGK2lZB0zOrqtAiqrts0bpDxpLDmecAXRRXDm5o=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"adzqBFZD3Q3pmKPNDMu7RrRr/yZRqHpWxzwo6yCOj5g=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-adzqBFZD3Q3pmKPNDMu7RrRr/yZRqHpWxzwo6yCOj5g="
+        }
+      ]
+    },
+    {
+      "Route": "browser/polyfills-FFHMD2TL.js",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\polyfills-FFHMD2TL.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "34519"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"adzqBFZD3Q3pmKPNDMu7RrRr/yZRqHpWxzwo6yCOj5g=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-adzqBFZD3Q3pmKPNDMu7RrRr/yZRqHpWxzwo6yCOj5g="
+        }
+      ]
+    },
+    {
+      "Route": "browser/polyfills-FFHMD2TL.js.gz",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\z1vsfhzk52-39tegmrjtp.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "12409"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"RaqgnGK2lZB0zOrqtAiqrts0bpDxpLDmecAXRRXDm5o=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-RaqgnGK2lZB0zOrqtAiqrts0bpDxpLDmecAXRRXDm5o="
+        }
+      ]
+    },
+    {
+      "Route": "browser/styles-5INURTSO.5ipweew5fc.css",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\q3znocrbd8-5ipweew5fc.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "1.000000000000"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "0"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "5ipweew5fc"
+        },
+        {
+          "Name": "label",
+          "Value": "browser/styles-5INURTSO.css"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU="
+        }
+      ]
+    },
+    {
+      "Route": "browser/styles-5INURTSO.5ipweew5fc.css",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\styles-5INURTSO.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "0"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "5ipweew5fc"
+        },
+        {
+          "Name": "label",
+          "Value": "browser/styles-5INURTSO.css"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU="
+        }
+      ]
+    },
+    {
+      "Route": "browser/styles-5INURTSO.5ipweew5fc.css.gz",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\q3znocrbd8-5ipweew5fc.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "0"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "5ipweew5fc"
+        },
+        {
+          "Name": "label",
+          "Value": "browser/styles-5INURTSO.css.gz"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU="
+        }
+      ]
+    },
+    {
+      "Route": "browser/styles-5INURTSO.css",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\q3znocrbd8-5ipweew5fc.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "1.000000000000"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "0"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU="
+        }
+      ]
+    },
+    {
+      "Route": "browser/styles-5INURTSO.css",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\styles-5INURTSO.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "0"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU="
+        }
+      ]
+    },
+    {
+      "Route": "browser/styles-5INURTSO.css.gz",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\q3znocrbd8-5ipweew5fc.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "0"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU="
+        }
+      ]
+    },
+    {
+      "Route": "prerendered-routes.json",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\xsxb1ff2s8-tvy3j3n584.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.025641025641"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "38"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"/rMhsS1OzHDccjKmgNwxzRIpevRcg7dA1xD1YeDF6yw=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/json"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"p53cyKEVGQ6cGUee02kUdBp9HbdPChFTUp78gHJVBf4=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-p53cyKEVGQ6cGUee02kUdBp9HbdPChFTUp78gHJVBf4="
+        }
+      ]
+    },
+    {
+      "Route": "prerendered-routes.json",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\prerendered-routes.json",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "18"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/json"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"p53cyKEVGQ6cGUee02kUdBp9HbdPChFTUp78gHJVBf4=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-p53cyKEVGQ6cGUee02kUdBp9HbdPChFTUp78gHJVBf4="
+        }
+      ]
+    },
+    {
+      "Route": "prerendered-routes.json.gz",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\xsxb1ff2s8-tvy3j3n584.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "38"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/json"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"/rMhsS1OzHDccjKmgNwxzRIpevRcg7dA1xD1YeDF6yw=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-/rMhsS1OzHDccjKmgNwxzRIpevRcg7dA1xD1YeDF6yw="
+        }
+      ]
+    },
+    {
+      "Route": "prerendered-routes.tvy3j3n584.json",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\xsxb1ff2s8-tvy3j3n584.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.025641025641"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "38"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"/rMhsS1OzHDccjKmgNwxzRIpevRcg7dA1xD1YeDF6yw=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/json"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"p53cyKEVGQ6cGUee02kUdBp9HbdPChFTUp78gHJVBf4=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "tvy3j3n584"
+        },
+        {
+          "Name": "label",
+          "Value": "prerendered-routes.json"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-p53cyKEVGQ6cGUee02kUdBp9HbdPChFTUp78gHJVBf4="
+        }
+      ]
+    },
+    {
+      "Route": "prerendered-routes.tvy3j3n584.json",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\prerendered-routes.json",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "18"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/json"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"p53cyKEVGQ6cGUee02kUdBp9HbdPChFTUp78gHJVBf4=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "tvy3j3n584"
+        },
+        {
+          "Name": "label",
+          "Value": "prerendered-routes.json"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-p53cyKEVGQ6cGUee02kUdBp9HbdPChFTUp78gHJVBf4="
+        }
+      ]
+    },
+    {
+      "Route": "prerendered-routes.tvy3j3n584.json.gz",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\xsxb1ff2s8-tvy3j3n584.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "38"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/json"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"/rMhsS1OzHDccjKmgNwxzRIpevRcg7dA1xD1YeDF6yw=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "tvy3j3n584"
+        },
+        {
+          "Name": "label",
+          "Value": "prerendered-routes.json.gz"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-/rMhsS1OzHDccjKmgNwxzRIpevRcg7dA1xD1YeDF6yw="
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+C:\Dan\Git\CloudMediaPlayer\cloudmediaplayer.client\obj\Debug\cloudmediaplayer.client.esproj.CoreCompileInputs.cache

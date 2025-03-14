@@ -1,0 +1,53 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\3rdpartylicenses.txt",
+      "PackagePath": "staticwebassets\\3rdpartylicenses.txt"
+    },
+    {
+      "Id": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\favicon.ico",
+      "PackagePath": "staticwebassets\\browser\\favicon.ico"
+    },
+    {
+      "Id": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\index.html",
+      "PackagePath": "staticwebassets\\browser\\index.html"
+    },
+    {
+      "Id": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\main-AKNCFTCO.js",
+      "PackagePath": "staticwebassets\\browser\\main-AKNCFTCO.js"
+    },
+    {
+      "Id": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\polyfills-FFHMD2TL.js",
+      "PackagePath": "staticwebassets\\browser\\polyfills-FFHMD2TL.js"
+    },
+    {
+      "Id": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\styles-5INURTSO.css",
+      "PackagePath": "staticwebassets\\browser\\styles-5INURTSO.css"
+    },
+    {
+      "Id": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\prerendered-routes.json",
+      "PackagePath": "staticwebassets\\prerendered-routes.json"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.CloudMediaPlayer.Server.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.CloudMediaPlayer.Server.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.build.CloudMediaPlayer.Server.props",
+      "PackagePath": "build\\CloudMediaPlayer.Server.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.buildMultiTargeting.CloudMediaPlayer.Server.props",
+      "PackagePath": "buildMultiTargeting\\CloudMediaPlayer.Server.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.buildTransitive.CloudMediaPlayer.Server.props",
+      "PackagePath": "buildTransitive\\CloudMediaPlayer.Server.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

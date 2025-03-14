@@ -1,0 +1,14 @@
+C:\Dan\Git\CloudMediaPlayer\CloudMediaPlayer.Server\wwwroot\browser\favicon.ico
+C:\Dan\Git\CloudMediaPlayer\CloudMediaPlayer.Server\wwwroot\browser\main-AKNCFTCO.js
+C:\Dan\Git\CloudMediaPlayer\CloudMediaPlayer.Server\wwwroot\browser\index.html
+C:\Dan\Git\CloudMediaPlayer\CloudMediaPlayer.Server\wwwroot\3rdpartylicenses.txt
+C:\Dan\Git\CloudMediaPlayer\CloudMediaPlayer.Server\wwwroot\browser\styles-5INURTSO.css
+C:\Dan\Git\CloudMediaPlayer\CloudMediaPlayer.Server\wwwroot\prerendered-routes.json
+C:\Dan\Git\CloudMediaPlayer\CloudMediaPlayer.Server\wwwroot\browser\polyfills-FFHMD2TL.js
+wwwroot\3rdpartylicenses.txt
+wwwroot\browser\favicon.ico
+wwwroot\browser\index.html
+wwwroot\browser\main-AKNCFTCO.js
+wwwroot\browser\polyfills-FFHMD2TL.js
+wwwroot\browser\styles-5INURTSO.css
+wwwroot\prerendered-routes.json

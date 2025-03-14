@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35825.156 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "cloudmediaplayer.client", "cloudmediaplayer.client\cloudmediaplayer.client.esproj", "{C2F74440-36B9-94A0-6270-8E5695794A8A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudMediaPlayer.Server", "CloudMediaPlayer.Server\CloudMediaPlayer.Server.csproj", "{1826D633-87BD-403F-B7A9-7564DB171146}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C2F74440-36B9-94A0-6270-8E5695794A8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2F74440-36B9-94A0-6270-8E5695794A8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2F74440-36B9-94A0-6270-8E5695794A8A}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{C2F74440-36B9-94A0-6270-8E5695794A8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2F74440-36B9-94A0-6270-8E5695794A8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2F74440-36B9-94A0-6270-8E5695794A8A}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{1826D633-87BD-403F-B7A9-7564DB171146}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1826D633-87BD-403F-B7A9-7564DB171146}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1826D633-87BD-403F-B7A9-7564DB171146}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1826D633-87BD-403F-B7A9-7564DB171146}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DB07DC60-E0B6-4655-85AC-8B8F8814E49F}
+	EndGlobalSection
+EndGlobal
