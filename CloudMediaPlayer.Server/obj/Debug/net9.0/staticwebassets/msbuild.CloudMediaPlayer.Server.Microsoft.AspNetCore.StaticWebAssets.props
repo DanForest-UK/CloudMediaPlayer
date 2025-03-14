@@ -48,29 +48,29 @@
       <RelatedAsset></RelatedAsset>
       <AssetTraitName></AssetTraitName>
       <AssetTraitValue></AssetTraitValue>
-      <Fingerprint>w7qwo5wg31</Fingerprint>
-      <Integrity>RGefY+HJhknmzGdkkNLrv5/pAMXch+8Qdi14mZF02Mk=</Integrity>
+      <Fingerprint>3dvlj64jct</Fingerprint>
+      <Integrity>B13x9H3sNxVe6KBro7XBXVQkD3A3K3onqBjP6r/vgzw=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\browser\index.html'))</OriginalItemSpec>
     </StaticWebAsset>
-    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\browser\main-AKNCFTCO.js'))">
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\browser\main-ICAVKCLM.js'))">
       <SourceType>Package</SourceType>
       <SourceId>CloudMediaPlayer.Server</SourceId>
       <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
       <BasePath>_content/CloudMediaPlayer.Server</BasePath>
-      <RelativePath>browser/main-AKNCFTCO.js</RelativePath>
+      <RelativePath>browser/main-ICAVKCLM.js</RelativePath>
       <AssetKind>All</AssetKind>
       <AssetMode>All</AssetMode>
       <AssetRole>Primary</AssetRole>
       <RelatedAsset></RelatedAsset>
       <AssetTraitName></AssetTraitName>
       <AssetTraitValue></AssetTraitValue>
-      <Fingerprint>okboh3mxq3</Fingerprint>
-      <Integrity>mI3s7Z3fVoYgRwlWKsfnd3qzp9bs6EMfiVxl/Bs2iK8=</Integrity>
+      <Fingerprint>3wjh49igpd</Fingerprint>
+      <Integrity>DRkNEMx5dgrYpipe5s4qt4lEwmiYitzaMzPvPMGf74E=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\browser\main-AKNCFTCO.js'))</OriginalItemSpec>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\browser\main-ICAVKCLM.js'))</OriginalItemSpec>
     </StaticWebAsset>
     <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\browser\polyfills-FFHMD2TL.js'))">
       <SourceType>Package</SourceType>

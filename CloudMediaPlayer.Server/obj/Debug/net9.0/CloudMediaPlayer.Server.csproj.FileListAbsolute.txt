@@ -36,10 +36,11 @@ C:\Dan\Git\CloudMediaPlayer\CloudMediaPlayer.Server\obj\Debug\net9.0\CloudMediaP
 C:\Dan\Git\CloudMediaPlayer\CloudMediaPlayer.Server\obj\Debug\net9.0\CloudMediaPlayer.Server.genruntimeconfig.cache
 C:\Dan\Git\CloudMediaPlayer\CloudMediaPlayer.Server\obj\Debug\net9.0\ref\CloudMediaPlayer.Server.dll
 C:\Dan\Git\CloudMediaPlayer\CloudMediaPlayer.Server\bin\Debug\net9.0\CloudMediaPlayer.Server.staticwebassets.runtime.json
+C:\Dan\Git\CloudMediaPlayer\CloudMediaPlayer.Server\obj\Debug\net9.0\CloudMediaPlayer.Server.sourcelink.json
 C:\Dan\Git\CloudMediaPlayer\CloudMediaPlayer.Server\obj\Debug\net9.0\compressed\eii9wrvdqz-ajy2hkq1ho.gz
 C:\Dan\Git\CloudMediaPlayer\CloudMediaPlayer.Server\obj\Debug\net9.0\compressed\1ngl2q34h2-vagikyz9qx.gz
-C:\Dan\Git\CloudMediaPlayer\CloudMediaPlayer.Server\obj\Debug\net9.0\compressed\d8nf5f42f4-w7qwo5wg31.gz
-C:\Dan\Git\CloudMediaPlayer\CloudMediaPlayer.Server\obj\Debug\net9.0\compressed\8htsaytp00-okboh3mxq3.gz
+C:\Dan\Git\CloudMediaPlayer\CloudMediaPlayer.Server\obj\Debug\net9.0\compressed\d8nf5f42f4-3dvlj64jct.gz
+C:\Dan\Git\CloudMediaPlayer\CloudMediaPlayer.Server\obj\Debug\net9.0\compressed\zrltuo7b5t-3wjh49igpd.gz
 C:\Dan\Git\CloudMediaPlayer\CloudMediaPlayer.Server\obj\Debug\net9.0\compressed\z1vsfhzk52-39tegmrjtp.gz
 C:\Dan\Git\CloudMediaPlayer\CloudMediaPlayer.Server\obj\Debug\net9.0\compressed\q3znocrbd8-5ipweew5fc.gz
 C:\Dan\Git\CloudMediaPlayer\CloudMediaPlayer.Server\obj\Debug\net9.0\compressed\xsxb1ff2s8-tvy3j3n584.gz

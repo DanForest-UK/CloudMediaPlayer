@@ -3,6 +3,46 @@
   "WorkspaceRootPath": "C:\\Dan\\Git\\CloudMediaPlayer\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{C2F74440-36B9-94A0-6270-8E5695794A8A}|cloudmediaplayer.client\\cloudmediaplayer.client.esproj|c:\\dan\\git\\cloudmediaplayer\\cloudmediaplayer.client\\src\\app\\app.module.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{C2F74440-36B9-94A0-6270-8E5695794A8A}|cloudmediaplayer.client\\cloudmediaplayer.client.esproj|solutionrelative:cloudmediaplayer.client\\src\\app\\app.module.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C2F74440-36B9-94A0-6270-8E5695794A8A}|cloudmediaplayer.client\\cloudmediaplayer.client.esproj|c:\\dan\\git\\cloudmediaplayer\\cloudmediaplayer.client\\src\\app\\app.component.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{C2F74440-36B9-94A0-6270-8E5695794A8A}|cloudmediaplayer.client\\cloudmediaplayer.client.esproj|solutionrelative:cloudmediaplayer.client\\src\\app\\app.component.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C2F74440-36B9-94A0-6270-8E5695794A8A}|cloudmediaplayer.client\\cloudmediaplayer.client.esproj|c:\\dan\\git\\cloudmediaplayer\\cloudmediaplayer.client\\src\\app\\app.component.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{C2F74440-36B9-94A0-6270-8E5695794A8A}|cloudmediaplayer.client\\cloudmediaplayer.client.esproj|solutionrelative:cloudmediaplayer.client\\src\\app\\app.component.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C2F74440-36B9-94A0-6270-8E5695794A8A}|cloudmediaplayer.client\\cloudmediaplayer.client.esproj|c:\\dan\\git\\cloudmediaplayer\\cloudmediaplayer.client\\src\\app\\app.component.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{C2F74440-36B9-94A0-6270-8E5695794A8A}|cloudmediaplayer.client\\cloudmediaplayer.client.esproj|solutionrelative:cloudmediaplayer.client\\src\\app\\app.component.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C2F74440-36B9-94A0-6270-8E5695794A8A}|cloudmediaplayer.client\\cloudmediaplayer.client.esproj|c:\\dan\\git\\cloudmediaplayer\\cloudmediaplayer.client\\src\\app\\media-player\\media-player.component.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{C2F74440-36B9-94A0-6270-8E5695794A8A}|cloudmediaplayer.client\\cloudmediaplayer.client.esproj|solutionrelative:cloudmediaplayer.client\\src\\app\\media-player\\media-player.component.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C2F74440-36B9-94A0-6270-8E5695794A8A}|cloudmediaplayer.client\\cloudmediaplayer.client.esproj|c:\\dan\\git\\cloudmediaplayer\\cloudmediaplayer.client\\src\\app\\media-player\\media-player.component.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{C2F74440-36B9-94A0-6270-8E5695794A8A}|cloudmediaplayer.client\\cloudmediaplayer.client.esproj|solutionrelative:cloudmediaplayer.client\\src\\app\\media-player\\media-player.component.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C2F74440-36B9-94A0-6270-8E5695794A8A}|cloudmediaplayer.client\\cloudmediaplayer.client.esproj|c:\\dan\\git\\cloudmediaplayer\\cloudmediaplayer.client\\src\\app\\media-player\\media-player.component.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{C2F74440-36B9-94A0-6270-8E5695794A8A}|cloudmediaplayer.client\\cloudmediaplayer.client.esproj|solutionrelative:cloudmediaplayer.client\\src\\app\\media-player\\media-player.component.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C2F74440-36B9-94A0-6270-8E5695794A8A}|cloudmediaplayer.client\\cloudmediaplayer.client.esproj|c:\\dan\\git\\cloudmediaplayer\\cloudmediaplayer.client\\src\\app\\app-routing.module.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{C2F74440-36B9-94A0-6270-8E5695794A8A}|cloudmediaplayer.client\\cloudmediaplayer.client.esproj|solutionrelative:cloudmediaplayer.client\\src\\app\\app-routing.module.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1826D633-87BD-403F-B7A9-7564DB171146}|CloudMediaPlayer.Server\\CloudMediaPlayer.Server.csproj|c:\\dan\\git\\cloudmediaplayer\\cloudmediaplayer.server\\controllers\\weatherforecastcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1826D633-87BD-403F-B7A9-7564DB171146}|CloudMediaPlayer.Server\\CloudMediaPlayer.Server.csproj|solutionrelative:cloudmediaplayer.server\\controllers\\weatherforecastcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1826D633-87BD-403F-B7A9-7564DB171146}|CloudMediaPlayer.Server\\CloudMediaPlayer.Server.csproj|c:\\dan\\git\\cloudmediaplayer\\cloudmediaplayer.server\\weatherforecast.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1826D633-87BD-403F-B7A9-7564DB171146}|CloudMediaPlayer.Server\\CloudMediaPlayer.Server.csproj|solutionrelative:cloudmediaplayer.server\\weatherforecast.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{C2F74440-36B9-94A0-6270-8E5695794A8A}|cloudmediaplayer.client\\cloudmediaplayer.client.esproj|c:\\dan\\git\\cloudmediaplayer\\cloudmediaplayer.client\\angular.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{C2F74440-36B9-94A0-6270-8E5695794A8A}|cloudmediaplayer.client\\cloudmediaplayer.client.esproj|solutionrelative:cloudmediaplayer.client\\angular.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
@@ -26,24 +66,144 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 7,
           "Children": [
             {
               "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "app.component.css",
+              "DocumentMoniker": "C:\\Dan\\Git\\CloudMediaPlayer\\cloudmediaplayer.client\\src\\app\\app.component.css",
+              "RelativeDocumentMoniker": "cloudmediaplayer.client\\src\\app\\app.component.css",
+              "ToolTip": "C:\\Dan\\Git\\CloudMediaPlayer\\cloudmediaplayer.client\\src\\app\\app.component.css",
+              "RelativeToolTip": "cloudmediaplayer.client\\src\\app\\app.component.css",
+              "ViewState": "AgIAABwAAAAAAAAAAAAAwDYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-03-14T09:01:39.866Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "app.component.html",
+              "DocumentMoniker": "C:\\Dan\\Git\\CloudMediaPlayer\\cloudmediaplayer.client\\src\\app\\app.component.html",
+              "RelativeDocumentMoniker": "cloudmediaplayer.client\\src\\app\\app.component.html",
+              "ToolTip": "C:\\Dan\\Git\\CloudMediaPlayer\\cloudmediaplayer.client\\src\\app\\app.component.html",
+              "RelativeToolTip": "cloudmediaplayer.client\\src\\app\\app.component.html",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAAwCYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2025-03-14T09:01:27.301Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "app-routing.module.ts",
+              "DocumentMoniker": "C:\\Dan\\Git\\CloudMediaPlayer\\cloudmediaplayer.client\\src\\app\\app-routing.module.ts",
+              "RelativeDocumentMoniker": "cloudmediaplayer.client\\src\\app\\app-routing.module.ts",
+              "ToolTip": "C:\\Dan\\Git\\CloudMediaPlayer\\cloudmediaplayer.client\\src\\app\\app-routing.module.ts",
+              "RelativeToolTip": "cloudmediaplayer.client\\src\\app\\app-routing.module.ts",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2025-03-14T08:59:59.339Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "media-player.component.css",
+              "DocumentMoniker": "C:\\Dan\\Git\\CloudMediaPlayer\\cloudmediaplayer.client\\src\\app\\media-player\\media-player.component.css",
+              "RelativeDocumentMoniker": "cloudmediaplayer.client\\src\\app\\media-player\\media-player.component.css",
+              "ToolTip": "C:\\Dan\\Git\\CloudMediaPlayer\\cloudmediaplayer.client\\src\\app\\media-player\\media-player.component.css",
+              "RelativeToolTip": "cloudmediaplayer.client\\src\\app\\media-player\\media-player.component.css",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAAwB8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-03-14T08:59:45.246Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "media-player.component.html",
+              "DocumentMoniker": "C:\\Dan\\Git\\CloudMediaPlayer\\cloudmediaplayer.client\\src\\app\\media-player\\media-player.component.html",
+              "RelativeDocumentMoniker": "cloudmediaplayer.client\\src\\app\\media-player\\media-player.component.html",
+              "ToolTip": "C:\\Dan\\Git\\CloudMediaPlayer\\cloudmediaplayer.client\\src\\app\\media-player\\media-player.component.html",
+              "RelativeToolTip": "cloudmediaplayer.client\\src\\app\\media-player\\media-player.component.html",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2025-03-14T08:56:27.594Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "media-player.component.ts",
+              "DocumentMoniker": "C:\\Dan\\Git\\CloudMediaPlayer\\cloudmediaplayer.client\\src\\app\\media-player\\media-player.component.ts",
+              "RelativeDocumentMoniker": "cloudmediaplayer.client\\src\\app\\media-player\\media-player.component.ts",
+              "ToolTip": "C:\\Dan\\Git\\CloudMediaPlayer\\cloudmediaplayer.client\\src\\app\\media-player\\media-player.component.ts",
+              "RelativeToolTip": "cloudmediaplayer.client\\src\\app\\media-player\\media-player.component.ts",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2025-03-14T08:55:26.851Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "app.component.ts",
+              "DocumentMoniker": "C:\\Dan\\Git\\CloudMediaPlayer\\cloudmediaplayer.client\\src\\app\\app.component.ts",
+              "RelativeDocumentMoniker": "cloudmediaplayer.client\\src\\app\\app.component.ts",
+              "ToolTip": "C:\\Dan\\Git\\CloudMediaPlayer\\cloudmediaplayer.client\\src\\app\\app.component.ts",
+              "RelativeToolTip": "cloudmediaplayer.client\\src\\app\\app.component.ts",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2025-03-14T08:47:33.405Z"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "app.module.ts",
+              "DocumentMoniker": "C:\\Dan\\Git\\CloudMediaPlayer\\cloudmediaplayer.client\\src\\app\\app.module.ts",
+              "RelativeDocumentMoniker": "cloudmediaplayer.client\\src\\app\\app.module.ts",
+              "ToolTip": "C:\\Dan\\Git\\CloudMediaPlayer\\cloudmediaplayer.client\\src\\app\\app.module.ts",
+              "RelativeToolTip": "cloudmediaplayer.client\\src\\app\\app.module.ts",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2025-03-14T08:47:17.706Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "WeatherForecastController.cs",
+              "DocumentMoniker": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\Controllers\\WeatherForecastController.cs",
+              "RelativeDocumentMoniker": "CloudMediaPlayer.Server\\Controllers\\WeatherForecastController.cs",
+              "ToolTip": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\Controllers\\WeatherForecastController.cs",
+              "RelativeToolTip": "CloudMediaPlayer.Server\\Controllers\\WeatherForecastController.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-14T08:44:31.581Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "WeatherForecast.cs",
+              "DocumentMoniker": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\WeatherForecast.cs",
+              "RelativeDocumentMoniker": "CloudMediaPlayer.Server\\WeatherForecast.cs",
+              "ToolTip": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\WeatherForecast.cs",
+              "RelativeToolTip": "CloudMediaPlayer.Server\\WeatherForecast.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-14T08:44:22.422Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
               "Title": "angular.json",
               "DocumentMoniker": "C:\\Dan\\Git\\CloudMediaPlayer\\cloudmediaplayer.client\\angular.json",
               "RelativeDocumentMoniker": "cloudmediaplayer.client\\angular.json",
               "ToolTip": "C:\\Dan\\Git\\CloudMediaPlayer\\cloudmediaplayer.client\\angular.json",
               "RelativeToolTip": "cloudmediaplayer.client\\angular.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAG8AAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAC0AAAAAAAAAAAAAAG8AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-03-14T08:20:11.856Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-14T08:20:11.856Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 11,
               "Title": "main.ts",
               "DocumentMoniker": "C:\\Dan\\Git\\CloudMediaPlayer\\cloudmediaplayer.client\\src\\main.ts",
               "RelativeDocumentMoniker": "cloudmediaplayer.client\\src\\main.ts",
@@ -51,12 +211,11 @@
               "RelativeToolTip": "cloudmediaplayer.client\\src\\main.ts",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2025-03-14T08:13:04.835Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-14T08:13:04.835Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 12,
               "Title": "index.html",
               "DocumentMoniker": "C:\\Dan\\Git\\CloudMediaPlayer\\cloudmediaplayer.client\\src\\index.html",
               "RelativeDocumentMoniker": "cloudmediaplayer.client\\src\\index.html",
@@ -64,12 +223,11 @@
               "RelativeToolTip": "cloudmediaplayer.client\\src\\index.html",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
-              "WhenOpened": "2025-03-14T08:12:33.802Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-14T08:12:33.802Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 13,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\Program.cs",
               "RelativeDocumentMoniker": "CloudMediaPlayer.Server\\Program.cs",
@@ -77,8 +235,7 @@
               "RelativeToolTip": "CloudMediaPlayer.Server\\Program.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAABIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-14T08:12:17.932Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-14T08:12:17.932Z"
             }
           ]
         }

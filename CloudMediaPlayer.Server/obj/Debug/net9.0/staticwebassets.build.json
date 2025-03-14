@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "lihi/lyySyBQ7wBRTL6CJ2v/jPT64CAamA3dIR2Kbms=",
+  "Hash": "nAxQ+ku6zcJSbI9uAYA7CMEDF0IyQspWYkoRnOBlgNU=",
   "Source": "CloudMediaPlayer.Server",
   "BasePath": "_content/CloudMediaPlayer.Server",
   "Mode": "Default",
@@ -50,33 +50,12 @@
       "OriginalItemSpec": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\favicon.ico"
     },
     {
-      "Identity": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\8htsaytp00-okboh3mxq3.gz",
+      "Identity": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\d8nf5f42f4-3dvlj64jct.gz",
       "SourceId": "CloudMediaPlayer.Server",
       "SourceType": "Discovered",
       "ContentRoot": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\",
       "BasePath": "_content/CloudMediaPlayer.Server",
-      "RelativePath": "browser/main-AKNCFTCO#[.{fingerprint=okboh3mxq3}]?.js.gz",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Alternative",
-      "AssetMergeBehavior": "",
-      "AssetMergeSource": "",
-      "RelatedAsset": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\main-AKNCFTCO.js",
-      "AssetTraitName": "Content-Encoding",
-      "AssetTraitValue": "gzip",
-      "Fingerprint": "x6h0dyfmvp",
-      "Integrity": "90NKpztnNjb9CIuh0fZFOHSG/6wxgK2qdbYFyVOExas=",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\main-AKNCFTCO.js"
-    },
-    {
-      "Identity": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\d8nf5f42f4-w7qwo5wg31.gz",
-      "SourceId": "CloudMediaPlayer.Server",
-      "SourceType": "Discovered",
-      "ContentRoot": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\",
-      "BasePath": "_content/CloudMediaPlayer.Server",
-      "RelativePath": "browser/index#[.{fingerprint=w7qwo5wg31}]?.html.gz",
+      "RelativePath": "browser/index#[.{fingerprint=3dvlj64jct}]?.html.gz",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Alternative",
@@ -85,8 +64,8 @@
       "RelatedAsset": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\index.html",
       "AssetTraitName": "Content-Encoding",
       "AssetTraitValue": "gzip",
-      "Fingerprint": "t9wbmqvvxv",
-      "Integrity": "IabqgytbcO46C+mnK/ild/24A/sR+jjKRUtbcgPZ+Jc=",
+      "Fingerprint": "l7235sa9wm",
+      "Integrity": "D92EAxs2TgmPesNYCAq+RkiMPN8nbVl6jgWFLQnPncw=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\index.html"
@@ -176,6 +155,27 @@
       "OriginalItemSpec": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\polyfills-FFHMD2TL.js"
     },
     {
+      "Identity": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\zrltuo7b5t-3wjh49igpd.gz",
+      "SourceId": "CloudMediaPlayer.Server",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\",
+      "BasePath": "_content/CloudMediaPlayer.Server",
+      "RelativePath": "browser/main-ICAVKCLM#[.{fingerprint=3wjh49igpd}]?.js.gz",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\main-ICAVKCLM.js",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "Fingerprint": "53sk4onqtr",
+      "Integrity": "MZ8ay3Yr8BhGwP2ZfruKenMwiIJbjreddfVenN5xyT4=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\main-ICAVKCLM.js"
+    },
+    {
       "Identity": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\3rdpartylicenses.txt",
       "SourceId": "CloudMediaPlayer.Server",
       "SourceType": "Discovered",
@@ -232,19 +232,19 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "w7qwo5wg31",
-      "Integrity": "RGefY+HJhknmzGdkkNLrv5/pAMXch+8Qdi14mZF02Mk=",
+      "Fingerprint": "3dvlj64jct",
+      "Integrity": "B13x9H3sNxVe6KBro7XBXVQkD3A3K3onqBjP6r/vgzw=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\browser\\index.html"
     },
     {
-      "Identity": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\main-AKNCFTCO.js",
+      "Identity": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\main-ICAVKCLM.js",
       "SourceId": "CloudMediaPlayer.Server",
       "SourceType": "Discovered",
       "ContentRoot": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\",
       "BasePath": "_content/CloudMediaPlayer.Server",
-      "RelativePath": "browser/main-AKNCFTCO#[.{fingerprint}]?.js",
+      "RelativePath": "browser/main-ICAVKCLM#[.{fingerprint}]?.js",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -253,11 +253,11 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "okboh3mxq3",
-      "Integrity": "mI3s7Z3fVoYgRwlWKsfnd3qzp9bs6EMfiVxl/Bs2iK8=",
+      "Fingerprint": "3wjh49igpd",
+      "Integrity": "DRkNEMx5dgrYpipe5s4qt4lEwmiYitzaMzPvPMGf74E=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\browser\\main-AKNCFTCO.js"
+      "OriginalItemSpec": "wwwroot\\browser\\main-ICAVKCLM.js"
     },
     {
       "Identity": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\polyfills-FFHMD2TL.js",
@@ -349,7 +349,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -410,7 +410,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -455,7 +455,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -510,7 +510,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -563,7 +563,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -600,7 +600,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -921,8 +921,8 @@
       ]
     },
     {
-      "Route": "browser/index.html",
-      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\d8nf5f42f4-w7qwo5wg31.gz",
+      "Route": "browser/index.3dvlj64jct.html",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\d8nf5f42f4-3dvlj64jct.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
@@ -941,15 +941,15 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"IabqgytbcO46C+mnK/ild/24A/sR+jjKRUtbcgPZ+Jc=\""
+          "Value": "\"D92EAxs2TgmPesNYCAq+RkiMPN8nbVl6jgWFLQnPncw=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
-          "Value": "no-cache"
+          "Value": "max-age=31536000, immutable"
         },
         {
           "Name": "Content-Encoding",
@@ -965,18 +965,26 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"RGefY+HJhknmzGdkkNLrv5/pAMXch+8Qdi14mZF02Mk=\""
+          "Value": "W/\"B13x9H3sNxVe6KBro7XBXVQkD3A3K3onqBjP6r/vgzw=\""
         }
       ],
       "EndpointProperties": [
         {
+          "Name": "fingerprint",
+          "Value": "3dvlj64jct"
+        },
+        {
+          "Name": "label",
+          "Value": "browser/index.html"
+        },
+        {
           "Name": "integrity",
-          "Value": "sha256-RGefY+HJhknmzGdkkNLrv5/pAMXch+8Qdi14mZF02Mk="
+          "Value": "sha256-B13x9H3sNxVe6KBro7XBXVQkD3A3K3onqBjP6r/vgzw="
         }
       ]
     },
     {
-      "Route": "browser/index.html",
+      "Route": "browser/index.3dvlj64jct.html",
       "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\index.html",
       "Selectors": [],
       "ResponseHeaders": [
@@ -994,121 +1002,21 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"RGefY+HJhknmzGdkkNLrv5/pAMXch+8Qdi14mZF02Mk=\""
+          "Value": "\"B13x9H3sNxVe6KBro7XBXVQkD3A3K3onqBjP6r/vgzw=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "no-cache"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "integrity",
-          "Value": "sha256-RGefY+HJhknmzGdkkNLrv5/pAMXch+8Qdi14mZF02Mk="
-        }
-      ]
-    },
-    {
-      "Route": "browser/index.html.gz",
-      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\d8nf5f42f4-w7qwo5wg31.gz",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "321"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/html"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"IabqgytbcO46C+mnK/ild/24A/sR+jjKRUtbcgPZ+Jc=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "no-cache"
-        },
-        {
-          "Name": "Content-Encoding",
-          "Value": "gzip"
-        },
-        {
-          "Name": "Vary",
-          "Value": "Content-Encoding"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "integrity",
-          "Value": "sha256-IabqgytbcO46C+mnK/ild/24A/sR+jjKRUtbcgPZ+Jc="
-        }
-      ]
-    },
-    {
-      "Route": "browser/index.w7qwo5wg31.html",
-      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\d8nf5f42f4-w7qwo5wg31.gz",
-      "Selectors": [
-        {
-          "Name": "Content-Encoding",
-          "Value": "gzip",
-          "Quality": "0.003105590062"
-        }
-      ],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "321"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"IabqgytbcO46C+mnK/ild/24A/sR+jjKRUtbcgPZ+Jc=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
           "Value": "max-age=31536000, immutable"
-        },
-        {
-          "Name": "Content-Encoding",
-          "Value": "gzip"
-        },
-        {
-          "Name": "Vary",
-          "Value": "Content-Encoding"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/html"
-        },
-        {
-          "Name": "ETag",
-          "Value": "W/\"RGefY+HJhknmzGdkkNLrv5/pAMXch+8Qdi14mZF02Mk=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "w7qwo5wg31"
+          "Value": "3dvlj64jct"
         },
         {
           "Name": "label",
@@ -1116,58 +1024,13 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-RGefY+HJhknmzGdkkNLrv5/pAMXch+8Qdi14mZF02Mk="
+          "Value": "sha256-B13x9H3sNxVe6KBro7XBXVQkD3A3K3onqBjP6r/vgzw="
         }
       ]
     },
     {
-      "Route": "browser/index.w7qwo5wg31.html",
-      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\index.html",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "508"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/html"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"RGefY+HJhknmzGdkkNLrv5/pAMXch+8Qdi14mZF02Mk=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "w7qwo5wg31"
-        },
-        {
-          "Name": "label",
-          "Value": "browser/index.html"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-RGefY+HJhknmzGdkkNLrv5/pAMXch+8Qdi14mZF02Mk="
-        }
-      ]
-    },
-    {
-      "Route": "browser/index.w7qwo5wg31.html.gz",
-      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\d8nf5f42f4-w7qwo5wg31.gz",
+      "Route": "browser/index.3dvlj64jct.html.gz",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\d8nf5f42f4-3dvlj64jct.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1184,11 +1047,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"IabqgytbcO46C+mnK/ild/24A/sR+jjKRUtbcgPZ+Jc=\""
+          "Value": "\"D92EAxs2TgmPesNYCAq+RkiMPN8nbVl6jgWFLQnPncw=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1206,7 +1069,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "w7qwo5wg31"
+          "Value": "3dvlj64jct"
         },
         {
           "Name": "label",
@@ -1214,18 +1077,18 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-IabqgytbcO46C+mnK/ild/24A/sR+jjKRUtbcgPZ+Jc="
+          "Value": "sha256-D92EAxs2TgmPesNYCAq+RkiMPN8nbVl6jgWFLQnPncw="
         }
       ]
     },
     {
-      "Route": "browser/main-AKNCFTCO.js",
-      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\8htsaytp00-okboh3mxq3.gz",
+      "Route": "browser/index.html",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\d8nf5f42f4-3dvlj64jct.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0.000014305538"
+          "Quality": "0.003105590062"
         }
       ],
       "ResponseHeaders": [
@@ -1235,15 +1098,15 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "69902"
+          "Value": "321"
         },
         {
           "Name": "ETag",
-          "Value": "\"90NKpztnNjb9CIuh0fZFOHSG/6wxgK2qdbYFyVOExas=\""
+          "Value": "\"D92EAxs2TgmPesNYCAq+RkiMPN8nbVl6jgWFLQnPncw=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1259,23 +1122,23 @@
         },
         {
           "Name": "Content-Type",
-          "Value": "text/javascript"
+          "Value": "text/html"
         },
         {
           "Name": "ETag",
-          "Value": "W/\"mI3s7Z3fVoYgRwlWKsfnd3qzp9bs6EMfiVxl/Bs2iK8=\""
+          "Value": "W/\"B13x9H3sNxVe6KBro7XBXVQkD3A3K3onqBjP6r/vgzw=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-mI3s7Z3fVoYgRwlWKsfnd3qzp9bs6EMfiVxl/Bs2iK8="
+          "Value": "sha256-B13x9H3sNxVe6KBro7XBXVQkD3A3K3onqBjP6r/vgzw="
         }
       ]
     },
     {
-      "Route": "browser/main-AKNCFTCO.js",
-      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\main-AKNCFTCO.js",
+      "Route": "browser/index.html",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\index.html",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1284,19 +1147,19 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "233064"
+          "Value": "508"
         },
         {
           "Name": "Content-Type",
-          "Value": "text/javascript"
+          "Value": "text/html"
         },
         {
           "Name": "ETag",
-          "Value": "\"mI3s7Z3fVoYgRwlWKsfnd3qzp9bs6EMfiVxl/Bs2iK8=\""
+          "Value": "\"B13x9H3sNxVe6KBro7XBXVQkD3A3K3onqBjP6r/vgzw=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1306,13 +1169,13 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-mI3s7Z3fVoYgRwlWKsfnd3qzp9bs6EMfiVxl/Bs2iK8="
+          "Value": "sha256-B13x9H3sNxVe6KBro7XBXVQkD3A3K3onqBjP6r/vgzw="
         }
       ]
     },
     {
-      "Route": "browser/main-AKNCFTCO.js.gz",
-      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\8htsaytp00-okboh3mxq3.gz",
+      "Route": "browser/index.html.gz",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\d8nf5f42f4-3dvlj64jct.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1321,19 +1184,19 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "69902"
+          "Value": "321"
         },
         {
           "Name": "Content-Type",
-          "Value": "text/javascript"
+          "Value": "text/html"
         },
         {
           "Name": "ETag",
-          "Value": "\"90NKpztnNjb9CIuh0fZFOHSG/6wxgK2qdbYFyVOExas=\""
+          "Value": "\"D92EAxs2TgmPesNYCAq+RkiMPN8nbVl6jgWFLQnPncw=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1351,18 +1214,18 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-90NKpztnNjb9CIuh0fZFOHSG/6wxgK2qdbYFyVOExas="
+          "Value": "sha256-D92EAxs2TgmPesNYCAq+RkiMPN8nbVl6jgWFLQnPncw="
         }
       ]
     },
     {
-      "Route": "browser/main-AKNCFTCO.okboh3mxq3.js",
-      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\8htsaytp00-okboh3mxq3.gz",
+      "Route": "browser/main-ICAVKCLM.3wjh49igpd.js",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\zrltuo7b5t-3wjh49igpd.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0.000014305538"
+          "Quality": "0.000013288683"
         }
       ],
       "ResponseHeaders": [
@@ -1372,15 +1235,15 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "69902"
+          "Value": "75251"
         },
         {
           "Name": "ETag",
-          "Value": "\"90NKpztnNjb9CIuh0fZFOHSG/6wxgK2qdbYFyVOExas=\""
+          "Value": "\"MZ8ay3Yr8BhGwP2ZfruKenMwiIJbjreddfVenN5xyT4=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1400,27 +1263,27 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"mI3s7Z3fVoYgRwlWKsfnd3qzp9bs6EMfiVxl/Bs2iK8=\""
+          "Value": "W/\"DRkNEMx5dgrYpipe5s4qt4lEwmiYitzaMzPvPMGf74E=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "okboh3mxq3"
+          "Value": "3wjh49igpd"
         },
         {
           "Name": "label",
-          "Value": "browser/main-AKNCFTCO.js"
+          "Value": "browser/main-ICAVKCLM.js"
         },
         {
           "Name": "integrity",
-          "Value": "sha256-mI3s7Z3fVoYgRwlWKsfnd3qzp9bs6EMfiVxl/Bs2iK8="
+          "Value": "sha256-DRkNEMx5dgrYpipe5s4qt4lEwmiYitzaMzPvPMGf74E="
         }
       ]
     },
     {
-      "Route": "browser/main-AKNCFTCO.okboh3mxq3.js",
-      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\main-AKNCFTCO.js",
+      "Route": "browser/main-ICAVKCLM.3wjh49igpd.js",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\main-ICAVKCLM.js",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1429,7 +1292,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "233064"
+          "Value": "250476"
         },
         {
           "Name": "Content-Type",
@@ -1437,11 +1300,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"mI3s7Z3fVoYgRwlWKsfnd3qzp9bs6EMfiVxl/Bs2iK8=\""
+          "Value": "\"DRkNEMx5dgrYpipe5s4qt4lEwmiYitzaMzPvPMGf74E=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1451,21 +1314,21 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "okboh3mxq3"
+          "Value": "3wjh49igpd"
         },
         {
           "Name": "label",
-          "Value": "browser/main-AKNCFTCO.js"
+          "Value": "browser/main-ICAVKCLM.js"
         },
         {
           "Name": "integrity",
-          "Value": "sha256-mI3s7Z3fVoYgRwlWKsfnd3qzp9bs6EMfiVxl/Bs2iK8="
+          "Value": "sha256-DRkNEMx5dgrYpipe5s4qt4lEwmiYitzaMzPvPMGf74E="
         }
       ]
     },
     {
-      "Route": "browser/main-AKNCFTCO.okboh3mxq3.js.gz",
-      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\8htsaytp00-okboh3mxq3.gz",
+      "Route": "browser/main-ICAVKCLM.3wjh49igpd.js.gz",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\zrltuo7b5t-3wjh49igpd.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1474,7 +1337,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "69902"
+          "Value": "75251"
         },
         {
           "Name": "Content-Type",
@@ -1482,11 +1345,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"90NKpztnNjb9CIuh0fZFOHSG/6wxgK2qdbYFyVOExas=\""
+          "Value": "\"MZ8ay3Yr8BhGwP2ZfruKenMwiIJbjreddfVenN5xyT4=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1504,15 +1367,152 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "okboh3mxq3"
+          "Value": "3wjh49igpd"
         },
         {
           "Name": "label",
-          "Value": "browser/main-AKNCFTCO.js.gz"
+          "Value": "browser/main-ICAVKCLM.js.gz"
         },
         {
           "Name": "integrity",
-          "Value": "sha256-90NKpztnNjb9CIuh0fZFOHSG/6wxgK2qdbYFyVOExas="
+          "Value": "sha256-MZ8ay3Yr8BhGwP2ZfruKenMwiIJbjreddfVenN5xyT4="
+        }
+      ]
+    },
+    {
+      "Route": "browser/main-ICAVKCLM.js",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\zrltuo7b5t-3wjh49igpd.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000013288683"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "75251"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"MZ8ay3Yr8BhGwP2ZfruKenMwiIJbjreddfVenN5xyT4=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"DRkNEMx5dgrYpipe5s4qt4lEwmiYitzaMzPvPMGf74E=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-DRkNEMx5dgrYpipe5s4qt4lEwmiYitzaMzPvPMGf74E="
+        }
+      ]
+    },
+    {
+      "Route": "browser/main-ICAVKCLM.js",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\wwwroot\\browser\\main-ICAVKCLM.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "250476"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"DRkNEMx5dgrYpipe5s4qt4lEwmiYitzaMzPvPMGf74E=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-DRkNEMx5dgrYpipe5s4qt4lEwmiYitzaMzPvPMGf74E="
+        }
+      ]
+    },
+    {
+      "Route": "browser/main-ICAVKCLM.js.gz",
+      "AssetFile": "C:\\Dan\\Git\\CloudMediaPlayer\\CloudMediaPlayer.Server\\obj\\Debug\\net9.0\\compressed\\zrltuo7b5t-3wjh49igpd.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "75251"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"MZ8ay3Yr8BhGwP2ZfruKenMwiIJbjreddfVenN5xyT4=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-MZ8ay3Yr8BhGwP2ZfruKenMwiIJbjreddfVenN5xyT4="
         }
       ]
     },
@@ -1541,7 +1541,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1602,7 +1602,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1647,7 +1647,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1702,7 +1702,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1755,7 +1755,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1792,7 +1792,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1839,7 +1839,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1900,7 +1900,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1945,7 +1945,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -2000,7 +2000,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -2053,7 +2053,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -2090,7 +2090,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -2137,7 +2137,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -2190,7 +2190,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -2227,7 +2227,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -2274,7 +2274,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -2335,7 +2335,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -2380,7 +2380,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 14 Mar 2025 08:22:19 GMT"
+          "Value": "Fri, 14 Mar 2025 10:01:40 GMT"
         },
         {
           "Name": "Cache-Control",

@@ -4,14 +4,16 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { MediaPlayerComponent } from './media-player/media-player.component';
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
+  declarations: [],  // AppComponent removed from declarations
   imports: [
-    BrowserModule, HttpClientModule,
-    AppRoutingModule
+    BrowserModule,
+    HttpClientModule,
+    AppRoutingModule,
+    AppComponent,  // AppComponent added to imports
+    MediaPlayerComponent
   ],
   providers: [],
   bootstrap: [AppComponent]

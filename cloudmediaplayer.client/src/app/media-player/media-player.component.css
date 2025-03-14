@@ -1,0 +1,31 @@
+.media-player-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 20px 0;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+  button:hover {
+    background-color: #45a049;
+  }
+
+.media-status {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f0f0f0;
+  border-left: 5px solid #4CAF50;
+  font-size: 18px;
+}
