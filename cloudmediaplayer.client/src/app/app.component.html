@@ -1,38 +1,8 @@
 <div class="container">
   <header>
     <h1>Cloud Media Player</h1>
-    <nav>
-      <a routerLink="/media-player" routerLinkActive="active">Media Player</a>
-      <a routerLink="/weather" routerLinkActive="active">Weather</a>
-    </nav>
   </header>
-
   <main>
-    <router-outlet></router-outlet>
+    <app-media-player></app-media-player>
   </main>
-
-  <!-- Only show weather data if we're on the weather page -->
-  <div *ngIf="router.url === '/weather'" class="weather-container">
-    <h2>Weather forecast</h2>
-    <p>This component demonstrates fetching data from the server.</p>
-
-    <table *ngIf="forecasts.length">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Temp. (C)</th>
-          <th>Temp. (F)</th>
-          <th>Summary</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let forecast of forecasts">
-          <td>{{ forecast.date }}</td>
-          <td>{{ forecast.temperatureC }}</td>
-          <td>{{ forecast.temperatureF }}</td>
-          <td>{{ forecast.summary }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
 </div>
