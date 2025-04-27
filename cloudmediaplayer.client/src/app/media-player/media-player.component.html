@@ -1,9 +1,95 @@
 <div class="media-player-container">
   <h1>Media Player</h1>
 
-  <button (click)="playMedia()">Play Media</button>
+  <!-- Authentication Section -->
+  <div class="auth-section">
+    <div *ngIf="!isAuthenticated() && showTokenInput">
+      <h3>Connect to Dropbox</h3>
+      <p class="auth-message">
+        Enter a Dropbox access token to connect to your account:
+      </p>
+      <div class="token-input">
+        <input type="text" [(ngModel)]="tokenInput" placeholder="Paste your Dropbox access token here" />
+        <button class="btn-primary" (click)="submitToken()">Connect</button>
+      </div>
+      <div class="token-help">
+        <p>To get an access token:</p>
+        <ol>
+          <li>Go to <a href="https://dropbox.github.io/dropbox-api-v2-explorer/#files_list_folder" target="_blank">Dropbox API Explorer</a></li>
+          <li>Click "Get Token" and sign in to your Dropbox account</li>
+          <li>Copy the generated token and paste it above</li>
+        </ol>
+      </div>
+    </div>
+    <div *ngIf="isAuthenticated()" class="auth-status">
+      <span>Connected to Dropbox</span>
+      <button class="btn-secondary" (click)="logout()">Disconnect</button>
+    </div>
+  </div>
 
-  <div *ngIf="isPlaying" class="media-status">
-    Media playing
+  <!-- File Browser Section -->
+  <div *ngIf="isAuthenticated()" class="file-browser">
+    <!-- Breadcrumbs -->
+    <div class="breadcrumbs">
+      <span *ngFor="let crumb of breadcrumbs; let last = last">
+        <a (click)="navigateTo(crumb.path)" [class.active]="last">{{crumb.name}}</a>
+        <span *ngIf="!last"> / </span>
+      </span>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div *ngIf="isLoading" class="loading">
+      Loading...
+    </div>
+
+    <!-- File List -->
+    <div *ngIf="!isLoading" class="file-list">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Size</th>
+            <th>Modified</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let file of files" (click)="openItem(file)" [class.folder]="file.is_folder" [class.media-file]="!file.is_folder && dropboxService.isMediaFile(file.name)">
+            <td>
+              <span class="file-icon" [ngClass]="getFileIcon(file)"></span>
+              {{ file.name }}
+            </td>
+            <td>{{ getFileType(file) }}</td>
+            <td>{{ file.is_folder ? '' : formatFileSize(file.size) }}</td>
+            <td>{{ file.client_modified ? (file.client_modified | date:'medium') : '' }}</td>
+          </tr>
+          <tr *ngIf="files.length === 0">
+            <td colspan="4" class="empty-folder">This folder is empty</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Media Player Section -->
+  <div *ngIf="isPlaying" class="player-section">
+    <div class="now-playing">
+      <h3>Now Playing: {{ currentFile?.name }}</h3>
+      <button class="btn-secondary" (click)="stopMedia()">Stop</button>
+    </div>
+
+    <div class="media-wrapper">
+      <!-- Audio player for audio files -->
+      <audio #mediaPlayer *ngIf="currentFile && getFileType(currentFile) === 'Audio'" controls class="media-element">
+        <source [src]="mediaUrl" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+
+      <!-- Video player for video files -->
+      <video #mediaPlayer *ngIf="currentFile && getFileType(currentFile) === 'Video'" controls class="media-element">
+        <source [src]="mediaUrl" type="video/mp4">
+        Your browser does not support the video element.
+      </video>
+    </div>
   </div>
 </div>
