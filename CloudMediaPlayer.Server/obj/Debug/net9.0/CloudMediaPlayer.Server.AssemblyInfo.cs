@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CloudMediaPlayer.Server")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+373a7001794e67b5c08ab39588d528964607981f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bf8452997ad7e670366e114c9c6ef5e8902c0f76")]
 [assembly: System.Reflection.AssemblyProductAttribute("CloudMediaPlayer.Server")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CloudMediaPlayer.Server")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

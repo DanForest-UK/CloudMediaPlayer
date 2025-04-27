@@ -1,0 +1,23 @@
+﻿# .NET build artifacts
+bin/
+obj/
+
+# Angular build artifacts
+dist/
+node_modules/
+.angular/
+
+# IDE files
+.vs/
+.vscode/
+*.user
+
+# SSL certificates
+*.pem
+*.key
+
+# GitHub Copilot indices
+CloudMediaPlayer/CopilotIndices/
+/.vs/CloudMediaPlayer/v17/.suo
+/.vs/CloudMediaPlayer/v17/DocumentLayout.json
+/git.ignore
