@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { Observable, of, Subject } from 'rxjs';
+import { map, catchError, scan } from 'rxjs/operators';
 
 /**
  * Interface that defines the structure of a Dropbox file or folder
@@ -108,49 +108,89 @@ export class DropboxService {
       return of([]);
     }
 
-    const endpoint = `${this.API_URL}/files/list_folder`;
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${this.accessToken}`,
-      'Content-Type': 'application/json'
-    });
-
     // Dropbox API expects empty string for root, not '/'
     if (path === '/') {
       path = '';
     }
 
-    const body = {
-      path: path,
-      recursive: false,
-      include_media_info: true,
-      include_non_downloadable_files: true
+    // Create a subject to emit the complete file list
+    const filesSubject = new Subject<DropboxFile[]>();
+
+    // Helper function to list folder contents with pagination
+    const getFiles = (folderPath: string, cursor?: string) => {
+      let endpoint: string;
+      let body: any;
+
+      if (cursor) {
+        // Continue listing with cursor if we have one
+        endpoint = `${this.API_URL}/files/list_folder/continue`;
+        body = { cursor };
+      } else {
+        // Initial request
+        endpoint = `${this.API_URL}/files/list_folder`;
+        body = {
+          path: folderPath,
+          recursive: false,
+          include_media_info: true,
+          include_non_downloadable_files: true
+        };
+      }
+
+      const headers = new HttpHeaders({
+        'Authorization': `Bearer ${this.accessToken}`,
+        'Content-Type': 'application/json'
+      });
+
+      console.log(`Sending Dropbox API request for path: ${folderPath}${cursor ? ' with cursor' : ''}`);
+
+      this.http.post<any>(endpoint, body, { headers }).pipe(
+        catchError(error => {
+          console.error('Error listing Dropbox folder:', error);
+          if (error.error && error.error.error_summary) {
+            console.error('Dropbox API error:', error.error.error_summary);
+          }
+          // Return empty result on error
+          return of({ entries: [], has_more: false });
+        })
+      ).subscribe(response => {
+        console.log('Dropbox API response:', response);
+
+        // Process entries
+        const files: DropboxFile[] = [];
+        if (response.entries && Array.isArray(response.entries)) {
+          response.entries.forEach((entry: any) => {
+            files.push({
+              id: entry.id,
+              name: entry.name,
+              path_display: entry.path_display,
+              is_folder: entry['.tag'] === 'folder',
+              media_info: entry.media_info,
+              size: entry.size,
+              client_modified: entry.client_modified
+            });
+          });
+        }
+
+        // If there are more files, request the next batch
+        if (response.has_more && response.cursor) {
+          // First emit the current batch
+          filesSubject.next(files);
+          // Then get more files
+          getFiles(folderPath, response.cursor);
+        } else {
+          // No more files, complete the observable
+          filesSubject.next(files);
+          filesSubject.complete();
+        }
+      });
     };
 
-    console.log('Sending Dropbox API request with path:', path);
+    // Start the first request
+    getFiles(path);
 
-    return this.http.post<any>(endpoint, body, { headers }).pipe(
-      map(response => {
-        console.log('Dropbox API response:', response);
-        if (response.entries && Array.isArray(response.entries)) {
-          return response.entries.map((entry: any) => ({
-            id: entry.id,
-            name: entry.name,
-            path_display: entry.path_display,
-            is_folder: entry['.tag'] === 'folder',
-            media_info: entry.media_info,
-            size: entry.size,
-            client_modified: entry.client_modified
-          }));
-        }
-        return [];
-      }),
-      catchError(error => {
-        console.error('Error listing Dropbox folder:', error);
-        if (error.error && error.error.error_summary) {
-          console.error('Dropbox API error:', error.error.error_summary);
-        }
-        return of([]);
-      })
+    return filesSubject.asObservable().pipe(
+      // Collect all emitted arrays into a single array
+      scan((acc: DropboxFile[], val: DropboxFile[]) => [...acc, ...val], [] as DropboxFile[])
     );
   }
 

@@ -105,10 +105,36 @@ export class MediaPlayerComponent implements OnInit {
     // Update breadcrumbs for navigation
     this.updateBreadcrumbs(path);
 
+    console.log(`Loading files from path: ${path}`);
+
     // Call the Dropbox service to get files
-    this.dropboxService.listFolder(path).subscribe(files => {
-      this.files = files;
-      this.isLoading = false;
+    this.dropboxService.listFolder(path).subscribe(
+      files => {
+        console.log(`Received ${files.length} files from Dropbox for path: ${path}`);
+        // Sort files: folders first, then files alphabetically
+        this.files = this.sortFiles(files);
+        this.isLoading = false;
+      },
+      error => {
+        console.error('Error loading files:', error);
+        this.isLoading = false;
+      }
+    );
+  }
+
+  /**
+   * Sorts files with folders first, then alphabetically by name
+   * @param files Array of files to sort
+   * @returns Sorted array of files
+   */
+  sortFiles(files: DropboxFile[]): DropboxFile[] {
+    return files.sort((a, b) => {
+      // If both are folders or both are files, sort alphabetically
+      if (a.is_folder === b.is_folder) {
+        return a.name.localeCompare(b.name);
+      }
+      // Otherwise, folders come first
+      return a.is_folder ? -1 : 1;
     });
   }
 
@@ -166,8 +192,11 @@ export class MediaPlayerComponent implements OnInit {
     this.isLoading = true;
     this.currentFile = file;
 
+    console.log(`Getting temporary link for file: ${file.path_display}`);
+
     // Get a temporary link from Dropbox to stream the file
     this.dropboxService.getTemporaryLink(file.path_display).subscribe(url => {
+      console.log(`Received temporary link: ${url.substring(0, 50)}...`);
       this.mediaUrl = url;
       this.isLoading = false;
       this.isPlaying = true;
