@@ -1,27 +1,76 @@
 ﻿# .NET build artifacts
 bin/
 obj/
+*.dll
+*.exe
+*.pdb
+*.user
+*.suo
+*.cache
+*.log
 
-# Angular build artifacts
-dist/
-node_modules/
-.angular/
-
-# IDE files
+# Visual Studio files
 .vs/
 .vscode/
 *.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+*.dbmdl
+*.jfm
+**/Properties/launchSettings.json
+/.vs/CloudMediaPlayer/v17/.suo
+/.vs/CloudMediaPlayer/v17/DocumentLayout.json
+/.vs/CloudMediaPlayer/FileContentIndex/
+/.vs/CloudMediaPlayer/DesignTimeBuild/.dtbcache.v2
+/.vs/CloudMediaPlayer/v17/.futdcache.v2
+/.vs/CloudMediaPlayer/v17/HierarchyCache.v1.txt
+
+# Angular/Node.js files
+node_modules/
+dist/
+.angular/
+npm-debug.log
+yarn-error.log
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE - Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
 
 # SSL certificates
 *.pem
 *.key
+*.pfx
+*.crt
 
 # GitHub Copilot indices
 CloudMediaPlayer/CopilotIndices/
-/.vs/CloudMediaPlayer/v17/.suo
-/.vs/CloudMediaPlayer/v17/DocumentLayout.json
-/git.ignore
-/.vs/CloudMediaPlayer/FileContentIndex/88bd0c48-d91b-4fee-8e5e-da4ccc50e3e5.vsidx
-/.vs/CloudMediaPlayer/DesignTimeBuild/.dtbcache.v2
-/.vs/CloudMediaPlayer/v17/.futdcache.v2
-/.vs/CloudMediaPlayer/v17/HierarchyCache.v1.txt
+
+# Miscellaneous
+Thumbs.db
+Desktop.ini
+.DS_Store
+git.ignore
