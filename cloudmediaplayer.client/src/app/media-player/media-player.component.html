@@ -1,8 +1,7 @@
 <div class="media-player-container">
-  <h1>Media Player</h1>
-
   <!-- Authentication Section -->
   <div class="auth-section">
+    <!-- Show this section if user is not authenticated and token input should be shown -->
     <div *ngIf="!isAuthenticated() && showTokenInput">
       <h3>Connect to Dropbox</h3>
       <p class="auth-message">
@@ -21,6 +20,7 @@
         </ol>
       </div>
     </div>
+    <!-- Show this section if user is authenticated -->
     <div *ngIf="isAuthenticated()" class="auth-status">
       <span>Connected to Dropbox</span>
       <button class="btn-secondary" (click)="logout()">Disconnect</button>
@@ -29,7 +29,7 @@
 
   <!-- File Browser Section -->
   <div *ngIf="isAuthenticated()" class="file-browser">
-    <!-- Breadcrumbs -->
+    <!-- Breadcrumbs - showing the current path navigation -->
     <div class="breadcrumbs">
       <span *ngFor="let crumb of breadcrumbs; let last = last">
         <a (click)="navigateTo(crumb.path)" [class.active]="last">{{crumb.name}}</a>
@@ -37,41 +37,40 @@
       </span>
     </div>
 
-    <!-- Loading Indicator -->
+    <!-- Loading Indicator - shows when files are being fetched -->
     <div *ngIf="isLoading" class="loading">
       Loading...
     </div>
 
-    <!-- File List -->
+    <!-- Simplified File List -->
     <div *ngIf="!isLoading" class="file-list">
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Size</th>
-            <th>Modified</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let file of files" (click)="openItem(file)" [class.folder]="file.is_folder" [class.media-file]="!file.is_folder && dropboxService.isMediaFile(file.name)">
-            <td>
-              <span class="file-icon" [ngClass]="getFileIcon(file)"></span>
-              {{ file.name }}
-            </td>
-            <td>{{ getFileType(file) }}</td>
-            <td>{{ file.is_folder ? '' : formatFileSize(file.size) }}</td>
-            <td>{{ file.client_modified ? (file.client_modified | date:'medium') : '' }}</td>
-          </tr>
-          <tr *ngIf="files.length === 0">
-            <td colspan="4" class="empty-folder">This folder is empty</td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- List of files and folders -->
+      <div class="file-items">
+        <!-- Loop through each file in the files array -->
+        <div *ngFor="let file of files"
+             (click)="openItem(file)"
+             class="file-item">
+          <!-- Use text icons to avoid duplicate folder icons -->
+          <ng-container *ngIf="file.is_folder">
+            <span class="folder-icon">📁</span>
+          </ng-container>
+          <ng-container *ngIf="!file.is_folder && isAudioFile(file.name)">
+            <span class="music-icon">🎵</span>
+          </ng-container>
+          <ng-container *ngIf="!file.is_folder && !isAudioFile(file.name)">
+            <span class="file-icon">📄</span>
+          </ng-container>
+          {{ file.name }}
+        </div>
+        <!-- Show this message if the folder is empty -->
+        <div *ngIf="files.length === 0" class="empty-folder">
+          This folder is empty
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Media Player Section -->
+  <!-- Media Player Section - shown when a file is being played -->
   <div *ngIf="isPlaying" class="player-section">
     <div class="now-playing">
       <h3>Now Playing: {{ currentFile?.name }}</h3>
@@ -80,16 +79,10 @@
 
     <div class="media-wrapper">
       <!-- Audio player for audio files -->
-      <audio #mediaPlayer *ngIf="currentFile && getFileType(currentFile) === 'Audio'" controls class="media-element">
+      <audio #mediaPlayer controls class="media-element">
         <source [src]="mediaUrl" type="audio/mpeg">
         Your browser does not support the audio element.
       </audio>
-
-      <!-- Video player for video files -->
-      <video #mediaPlayer *ngIf="currentFile && getFileType(currentFile) === 'Video'" controls class="media-element">
-        <source [src]="mediaUrl" type="video/mp4">
-        Your browser does not support the video element.
-      </video>
     </div>
   </div>
 </div>

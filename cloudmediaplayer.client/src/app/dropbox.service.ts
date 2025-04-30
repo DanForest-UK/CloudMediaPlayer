@@ -3,22 +3,28 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
+/**
+ * Interface that defines the structure of a Dropbox file or folder
+ */
 export interface DropboxFile {
-  id: string;
-  name: string;
-  path_display: string;
-  is_folder: boolean;
-  media_info?: {
+  id: string;              // Unique identifier for the file/folder
+  name: string;            // Name of the file/folder
+  path_display: string;    // Full path of the file/folder
+  is_folder: boolean;      // Whether this is a folder (true) or file (false)
+  media_info?: {           // Optional media info (only for media files)
     metadata: {
       dimensions?: { height: number; width: number };
     };
   };
-  size?: number;
-  client_modified?: string;
+  size?: number;           // Size of the file in bytes (undefined for folders)
+  client_modified?: string; // Last modification date (undefined for folders)
 }
 
+/**
+ * Service that handles all communication with the Dropbox API
+ */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root'  // This makes the service available throughout the app
 })
 export class DropboxService {
   // Replace with your Dropbox app key
@@ -28,8 +34,13 @@ export class DropboxService {
   private readonly API_URL = 'https://api.dropboxapi.com/2';
   private readonly CONTENT_URL = 'https://content.dropboxapi.com/2';
 
+  // Store the access token
   private accessToken: string | null = null;
 
+  /**
+   * Constructor - Checks if a token exists in localStorage
+   * @param http HttpClient for making API requests
+   */
   constructor(private http: HttpClient) {
     // Check if token exists in localStorage
     this.accessToken = localStorage.getItem('dropbox_access_token');
@@ -37,6 +48,7 @@ export class DropboxService {
 
   /**
    * Manually set an access token (for development/testing)
+   * @param token The access token to set
    */
   setAccessToken(token: string): void {
     this.accessToken = token;
@@ -45,6 +57,7 @@ export class DropboxService {
 
   /**
    * Checks if user is authenticated with Dropbox
+   * @returns True if authenticated, false otherwise
    */
   isAuthenticated(): boolean {
     return !!this.accessToken;
@@ -61,6 +74,7 @@ export class DropboxService {
   /**
    * Gets the current user's account information
    * This is useful for testing if the token is valid
+   * @returns Observable with account info or null if error
    */
   getCurrentAccount(): Observable<any> {
     if (!this.isAuthenticated()) {
@@ -86,6 +100,8 @@ export class DropboxService {
 
   /**
    * Lists files and folders in a given Dropbox path
+   * @param path The path to list files from (empty string for root)
+   * @returns Observable with array of DropboxFile objects
    */
   listFolder(path: string = ''): Observable<DropboxFile[]> {
     if (!this.isAuthenticated()) {
@@ -140,6 +156,8 @@ export class DropboxService {
 
   /**
    * Gets a temporary link to download a file
+   * @param path The path of the file to get a link for
+   * @returns Observable with the temporary download URL
    */
   getTemporaryLink(path: string): Observable<string> {
     if (!this.isAuthenticated()) {
@@ -166,19 +184,19 @@ export class DropboxService {
   }
 
   /**
-   * Checks if a file is a media file based on its extension
+   * Checks if a file is an audio file based on its extension
+   * @param filename The name of the file to check
+   * @returns True if it's an audio file, false otherwise
    */
   isMediaFile(filename: string): boolean {
     if (!filename) return false;
 
-    const mediaExtensions = [
-      // Audio
-      '.mp3', '.wav', '.ogg', '.m4a', '.flac', '.aac',
-      // Video
-      '.mp4', '.webm', '.ogv', '.mov', '.mkv', '.avi'
+    // We only support audio files now
+    const audioExtensions = [
+      '.mp3', '.wav', '.ogg', '.m4a', '.flac', '.aac'
     ];
 
     const extension = filename.substring(filename.lastIndexOf('.')).toLowerCase();
-    return mediaExtensions.includes(extension);
+    return audioExtensions.includes(extension);
   }
 }

@@ -1,3 +1,4 @@
+/* Main container style */
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -5,50 +6,15 @@
   font-family: Arial, sans-serif;
 }
 
+/* Header style */
 header {
   margin-bottom: 30px;
   border-bottom: 1px solid #eee;
   padding-bottom: 10px;
 }
 
-nav {
-  display: flex;
-  gap: 20px;
-  margin-top: 15px;
-}
-
-  nav a {
-    text-decoration: none;
-    color: #333;
-    padding: 5px 10px;
-    border-radius: 4px;
-  }
-
-    nav a:hover {
-      background-color: #f0f0f0;
-    }
-
-    nav a.active {
-      background-color: #4CAF50;
-      color: white;
-    }
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-th, td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
-
-th {
-  background-color: #f2f2f2;
-}
-
-.weather-container {
-  margin-top: 20px;
+h1 {
+  color: #333;
+  margin: 0;
+  padding: 0;
 }
