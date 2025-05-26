@@ -364,10 +364,9 @@ button {
 
 .file-item {
   padding: 12px 15px;
-  text-align: left;
   border-bottom: 1px solid #eee;
-  cursor: pointer;
   display: flex;
+  justify-content: space-between;
   align-items: center;
   transition: background-color 0.2s;
   position: relative;
@@ -380,6 +379,20 @@ button {
   .file-item:last-child {
     border-bottom: none;
   }
+
+.file-item-main {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  cursor: pointer;
+}
+
+.file-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 10px;
+}
 
 .file-name {
   flex: 1;
@@ -419,6 +432,53 @@ button {
 
 .file-icon {
   color: #999;
+}
+
+/* Enqueue All button styles */
+.enqueue-all-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+  .enqueue-all-btn:hover:not(:disabled) {
+    background-color: #45a049;
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  }
+
+  .enqueue-all-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .remove-btn {
@@ -469,5 +529,20 @@ button {
   .playlist-buttons {
     justify-content: flex-end;
     width: 100%;
+  }
+
+  .file-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .file-item-main {
+    width: 100%;
+  }
+
+  .file-item-actions {
+    justify-content: flex-end;
+    margin-left: 0;
   }
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of, Subject } from 'rxjs';
-import { map, catchError, scan } from 'rxjs/operators';
+import { Observable, of, Subject, forkJoin } from 'rxjs';
+import { map, catchError, scan, mergeMap, concatMap } from 'rxjs/operators';
 
 /**
  * Interface that defines the structure of a Dropbox file or folder
@@ -204,6 +204,62 @@ export class DropboxService {
       // Collect all emitted arrays into a single array
       scan((acc: DropboxFile[], val: DropboxFile[]) => [...acc, ...val], [] as DropboxFile[])
     );
+  }
+
+  /**
+   * Recursively collects all audio files from a folder and its subfolders
+   * @param path The folder path to start collecting from
+   * @returns Observable with array of DropboxFile objects (audio files only)
+   */
+  collectAllAudioFilesRecursively(path: string): Observable<DropboxFile[]> {
+    if (!this.isAuthenticated()) {
+      return of([]);
+    }
+
+    const allAudioFiles: DropboxFile[] = [];
+    const processedFolders = new Set<string>(); // avoid infinite loops
+
+    const collectFromFolder = (folderPath: string): Observable<DropboxFile[]> => {
+      if (processedFolders.has(folderPath)) {
+        return of([]);
+      }
+      processedFolders.add(folderPath);
+
+      return this.listFolder(folderPath, false).pipe(
+        mergeMap((files: DropboxFile[]) => {
+          const audioFiles = files.filter(file => !file.is_folder && this.isMediaFile(file.name));
+          const subfolders = files.filter(file => file.is_folder);
+
+          // If no subfolders, just return the audio files
+          if (subfolders.length === 0) {
+            return of(audioFiles);
+          }
+
+          // Process all subfolders and combine results
+          const subfolderObservables = subfolders.map(folder =>
+            collectFromFolder(folder.path_display)
+          );
+
+          // Combine current folder's audio files with all subfolder results
+          return forkJoin([of(audioFiles), ...subfolderObservables]).pipe(
+            map(results => {
+              // Flatten all results into a single array
+              const combined: DropboxFile[] = [];
+              results.forEach(fileArray => {
+                combined.push(...fileArray);
+              });
+              return combined;
+            })
+          );
+        }),
+        catchError(error => {
+          console.error(`Error collecting files from ${folderPath}:`, error);
+          return of([]); 
+        })
+      );
+    };
+
+    return collectFromFolder(path);
   }
 
   /**

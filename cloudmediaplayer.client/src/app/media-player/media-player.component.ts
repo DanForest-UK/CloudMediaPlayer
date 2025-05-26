@@ -19,6 +19,7 @@ export interface PlaylistItem {
  * - Browsing Dropbox folders and files in a left panel
  * - Managing a playlist in a right panel
  * - Playing audio files with automatic progression through playlist
+ * - Enqueuing all audio files from a folder recursively
  */
 @Component({
   selector: 'app-media-player',
@@ -49,6 +50,9 @@ export class MediaPlayerComponent implements OnInit {
   // For manual access token entry
   tokenInput: string = '';
   showTokenInput = false;
+
+  // Track which folders are currently being enqueued
+  enqueuingFolders = new Set<string>();
 
   constructor(public dropboxService: DropboxService) { }
 
@@ -99,6 +103,7 @@ export class MediaPlayerComponent implements OnInit {
     this.mediaUrl = '';
     this.isPlaying = false;
     this.showTokenInput = true;
+    this.enqueuingFolders.clear();
   }
 
   loadFiles(path: string): void {
@@ -162,6 +167,51 @@ export class MediaPlayerComponent implements OnInit {
   }
 
   /**
+   * Enqueues all audio files from a folder and its subfolders recursively
+   * @param folder The folder to enqueue all files from
+   */
+  enqueueAllFromFolder(folder: DropboxFile, event: Event): void {
+    // Prevent the folder from being opened when clicking the enqueue button
+    event.stopPropagation();
+
+    if (!folder.is_folder) {
+      return;
+    }
+
+    this.enqueuingFolders.add(folder.path_display);
+
+    this.dropboxService.collectAllAudioFilesRecursively(folder.path_display).subscribe(
+      audioFiles => {
+        const playlistItems: PlaylistItem[] = audioFiles.map(file => ({
+          file: file,
+          displayName: `${file.name}`
+        }));
+
+        this.playlist.push(...playlistItems);
+
+        if (!this.isPlaying && playlistItems.length > 0 && this.currentPlaylistIndex === -1) {
+          this.playPlaylistItem(0); 
+        }
+
+        this.enqueuingFolders.delete(folder.path_display);
+      },
+      error => {
+        console.error(`Error enqueuing files from ${folder.path_display}:`, error);
+        this.enqueuingFolders.delete(folder.path_display);
+      }
+    );
+  }
+
+  /**
+   * Checks if a folder is currently being enqueued
+   * @param folderPath The path of the folder to check
+   * @returns True if the folder is being enqueued, false otherwise
+   */
+  isFolderBeingEnqueued(folderPath: string): boolean {
+    return this.enqueuingFolders.has(folderPath);
+  }
+
+  /**
    * Adds a song to the playlist 
    */
   addToPlaylist(file: DropboxFile): void {
@@ -172,11 +222,12 @@ export class MediaPlayerComponent implements OnInit {
 
     this.playlist.push(playlistItem);
 
-    // Play if playlist empty
+    // Play if playlist was empty
     if (!this.isPlaying && this.playlist.length === 1) {
       this.playPlaylistItem(0);
     }
   }
+
 
   /**
    * Plays a specific item from the playlist

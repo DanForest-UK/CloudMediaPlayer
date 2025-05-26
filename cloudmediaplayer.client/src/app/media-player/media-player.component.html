@@ -70,22 +70,35 @@
       <div *ngIf="!isLoading" class="file-list">
         <div class="file-items">
           <div *ngFor="let file of files"
-               (click)="openItem(file)"
                class="file-item"
                [class.folder-item]="file.is_folder"
                [class.audio-item]="!file.is_folder && isAudioFile(file.name)">
-            <!-- Icons -->
-            <ng-container *ngIf="file.is_folder">
-              <span class="folder-icon">📁</span>
-            </ng-container>
-            <ng-container *ngIf="!file.is_folder && isAudioFile(file.name)">
-              <span class="music-icon">🎵</span>
-            </ng-container>
-            <ng-container *ngIf="!file.is_folder && !isAudioFile(file.name)">
-              <span class="file-icon">📄</span>
-            </ng-container>
+            
+            <div class="file-item-main" (click)="openItem(file)">
+              <!-- Icons -->
+              <ng-container *ngIf="file.is_folder">
+                <span class="folder-icon">📁</span>
+              </ng-container>
+              <ng-container *ngIf="!file.is_folder && isAudioFile(file.name)">
+                <span class="music-icon">🎵</span>
+              </ng-container>
+              <ng-container *ngIf="!file.is_folder && !isAudioFile(file.name)">
+                <span class="file-icon">📄</span>
+              </ng-container>
 
-            <span class="file-name">{{ file.name }}</span>
+              <span class="file-name">{{ file.name }}</span>
+            </div>
+
+            <!-- Enqueue All button for folders -->
+            <div *ngIf="file.is_folder" class="file-item-actions">
+              <button class="enqueue-all-btn"
+                      (click)="enqueueAllFromFolder(file, $event)"
+                      [disabled]="isFolderBeingEnqueued(file.path_display)"
+                      title="Enqueue all audio files from this folder and subfolders">
+                <span *ngIf="!isFolderBeingEnqueued(file.path_display)">➕</span>
+                <span *ngIf="isFolderBeingEnqueued(file.path_display)" class="loading-spinner">⏳</span>
+              </button>
+            </div>
           </div>
 
           <div *ngIf="files.length === 0" class="empty-folder">
@@ -114,7 +127,7 @@
 
       <div class="playlist-content">
         <div *ngIf="playlist.length === 0" class="empty-playlist">
-          Click on songs in the file browser to add them to your playlist
+          Click on songs in the file browser to add them to your playlist, or use the ➕ button on folders to add all songs from that folder
         </div>
 
         <div *ngIf="playlist.length > 0" class="playlist-items">
