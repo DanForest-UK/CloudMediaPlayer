@@ -255,6 +255,23 @@ export class MediaPlayerComponent implements OnInit {
     this.stopMedia();
   }
 
+  /**
+   * Shuffles the playlist 
+   */
+  shufflePlaylist(): void {
+    if (this.playlist.length <= 1) {
+      return;
+    }
+
+    // Randomise
+    for (let i = this.playlist.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [this.playlist[i], this.playlist[j]] = [this.playlist[j], this.playlist[i]];
+    }
+
+    this.playPlaylistItem(0);
+  }
+
   playMedia(file: DropboxFile): void {
     this.isLoading = true;
 
