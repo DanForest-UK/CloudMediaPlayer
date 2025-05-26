@@ -1,4 +1,19 @@
 <div class="media-player-container">
+  <!-- Media Player Section - shown when a file is being played -->
+  <div *ngIf="isPlaying" class="player-section">
+    <div class="now-playing">
+      <h3>Now Playing: {{ currentFile?.name }}</h3>
+      <button class="btn-secondary" (click)="stopMedia()">Stop</button>
+    </div>
+
+    <div class="media-wrapper">
+      <!-- Audio player for audio files -->
+      <audio #mediaPlayer controls class="media-element">
+        <source [src]="mediaUrl" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+  </div>
   <!-- Authentication Section -->
   <div class="auth-section">
     <!-- Show this section if user is not authenticated and token input should be shown -->
@@ -20,69 +35,53 @@
         </ol>
       </div>
     </div>
+    <!-- File Browser Section -->
+    <div *ngIf="isAuthenticated()" class="file-browser">
+      <!-- Breadcrumbs - showing the current path navigation -->
+      <div class="breadcrumbs">
+        <span *ngFor="let crumb of breadcrumbs; let last = last">
+          <a (click)="navigateTo(crumb.path)" [class.active]="last">{{crumb.name}}</a>
+          <span *ngIf="!last"> / </span>
+        </span>
+      </div>
+
+      <!-- Loading Indicator - shows when files are being fetched -->
+      <div *ngIf="isLoading" class="loading">
+        Loading...
+      </div>
+
+      <!-- Simplified File List -->
+      <div *ngIf="!isLoading" class="file-list">
+        <!-- List of files and folders -->
+        <div class="file-items">
+          <!-- Loop through each file in the files array -->
+          <div *ngFor="let file of files"
+               (click)="openItem(file)"
+               class="file-item">
+            <!-- Use text icons to avoid duplicate folder icons -->
+            <ng-container *ngIf="file.is_folder">
+              <span class="folder-icon">📁</span>
+            </ng-container>
+            <ng-container *ngIf="!file.is_folder && isAudioFile(file.name)">
+              <span class="music-icon">🎵</span>
+            </ng-container>
+            <ng-container *ngIf="!file.is_folder && !isAudioFile(file.name)">
+              <span class="file-icon">📄</span>
+            </ng-container>
+            {{ file.name }}
+          </div>
+          <!-- Show this message if the folder is empty -->
+          <div *ngIf="files.length === 0" class="empty-folder">
+            This folder is empty
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Show this section if user is authenticated -->
     <div *ngIf="isAuthenticated()" class="auth-status">
       <span>Connected to Dropbox</span>
       <button class="btn-secondary" (click)="logout()">Disconnect</button>
-    </div>
-  </div>
-
-  <!-- File Browser Section -->
-  <div *ngIf="isAuthenticated()" class="file-browser">
-    <!-- Breadcrumbs - showing the current path navigation -->
-    <div class="breadcrumbs">
-      <span *ngFor="let crumb of breadcrumbs; let last = last">
-        <a (click)="navigateTo(crumb.path)" [class.active]="last">{{crumb.name}}</a>
-        <span *ngIf="!last"> / </span>
-      </span>
-    </div>
-
-    <!-- Loading Indicator - shows when files are being fetched -->
-    <div *ngIf="isLoading" class="loading">
-      Loading...
-    </div>
-
-    <!-- Simplified File List -->
-    <div *ngIf="!isLoading" class="file-list">
-      <!-- List of files and folders -->
-      <div class="file-items">
-        <!-- Loop through each file in the files array -->
-        <div *ngFor="let file of files"
-             (click)="openItem(file)"
-             class="file-item">
-          <!-- Use text icons to avoid duplicate folder icons -->
-          <ng-container *ngIf="file.is_folder">
-            <span class="folder-icon">📁</span>
-          </ng-container>
-          <ng-container *ngIf="!file.is_folder && isAudioFile(file.name)">
-            <span class="music-icon">🎵</span>
-          </ng-container>
-          <ng-container *ngIf="!file.is_folder && !isAudioFile(file.name)">
-            <span class="file-icon">📄</span>
-          </ng-container>
-          {{ file.name }}
-        </div>
-        <!-- Show this message if the folder is empty -->
-        <div *ngIf="files.length === 0" class="empty-folder">
-          This folder is empty
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Media Player Section - shown when a file is being played -->
-  <div *ngIf="isPlaying" class="player-section">
-    <div class="now-playing">
-      <h3>Now Playing: {{ currentFile?.name }}</h3>
-      <button class="btn-secondary" (click)="stopMedia()">Stop</button>
-    </div>
-
-    <div class="media-wrapper">
-      <!-- Audio player for audio files -->
-      <audio #mediaPlayer controls class="media-element">
-        <source [src]="mediaUrl" type="audio/mpeg">
-        Your browser does not support the audio element.
-      </audio>
     </div>
   </div>
 </div>
