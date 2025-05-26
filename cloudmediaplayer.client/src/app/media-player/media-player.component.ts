@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DropboxService, DropboxFile } from '../dropbox.service';
+import { forkJoin, of } from 'rxjs';
 
 /**
  * MediaPlayerComponent - Main component for browsing and playing audio files from Dropbox
@@ -10,6 +11,7 @@ import { DropboxService, DropboxFile } from '../dropbox.service';
  * - Authentication with Dropbox via an access token
  * - Browsing Dropbox folders and files
  * - Playing audio files from Dropbox
+ * - Filtering folders to show only those containing media files
  */
 @Component({
   selector: 'app-media-player',
@@ -27,6 +29,7 @@ export class MediaPlayerComponent implements OnInit {
   isLoading = false;     // Whether files are being loaded
   currentPath = '';      // Current path being displayed
   files: DropboxFile[] = []; // Array of files in the current path
+  filteredFiles: DropboxFile[] = []; // Filtered array of files (after applying folder filter)
   currentFile: DropboxFile | null = null; // Currently selected file
   mediaUrl: string = ''; // URL for the current media file
 
@@ -36,6 +39,10 @@ export class MediaPlayerComponent implements OnInit {
   // For manual access token entry
   tokenInput: string = '';
   showTokenInput = false;
+
+  // Filter settings
+  onlyShowFoldersWithAudio = true; // Default to checked
+  isFilteringFolders = false; // Track when we're checking folders for media
 
   /**
    * Constructor - Injects the DropboxService for API communication
@@ -88,10 +95,64 @@ export class MediaPlayerComponent implements OnInit {
   logout(): void {
     this.dropboxService.logout();
     this.files = [];
+    this.filteredFiles = [];
     this.currentFile = null;
     this.mediaUrl = '';
     this.isPlaying = false;
     this.showTokenInput = true;
+  }
+
+  /**
+   * Handles the change event for the folder filter checkbox
+   */
+  onFolderFilterChange(): void {
+    console.log('Folder filter changed to:', this.onlyShowFoldersWithAudio);
+    this.applyFolderFilter();
+  }
+
+  /**
+   * Applies the folder filter to the current file list
+   */
+  applyFolderFilter(): void {
+    if (!this.onlyShowFoldersWithAudio) {
+      // If filter is off, show all files
+      this.filteredFiles = [...this.files];
+      return;
+    }
+
+    // If filter is on, we need to check each folder
+    this.isFilteringFolders = true;
+
+    // Separate files from folders
+    const nonFolders = this.files.filter(file => !file.is_folder);
+    const folders = this.files.filter(file => file.is_folder);
+
+    if (folders.length === 0) {
+      // No folders to check
+      this.filteredFiles = [...nonFolders];
+      this.isFilteringFolders = false;
+      return;
+    }
+
+    // Check each folder for media files
+    const folderChecks = folders.map(folder =>
+      this.dropboxService.containsMediaFile(folder.path_display)
+    );
+
+    forkJoin(folderChecks).subscribe({
+      next: (results) => {
+        const foldersWithMedia = folders.filter((folder, index) => results[index]);
+        this.filteredFiles = [...nonFolders, ...foldersWithMedia];
+        this.isFilteringFolders = false;
+        console.log(`Filtered ${folders.length} folders down to ${foldersWithMedia.length} with media`);
+      },
+      error: (error) => {
+        console.error('Error checking folders for media:', error);
+        // On error, show all folders to avoid breaking the UI
+        this.filteredFiles = [...this.files];
+        this.isFilteringFolders = false;
+      }
+    });
   }
 
   /**
@@ -114,10 +175,14 @@ export class MediaPlayerComponent implements OnInit {
         // Sort files: folders first, then files alphabetically
         this.files = this.sortFiles(files);
         this.isLoading = false;
+
+        // Apply folder filter after loading files
+        this.applyFolderFilter();
       },
       error => {
         console.error('Error loading files:', error);
         this.isLoading = false;
+        this.isFilteringFolders = false;
       }
     );
   }

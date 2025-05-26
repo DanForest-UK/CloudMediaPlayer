@@ -67,6 +67,57 @@
       text-decoration: underline;
     }
 
+/* Filter controls styles */
+.filter-controls {
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+}
+
+.filter-checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+  .filter-checkbox input[type="checkbox"] {
+    margin-right: 8px;
+    cursor: pointer;
+    transform: scale(1.1);
+  }
+
+.filter-status {
+  margin-top: 8px;
+}
+
+.filtering-text {
+  color: #666;
+  font-size: 13px;
+  font-style: italic;
+}
+
+.filtering-folders {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  margin: 10px 0;
+}
+
+  .filtering-folders .filtering-text {
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
 /* Button styles */
 button {
   padding: 10px 20px;
@@ -170,6 +221,7 @@ button {
   text-align: center;
   color: #999;
   padding: 20px;
+  font-style: italic;
 }
 
 /* Icon styles */

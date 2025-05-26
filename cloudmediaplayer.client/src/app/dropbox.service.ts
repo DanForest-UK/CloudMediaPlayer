@@ -37,6 +37,9 @@ export class DropboxService {
   // Store the access token
   private accessToken: string | null = null;
 
+  // Cache for folder media file checks to avoid repeated API calls
+  private folderMediaCache = new Map<string, boolean>();
+
   /**
    * Constructor - Checks if a token exists in localStorage
    * @param http HttpClient for making API requests
@@ -69,6 +72,8 @@ export class DropboxService {
   logout(): void {
     this.accessToken = null;
     localStorage.removeItem('dropbox_access_token');
+    // Clear the cache when logging out
+    this.folderMediaCache.clear();
   }
 
   /**
@@ -213,6 +218,118 @@ export class DropboxService {
    */
   listMediaFiles(path: string = ''): Observable<DropboxFile[]> {
     return this.listFolder(path, true);
+  }
+
+  /**
+   * Recursively checks if a folder contains at least one playable media file
+   * Uses caching to avoid repeated API calls for the same folder
+   * @param folderPath The path of the folder to check
+   * @returns Observable that emits true if the folder contains media files, false otherwise
+   */
+  containsMediaFile(folderPath: string): Observable<boolean> {
+    if (!this.isAuthenticated()) {
+      return of(false);
+    }
+
+    // Check cache first
+    if (this.folderMediaCache.has(folderPath)) {
+      return of(this.folderMediaCache.get(folderPath)!);
+    }
+
+    // Create observable for the recursive check
+    return new Observable<boolean>(observer => {
+      this.checkFolderRecursively(folderPath, observer);
+    });
+  }
+
+  /**
+   * Recursive helper function to check if a folder contains media files
+   * @param folderPath The folder path to check
+   * @param observer The observer to emit the result to
+   */
+  private checkFolderRecursively(folderPath: string, observer: any): void {
+    // Normalize path for Dropbox API
+    const normalizedPath = folderPath === '/' ? '' : folderPath;
+
+    console.log(`Checking folder for media files: ${normalizedPath || 'root'}`);
+
+    this.listFolder(normalizedPath).subscribe({
+      next: (files) => {
+        // First, check if there are any direct media files in this folder
+        const hasDirectMediaFiles = files.some(file => !file.is_folder && this.isMediaFile(file.name));
+
+        if (hasDirectMediaFiles) {
+          console.log(`Found media files in folder: ${normalizedPath || 'root'}`);
+          // Cache the result
+          this.folderMediaCache.set(folderPath, true);
+          observer.next(true);
+          observer.complete();
+          return;
+        }
+
+        // If no direct media files, check subfolders
+        const subfolders = files.filter(file => file.is_folder);
+
+        if (subfolders.length === 0) {
+          // No subfolders and no media files
+          console.log(`No media files found in folder: ${normalizedPath || 'root'}`);
+          this.folderMediaCache.set(folderPath, false);
+          observer.next(false);
+          observer.complete();
+          return;
+        }
+
+        // Check subfolders recursively
+        let checkedFolders = 0;
+        let foundMedia = false;
+
+        subfolders.forEach(subfolder => {
+          this.containsMediaFile(subfolder.path_display).subscribe({
+            next: (hasMedia) => {
+              if (hasMedia && !foundMedia) {
+                foundMedia = true;
+                console.log(`Found media files in subfolder: ${subfolder.path_display}`);
+                // Cache the result
+                this.folderMediaCache.set(folderPath, true);
+                observer.next(true);
+                observer.complete();
+              } else {
+                checkedFolders++;
+                if (checkedFolders === subfolders.length && !foundMedia) {
+                  // All subfolders checked, no media found
+                  console.log(`No media files found in folder tree: ${normalizedPath || 'root'}`);
+                  this.folderMediaCache.set(folderPath, false);
+                  observer.next(false);
+                  observer.complete();
+                }
+              }
+            },
+            error: (error) => {
+              console.error(`Error checking subfolder ${subfolder.path_display}:`, error);
+              checkedFolders++;
+              if (checkedFolders === subfolders.length && !foundMedia) {
+                this.folderMediaCache.set(folderPath, false);
+                observer.next(false);
+                observer.complete();
+              }
+            }
+          });
+        });
+      },
+      error: (error) => {
+        console.error(`Error listing folder ${normalizedPath}:`, error);
+        observer.next(false);
+        observer.complete();
+      }
+    });
+  }
+
+  /**
+   * Clears the folder media cache
+   * Useful when you want to force a refresh of the folder checks
+   */
+  clearFolderMediaCache(): void {
+    this.folderMediaCache.clear();
   }
 
   /**
