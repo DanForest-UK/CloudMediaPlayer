@@ -2,18 +2,22 @@
   <!-- Media Player Section - shown when a file is being played -->
   <div *ngIf="isPlaying" class="player-section">
     <div class="now-playing">
-      <h3>Now Playing: {{ currentFile?.name }}</h3>
-      <button class="btn-secondary" (click)="stopMedia()">Stop</button>
+      <h3>Now Playing: {{ currentPlaylistItem?.displayName || 'Unknown' }}</h3>
+      <div class="player-controls">
+        <button class="btn-secondary" (click)="playPrevious()" [disabled]="currentPlaylistIndex <= 0">Previous</button>
+        <button class="btn-secondary" (click)="stopMedia()">Stop</button>
+        <button class="btn-secondary" (click)="playNext()" [disabled]="currentPlaylistIndex >= playlist.length - 1">Next</button>
+      </div>
     </div>
 
     <div class="media-wrapper">
-      <!-- Audio player for audio files -->
       <audio #mediaPlayer controls class="media-element">
         <source [src]="mediaUrl" type="audio/mpeg">
         Your browser does not support the audio element.
       </audio>
     </div>
   </div>
+
   <!-- Authentication Section -->
   <div class="auth-section">
     <!-- Show this section if user is not authenticated and token input should be shown -->
@@ -35,9 +39,21 @@
         </ol>
       </div>
     </div>
-    <!-- File Browser Section -->
-    <div *ngIf="isAuthenticated()" class="file-browser">
-      <!-- Breadcrumbs - showing the current path navigation -->
+
+    <!-- Show this section if user is authenticated -->
+    <div *ngIf="isAuthenticated()" class="auth-status">
+      <span>Connected to Dropbox</span>
+      <button class="btn-secondary" (click)="logout()">Disconnect</button>
+    </div>
+  </div>
+
+  <!-- Main Content Area - Split Layout -->
+  <div *ngIf="isAuthenticated()" class="main-content">
+    <!-- Left Panel - File Browser -->
+    <div class="file-browser-panel">
+      <h3>Browse Music</h3>
+
+      <!-- Breadcrumbs -->
       <div class="breadcrumbs">
         <span *ngFor="let crumb of breadcrumbs; let last = last">
           <a (click)="navigateTo(crumb.path)" [class.active]="last">{{crumb.name}}</a>
@@ -45,20 +61,20 @@
         </span>
       </div>
 
-      <!-- Loading Indicator - shows when files are being fetched -->
+      <!-- Loading Indicator -->
       <div *ngIf="isLoading" class="loading">
         Loading...
       </div>
 
-      <!-- Simplified File List -->
+      <!-- File List -->
       <div *ngIf="!isLoading" class="file-list">
-        <!-- List of files and folders -->
         <div class="file-items">
-          <!-- Loop through each file in the files array -->
           <div *ngFor="let file of files"
                (click)="openItem(file)"
-               class="file-item">
-            <!-- Use text icons to avoid duplicate folder icons -->
+               class="file-item"
+               [class.folder-item]="file.is_folder"
+               [class.audio-item]="!file.is_folder && isAudioFile(file.name)">
+            <!-- Icons -->
             <ng-container *ngIf="file.is_folder">
               <span class="folder-icon">📁</span>
             </ng-container>
@@ -68,9 +84,10 @@
             <ng-container *ngIf="!file.is_folder && !isAudioFile(file.name)">
               <span class="file-icon">📄</span>
             </ng-container>
-            {{ file.name }}
+
+            <span class="file-name">{{ file.name }}</span>
           </div>
-          <!-- Show this message if the folder is empty -->
+
           <div *ngIf="files.length === 0" class="empty-folder">
             This folder is empty
           </div>
@@ -78,10 +95,48 @@
       </div>
     </div>
 
-    <!-- Show this section if user is authenticated -->
-    <div *ngIf="isAuthenticated()" class="auth-status">
-      <span>Connected to Dropbox</span>
-      <button class="btn-secondary" (click)="logout()">Disconnect</button>
+    <!-- Right Panel - Playlist -->
+    <div class="playlist-panel">
+      <div class="playlist-header">
+        <h3>Playlist ({{ playlist.length }} songs)</h3>
+        <button *ngIf="playlist.length > 0"
+                class="btn-secondary clear-btn"
+                (click)="clearPlaylist()">
+          Clear All
+        </button>
+      </div>
+
+      <div class="playlist-content">
+        <div *ngIf="playlist.length === 0" class="empty-playlist">
+          Click on songs in the file browser to add them to your playlist
+        </div>
+
+        <div *ngIf="playlist.length > 0" class="playlist-items">
+          <div *ngFor="let item of playlist; let i = index"
+               class="playlist-item"
+               [class.currently-playing]="isCurrentlyPlaying(i)"
+               (click)="playPlaylistItem(i)">
+
+            <div class="playlist-item-content">
+              <div class="playlist-item-main">
+                <span class="playlist-number">{{ i + 1 }}.</span>
+                <div class="playlist-item-info">
+                  <div class="playlist-title">{{ item.displayName }}</div>
+                </div>
+              </div>
+
+              <div class="playlist-item-actions">
+                <span *ngIf="isCurrentlyPlaying(i)" class="now-playing-indicator">♪</span>
+                <button class="remove-btn"
+                        (click)="removeFromPlaylist(i); $event.stopPropagation()"
+                        title="Remove from playlist">
+                  ×
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
