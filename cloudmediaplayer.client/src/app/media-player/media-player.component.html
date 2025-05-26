@@ -14,7 +14,6 @@
       </audio>
     </div>
   </div>
-
   <!-- Authentication Section -->
   <div class="auth-section">
     <!-- Show this section if user is not authenticated and token input should be shown -->
@@ -36,22 +35,8 @@
         </ol>
       </div>
     </div>
-
     <!-- File Browser Section -->
     <div *ngIf="isAuthenticated()" class="file-browser">
-      <!-- Filter Controls -->
-      <div class="filter-controls">
-        <label class="filter-checkbox">
-          <input type="checkbox"
-                 [(ngModel)]="onlyShowFoldersWithAudio"
-                 (change)="onFolderFilterChange()">
-          Only show folders with audio
-        </label>
-        <div *ngIf="isFilteringFolders" class="filter-status">
-          <span class="filtering-text">Checking folders for audio files...</span>
-        </div>
-      </div>
-
       <!-- Breadcrumbs - showing the current path navigation -->
       <div class="breadcrumbs">
         <span *ngFor="let crumb of breadcrumbs; let last = last">
@@ -65,12 +50,12 @@
         Loading...
       </div>
 
-      <!-- File List -->
+      <!-- Simplified File List -->
       <div *ngIf="!isLoading" class="file-list">
         <!-- List of files and folders -->
         <div class="file-items">
-          <!-- Loop through each file in the filteredFiles array -->
-          <div *ngFor="let file of filteredFiles"
+          <!-- Loop through each file in the files array -->
+          <div *ngFor="let file of files"
                (click)="openItem(file)"
                class="file-item">
             <!-- Use text icons to avoid duplicate folder icons -->
@@ -85,16 +70,9 @@
             </ng-container>
             {{ file.name }}
           </div>
-
           <!-- Show this message if the folder is empty -->
-          <div *ngIf="filteredFiles.length === 0 && !isFilteringFolders" class="empty-folder">
-            <span *ngIf="!onlyShowFoldersWithAudio || files.length === 0">This folder is empty</span>
-            <span *ngIf="onlyShowFoldersWithAudio && files.length > 0">No folders with audio files found</span>
-          </div>
-
-          <!-- Show this message while filtering folders -->
-          <div *ngIf="isFilteringFolders" class="filtering-folders">
-            <span class="filtering-text">🔍 Checking folders for audio files...</span>
+          <div *ngIf="files.length === 0" class="empty-folder">
+            This folder is empty
           </div>
         </div>
       </div>
