@@ -101,9 +101,10 @@ export class DropboxService {
   /**
    * Lists files and folders in a given Dropbox path
    * @param path The path to list files from (empty string for root)
+   * @param mediaOnly Whether to filter and return only media files (default: false)
    * @returns Observable with array of DropboxFile objects
    */
-  listFolder(path: string = ''): Observable<DropboxFile[]> {
+  listFolder(path: string = '', mediaOnly: boolean = false): Observable<DropboxFile[]> {
     if (!this.isAuthenticated()) {
       return of([]);
     }
@@ -159,7 +160,7 @@ export class DropboxService {
         const files: DropboxFile[] = [];
         if (response.entries && Array.isArray(response.entries)) {
           response.entries.forEach((entry: any) => {
-            files.push({
+            const file: DropboxFile = {
               id: entry.id,
               name: entry.name,
               path_display: entry.path_display,
@@ -167,7 +168,18 @@ export class DropboxService {
               media_info: entry.media_info,
               size: entry.size,
               client_modified: entry.client_modified
-            });
+            };
+
+            // Apply filtering logic
+            if (mediaOnly) {
+              // Include folders (for navigation) and media files only
+              if (file.is_folder || this.isMediaFile(file.name)) {
+                files.push(file);
+              }
+            } else {
+              // Include all files
+              files.push(file);
+            }
           });
         }
 
@@ -192,6 +204,15 @@ export class DropboxService {
       // Collect all emitted arrays into a single array
       scan((acc: DropboxFile[], val: DropboxFile[]) => [...acc, ...val], [] as DropboxFile[])
     );
+  }
+
+  /**
+   * Lists only media files in a given Dropbox path
+   * @param path The path to list files from (empty string for root)
+   * @returns Observable with array of DropboxFile objects (folders + media files only)
+   */
+  listMediaFiles(path: string = ''): Observable<DropboxFile[]> {
+    return this.listFolder(path, true);
   }
 
   /**

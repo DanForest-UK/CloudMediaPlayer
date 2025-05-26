@@ -108,7 +108,7 @@ export class MediaPlayerComponent implements OnInit {
     console.log(`Loading files from path: ${path}`);
 
     // Call the Dropbox service to get files
-    this.dropboxService.listFolder(path).subscribe(
+    this.dropboxService.listFolder(path, true).subscribe(
       files => {
         console.log(`Received ${files.length} files from Dropbox for path: ${path}`);
         // Sort files: folders first, then files alphabetically
