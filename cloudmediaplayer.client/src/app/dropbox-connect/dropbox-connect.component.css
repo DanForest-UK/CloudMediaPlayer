@@ -1,0 +1,60 @@
+/* Authentication section styles */
+.auth-section {
+  margin-bottom: 30px;
+  padding: 15px;
+  background-color: #f8f8f8;
+  border-radius: 5px;
+  border: 1px solid #eee;
+}
+
+.auth-message {
+  margin-top: 10px;
+  color: #666;
+}
+
+.auth-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Token input styles */
+.token-input {
+  display: flex;
+  margin: 15px 0;
+}
+
+.token-input input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px 0 0 4px;
+  font-size: 16px;
+}
+
+.token-input button {
+  border-radius: 0 4px 4px 0;
+  margin: 0;
+}
+
+.token-help {
+  background-color: #f0f0f0;
+  padding: 10px 15px;
+  border-radius: 4px;
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.token-help ol {
+  margin-top: 5px;
+  padding-left: 20px;
+}
+
+.token-help a {
+  color: #0066cc;
+  text-decoration: none;
+}
+
+.token-help a:hover {
+  text-decoration: underline;
+}

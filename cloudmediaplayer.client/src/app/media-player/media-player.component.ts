@@ -1,60 +1,43 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { DropboxService, DropboxFile } from '../dropbox.service';
+import { DropboxConnectComponent } from '../dropbox-connect/dropbox-connect.component';
+import { FileBrowserComponent } from '../file-browser/file-browser.component';
+import { PlaylistComponent, PlaylistItem } from '../playlist/playlist.component';
+import { AudioPlayerComponent } from '../audio-player/audio-player.component';
 
 /**
- * Interface for playlist items with extracted metadata
- */
-export interface PlaylistItem {
-  file: DropboxFile;
-  displayName: string;
-}
-
-/**
- * MediaPlayerComponent - Main component for browsing and playing audio files from Dropbox
+ * MediaPlayerComponent - Main orchestrator component
  * 
- * This component handles:
- * - Authentication with Dropbox via an access token
- * - Browsing Dropbox folders and files in a left panel
- * - Managing a playlist in a right panel
- * - Playing audio files with automatic progression through playlist
- * - Enqueuing all audio files from a folder recursively
+ * This component coordinates between all the sub-components:
+ * - DropboxConnectComponent for authentication
+ * - FileBrowserComponent for browsing files
+ * - PlaylistComponent for playlist management
+ * - AudioPlayerComponent for audio playback
  */
 @Component({
   selector: 'app-media-player',
   templateUrl: './media-player.component.html',
   styleUrls: ['./media-player.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, DropboxConnectComponent, FileBrowserComponent, PlaylistComponent, AudioPlayerComponent]
 })
-export class MediaPlayerComponent implements OnInit {
-  // Reference to the audio element in the template
-  @ViewChild('mediaPlayer') mediaPlayerRef!: ElementRef;
+export class MediaPlayerComponent {
+  @ViewChild(FileBrowserComponent) fileBrowser!: FileBrowserComponent;
 
-  // State variables to track current status
+  // Authentication state
+  isAuthenticated = false;
+
+  // Player state
   isPlaying = false;
   isLoading = false;
-  currentPath = '';
-  files: DropboxFile[] = [];
+  mediaUrl: string = '';
 
   // Playlist management
   playlist: PlaylistItem[] = [];
   currentPlaylistIndex = -1;
 
-  mediaUrl: string = '';
-
-  // Navigation breadcrumbs
-  breadcrumbs: { name: string; path: string }[] = [];
-
-  // For manual access token entry
-  tokenInput: string = '';
-  showTokenInput = false;
-
-  // Track which folders are currently being enqueued
-  enqueuingFolders = new Set<string>();
-
-  constructor(public dropboxService: DropboxService) { }
+  constructor(private dropboxService: DropboxService) { }
 
   /**
    * Get current playlist item by index
@@ -66,120 +49,60 @@ export class MediaPlayerComponent implements OnInit {
     return null;
   }
 
-  ngOnInit(): void {
-    if (this.dropboxService.isAuthenticated()) {
-      console.log('Token found, validating...');
-      this.dropboxService.getCurrentAccount().subscribe(
-        account => {
-          if (account) {
-            console.log('Successfully authenticated with Dropbox. Account:', account.name);
-            this.loadFiles('');
-          } else {
-            console.error('Token invalid or expired');
-            this.dropboxService.logout();
-            this.showTokenInput = true;
-          }
-        }
-      );
-    } else {
-      console.log('Not authenticated with Dropbox yet');
-      this.showTokenInput = true;
-    }
+  /**
+   * Get the name of the currently playing track
+   */
+  get currentTrackName(): string {
+    return this.currentPlaylistItem?.displayName || '';
   }
 
-  submitToken(): void {
-    if (this.tokenInput) {
-      this.dropboxService.setAccessToken(this.tokenInput);
-      this.showTokenInput = false;
-      this.loadFiles('/');
-    }
+  /**
+   * Check if we can play the previous track
+   */
+  get canPlayPrevious(): boolean {
+    return this.currentPlaylistIndex > 0;
   }
 
-  logout(): void {
-    this.dropboxService.logout();
-    this.files = [];
-    this.playlist = [];
-    this.currentPlaylistIndex = -1;
-    this.mediaUrl = '';
-    this.isPlaying = false;
-    this.showTokenInput = true;
-    this.enqueuingFolders.clear();
+  /**
+   * Check if we can play the next track
+   */
+  get canPlayNext(): boolean {
+    return this.currentPlaylistIndex < this.playlist.length - 1;
   }
 
-  loadFiles(path: string): void {
-    this.isLoading = true;
-    this.currentPath = path;
-    this.updateBreadcrumbs(path);
+  /**
+   * Handle authentication status changes from DropboxConnectComponent
+   */
+  onAuthenticationChanged(authenticated: boolean): void {
+    this.isAuthenticated = authenticated;
 
-    console.log(`Loading files from path: ${path}`);
-
-    this.dropboxService.listFolder(path, true).subscribe(
-      files => {
-        console.log(`Received ${files.length} files from Dropbox for path: ${path}`);
-        this.files = this.sortFiles(files);
-        this.isLoading = false;
-      },
-      error => {
-        console.error('Error loading files:', error);
-        this.isLoading = false;
-      }
-    );
-  }
-
-  sortFiles(files: DropboxFile[]): DropboxFile[] {
-    return files.sort((a, b) => {
-      if (a.is_folder === b.is_folder) {
-        return a.name.localeCompare(b.name);
-      }
-      return a.is_folder ? -1 : 1;
-    });
-  }
-
-  updateBreadcrumbs(path: string): void {
-    if (path === '' || path === '/') {
-      this.breadcrumbs = [{ name: 'Root', path: '/' }];
-      return;
-    }
-
-    const parts = path.split('/').filter(p => p);
-    this.breadcrumbs = [{ name: 'Root', path: '/' }];
-
-    let currentPath = '';
-    for (let i = 0; i < parts.length; i++) {
-      currentPath += '/' + parts[i];
-      this.breadcrumbs.push({
-        name: parts[i],
-        path: currentPath
-      });
-    }
-  }
-
-  navigateTo(path: string): void {
-    this.loadFiles(path);
-  }
-
-  openItem(file: DropboxFile): void {
-    if (file.is_folder) {
-      this.loadFiles(file.path_display);
-    } else if (this.isAudioFile(file.name)) {
-      this.addToPlaylist(file);
+    if (!authenticated) {
+      // Clear everything when logged out
+      this.playlist = [];
+      this.currentPlaylistIndex = -1;
+      this.mediaUrl = '';
+      this.isPlaying = false;
     }
   }
 
   /**
-   * Enqueues all audio files from a folder and its subfolders recursively
-   * @param folder The folder to enqueue all files from
+   * Handle file selection from FileBrowserComponent
    */
-  enqueueAllFromFolder(folder: DropboxFile, event: Event): void {
-    // Prevent the folder from being opened when clicking the enqueue button
-    event.stopPropagation();
+  onFileSelected(file: DropboxFile): void {
+    this.addToPlaylist(file);
+  }
 
-    if (!folder.is_folder) {
-      return;
-    }
+  /**
+   * Handle folder enqueue request from FileBrowserComponent
+   */
+  onFolderEnqueueRequested(folder: DropboxFile): void {
+    this.enqueueAllFromFolder(folder);
+  }
 
-    this.enqueuingFolders.add(folder.path_display);
-
+  /**
+   * Enqueues all audio files from a folder and its subfolders recursively
+   */
+  private enqueueAllFromFolder(folder: DropboxFile): void {
     this.dropboxService.collectAllAudioFilesRecursively(folder.path_display).subscribe(
       audioFiles => {
         const playlistItems: PlaylistItem[] = audioFiles.map(file => ({
@@ -190,31 +113,27 @@ export class MediaPlayerComponent implements OnInit {
         this.playlist.push(...playlistItems);
 
         if (!this.isPlaying && playlistItems.length > 0 && this.currentPlaylistIndex === -1) {
-          this.playPlaylistItem(0); 
+          this.playPlaylistItem(0);
         }
 
-        this.enqueuingFolders.delete(folder.path_display);
+        // Notify file browser that enqueuing is complete
+        if (this.fileBrowser) {
+          this.fileBrowser.markFolderEnqueueComplete(folder.path_display);
+        }
       },
       error => {
         console.error(`Error enqueuing files from ${folder.path_display}:`, error);
-        this.enqueuingFolders.delete(folder.path_display);
+        if (this.fileBrowser) {
+          this.fileBrowser.markFolderEnqueueComplete(folder.path_display);
+        }
       }
     );
   }
 
   /**
-   * Checks if a folder is currently being enqueued
-   * @param folderPath The path of the folder to check
-   * @returns True if the folder is being enqueued, false otherwise
-   */
-  isFolderBeingEnqueued(folderPath: string): boolean {
-    return this.enqueuingFolders.has(folderPath);
-  }
-
-  /**
    * Adds a song to the playlist 
    */
-  addToPlaylist(file: DropboxFile): void {
+  private addToPlaylist(file: DropboxFile): void {
     const playlistItem: PlaylistItem = {
       file: file,
       displayName: `${file.name}`
@@ -228,11 +147,66 @@ export class MediaPlayerComponent implements OnInit {
     }
   }
 
+  /**
+   * Handle play item request from PlaylistComponent
+   */
+  onPlayItemRequested(index: number): void {
+    this.playPlaylistItem(index);
+  }
+
+  /**
+   * Handle remove item request from PlaylistComponent
+   */
+  onRemoveItemRequested(index: number): void {
+    this.removeFromPlaylist(index);
+  }
+
+  /**
+   * Handle clear playlist request from PlaylistComponent
+   */
+  onClearPlaylistRequested(): void {
+    this.clearPlaylist();
+  }
+
+  /**
+   * Handle shuffle playlist request from PlaylistComponent
+   */
+  onShufflePlaylistRequested(): void {
+    this.shufflePlaylist();
+  }
+
+  /**
+   * Handle stop request from AudioPlayerComponent
+   */
+  onStopRequested(): void {
+    this.stopMedia();
+  }
+
+  /**
+   * Handle previous request from AudioPlayerComponent
+   */
+  onPreviousRequested(): void {
+    this.playPrevious();
+  }
+
+  /**
+   * Handle next request from AudioPlayerComponent
+   */
+  onNextRequested(): void {
+    this.playNext();
+  }
+
+  /**
+   * Handle song ended from AudioPlayerComponent
+   */
+  onSongEnded(): void {
+    this.playNext();
+  }
 
   /**
    * Plays a specific item from the playlist
    */
-  playPlaylistItem(index: number): void {
+  private playPlaylistItem(index: number): void {
     if (index < 0 || index >= this.playlist.length) {
       return;
     }
@@ -244,7 +218,7 @@ export class MediaPlayerComponent implements OnInit {
   /**
    * Plays the next song in the playlist
    */
-  playNext(): void {
+  private playNext(): void {
     if (this.currentPlaylistIndex < this.playlist.length - 1) {
       this.playPlaylistItem(this.currentPlaylistIndex + 1);
     } else {
@@ -255,7 +229,7 @@ export class MediaPlayerComponent implements OnInit {
   /**
    * Plays the previous song in the playlist
    */
-  playPrevious(): void {
+  private playPrevious(): void {
     if (this.currentPlaylistIndex > 0) {
       this.playPlaylistItem(this.currentPlaylistIndex - 1);
     }
@@ -264,7 +238,7 @@ export class MediaPlayerComponent implements OnInit {
   /**
    * Removes an item from the playlist
    */
-  removeFromPlaylist(index: number): void {
+  private removeFromPlaylist(index: number): void {
     if (index < 0 || index >= this.playlist.length) {
       return;
     }
@@ -300,7 +274,7 @@ export class MediaPlayerComponent implements OnInit {
   /**
    * Clears the entire playlist
    */
-  clearPlaylist(): void {
+  private clearPlaylist(): void {
     this.playlist = [];
     this.currentPlaylistIndex = -1;
     this.stopMedia();
@@ -309,7 +283,7 @@ export class MediaPlayerComponent implements OnInit {
   /**
    * Shuffles the playlist 
    */
-  shufflePlaylist(): void {
+  private shufflePlaylist(): void {
     if (this.playlist.length <= 1) {
       return;
     }
@@ -323,7 +297,10 @@ export class MediaPlayerComponent implements OnInit {
     this.playPlaylistItem(0);
   }
 
-  playMedia(file: DropboxFile): void {
+  /**
+   * Plays media from a Dropbox file
+   */
+  private playMedia(file: DropboxFile): void {
     this.isLoading = true;
 
     console.log(`Getting temporary link for file: ${file.path_display}`);
@@ -333,81 +310,14 @@ export class MediaPlayerComponent implements OnInit {
       this.mediaUrl = url;
       this.isLoading = false;
       this.isPlaying = true;
-
-      setTimeout(() => {
-        const mediaElement = this.mediaPlayerRef?.nativeElement;
-        if (mediaElement) {
-          mediaElement.load();
-          mediaElement.play();
-
-          // Add event listener for when song ends
-          mediaElement.onended = () => {
-            this.onSongEnded();
-          };
-        }
-      }, 100);
     });
   }
 
   /**
-   * Called when the current song ends
+   * Stops media playback
    */
-  onSongEnded(): void {
-    this.playNext();
-  }
-
-  stopMedia(): void {
+  private stopMedia(): void {
     this.isPlaying = false;
     this.mediaUrl = '';
-
-    const mediaElement = this.mediaPlayerRef?.nativeElement;
-    if (mediaElement) {
-      mediaElement.pause();
-      mediaElement.currentTime = 0;
-    }
-  }
-
-  isAuthenticated(): boolean {
-    return this.dropboxService.isAuthenticated();
-  }
-
-  getFileIcon(file: DropboxFile): string {
-    if (file.is_folder) {
-      return 'folder-icon';
-    }
-
-    const name = file.name.toLowerCase();
-    if (this.isAudioFile(name)) {
-      return 'music-icon';
-    } else {
-      return 'file-icon';
-    }
-  }
-
-  isAudioFile(filename: string): boolean {
-    if (!filename) return false;
-
-    const audioExtensions = [
-      '.mp3', '.wav', '.ogg', '.m4a', '.flac', '.aac'
-    ];
-
-    const extension = filename.substring(filename.lastIndexOf('.')).toLowerCase();
-    return audioExtensions.includes(extension);
-  }
-
-  getCurrentFolderName(): string {
-    if (this.currentPath === '' || this.currentPath === '/') {
-      return 'Root';
-    }
-
-    const parts = this.currentPath.split('/').filter(p => p);
-    return parts[parts.length - 1];
-  }
-
-  /**
-   * Checks if a playlist item is currently playing
-   */
-  isCurrentlyPlaying(index: number): boolean {
-    return this.isPlaying && this.currentPlaylistIndex === index;
   }
 }

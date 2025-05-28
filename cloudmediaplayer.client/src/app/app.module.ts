@@ -5,6 +5,10 @@ import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { MediaPlayerComponent } from './media-player/media-player.component';
+import { DropboxConnectComponent } from './dropbox-connect/dropbox-connect.component';
+import { FileBrowserComponent } from './file-browser/file-browser.component';
+import { PlaylistComponent } from './playlist/playlist.component';
+import { AudioPlayerComponent } from './audio-player/audio-player.component';
 
 /**
  * AppModule - The main module for the application
@@ -13,12 +17,16 @@ import { MediaPlayerComponent } from './media-player/media-player.component';
  * This module imports all necessary Angular modules and components needed for our app.
  */
 @NgModule({
-  declarations: [], // We don't need declarations since we're using standalone components
+  declarations: [], 
   imports: [
     BrowserModule,
     FormsModule,
-    AppComponent,        // Our root component (standalone)
-    MediaPlayerComponent // Our media player component (standalone)
+    AppComponent,            
+    MediaPlayerComponent,     
+    DropboxConnectComponent, 
+    FileBrowserComponent,     
+    PlaylistComponent,         
+    AudioPlayerComponent      
   ],
   providers: [
     provideHttpClient(withFetch()) // Provides HttpClient with fetch API

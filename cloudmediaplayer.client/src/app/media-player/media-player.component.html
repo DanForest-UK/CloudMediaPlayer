@@ -1,161 +1,34 @@
 <div class="media-player-container">
-  <!-- Media Player Section - shown when a file is being played -->
-  <div *ngIf="isPlaying" class="player-section">
-    <div class="now-playing">
-      <h3>Now Playing: {{ currentPlaylistItem?.displayName || 'Unknown' }}</h3>
-      <div class="player-controls">
-        <button class="btn-secondary" (click)="playPrevious()" [disabled]="currentPlaylistIndex <= 0">Previous</button>
-        <button class="btn-secondary" (click)="stopMedia()">Stop</button>
-        <button class="btn-secondary" (click)="playNext()" [disabled]="currentPlaylistIndex >= playlist.length - 1">Next</button>
-      </div>
-    </div>
-
-    <div class="media-wrapper">
-      <audio #mediaPlayer controls class="media-element">
-        <source [src]="mediaUrl" type="audio/mpeg">
-        Your browser does not support the audio element.
-      </audio>
-    </div>
-  </div>
-
-  <!-- Authentication Section -->
-  <div class="auth-section">
-    <!-- Show this section if user is not authenticated and token input should be shown -->
-    <div *ngIf="!isAuthenticated() && showTokenInput">
-      <h3>Connect to Dropbox</h3>
-      <p class="auth-message">
-        Enter a Dropbox access token to connect to your account:
-      </p>
-      <div class="token-input">
-        <input type="text" [(ngModel)]="tokenInput" placeholder="Paste your Dropbox access token here" />
-        <button class="btn-primary" (click)="submitToken()">Connect</button>
-      </div>
-      <div class="token-help">
-        <p>To get an access token:</p>
-        <ol>
-          <li>Go to <a href="https://dropbox.github.io/dropbox-api-v2-explorer/#files_list_folder" target="_blank">Dropbox API Explorer</a></li>
-          <li>Click "Get Token" and sign in to your Dropbox account</li>
-          <li>Copy the generated token and paste it above</li>
-        </ol>
-      </div>
-    </div>
-
-    <!-- Show this section if user is authenticated -->
-    <div *ngIf="isAuthenticated()" class="auth-status">
-      <span>Connected to Dropbox</span>
-      <button class="btn-secondary" (click)="logout()">Disconnect</button>
-    </div>
-  </div>
-
+  <!-- Audio Player Section -->
+  <app-audio-player [isPlaying]="isPlaying"
+                    [isLoading]="isLoading"
+                    [mediaUrl]="mediaUrl"
+                    [currentTrackName]="currentTrackName"
+                    [canPlayPrevious]="canPlayPrevious"
+                    [canPlayNext]="canPlayNext"
+                    (stopRequested)="onStopRequested()"
+                    (previousRequested)="onPreviousRequested()"
+                    (nextRequested)="onNextRequested()"
+                    (songEnded)="onSongEnded()">
+  </app-audio-player>
   <!-- Main Content Area - Split Layout -->
-  <div *ngIf="isAuthenticated()" class="main-content">
+  <div *ngIf="isAuthenticated" class="main-content">
     <!-- Left Panel - File Browser -->
-    <div class="file-browser-panel">
-      <h3>Browse Music</h3>
-
-      <!-- Breadcrumbs -->
-      <div class="breadcrumbs">
-        <span *ngFor="let crumb of breadcrumbs; let last = last">
-          <a (click)="navigateTo(crumb.path)" [class.active]="last">{{crumb.name}}</a>
-          <span *ngIf="!last"> / </span>
-        </span>
-      </div>
-
-      <!-- Loading Indicator -->
-      <div *ngIf="isLoading" class="loading">
-        Loading...
-      </div>
-
-      <!-- File List -->
-      <div *ngIf="!isLoading" class="file-list">
-        <div class="file-items">
-          <div *ngFor="let file of files"
-               class="file-item"
-               [class.folder-item]="file.is_folder"
-               [class.audio-item]="!file.is_folder && isAudioFile(file.name)">
-            
-            <div class="file-item-main" (click)="openItem(file)">
-              <!-- Icons -->
-              <ng-container *ngIf="file.is_folder">
-                <span class="folder-icon">📁</span>
-              </ng-container>
-              <ng-container *ngIf="!file.is_folder && isAudioFile(file.name)">
-                <span class="music-icon">🎵</span>
-              </ng-container>
-              <ng-container *ngIf="!file.is_folder && !isAudioFile(file.name)">
-                <span class="file-icon">📄</span>
-              </ng-container>
-
-              <span class="file-name">{{ file.name }}</span>
-            </div>
-
-            <!-- Enqueue All button for folders -->
-            <div *ngIf="file.is_folder" class="file-item-actions">
-              <button class="enqueue-all-btn"
-                      (click)="enqueueAllFromFolder(file, $event)"
-                      [disabled]="isFolderBeingEnqueued(file.path_display)"
-                      title="Enqueue all audio files from this folder and subfolders">
-                <span *ngIf="!isFolderBeingEnqueued(file.path_display)">➕</span>
-                <span *ngIf="isFolderBeingEnqueued(file.path_display)" class="loading-spinner">⏳</span>
-              </button>
-            </div>
-          </div>
-
-          <div *ngIf="files.length === 0" class="empty-folder">
-            This folder is empty
-          </div>
-        </div>
-      </div>
-    </div>
+    <app-file-browser (fileSelected)="onFileSelected($event)"
+                      (folderEnqueueRequested)="onFolderEnqueueRequested($event)">
+    </app-file-browser>
 
     <!-- Right Panel - Playlist -->
-    <div class="playlist-panel">
-      <div class="playlist-header">
-        <h3>Playlist ({{ playlist.length }} songs)</h3>
-        <div *ngIf="playlist.length > 0" class="playlist-buttons">
-          <button class="btn-secondary shuffle-btn"
-                  (click)="shufflePlaylist()"
-                  title="Shuffle playlist and start playing">
-            Shuffle
-          </button>
-          <button class="btn-secondary clear-btn"
-                  (click)="clearPlaylist()">
-            Clear All
-          </button>
-        </div>
-      </div>
-
-      <div class="playlist-content">
-        <div *ngIf="playlist.length === 0" class="empty-playlist">
-          Click on songs in the file browser to add them to your playlist, or use the ➕ button on folders to add all songs from that folder
-        </div>
-
-        <div *ngIf="playlist.length > 0" class="playlist-items">
-          <div *ngFor="let item of playlist; let i = index"
-               class="playlist-item"
-               [class.currently-playing]="isCurrentlyPlaying(i)"
-               (click)="playPlaylistItem(i)">
-
-            <div class="playlist-item-content">
-              <div class="playlist-item-main">
-                <span class="playlist-number">{{ i + 1 }}.</span>
-                <div class="playlist-item-info">
-                  <div class="playlist-title">{{ item.displayName }}</div>
-                </div>
-              </div>
-
-              <div class="playlist-item-actions">
-                <span *ngIf="isCurrentlyPlaying(i)" class="now-playing-indicator">♪</span>
-                <button class="remove-btn"
-                        (click)="removeFromPlaylist(i); $event.stopPropagation()"
-                        title="Remove from playlist">
-                  ×
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <app-playlist [playlist]="playlist"
+                  [currentPlaylistIndex]="currentPlaylistIndex"
+                  [isPlaying]="isPlaying"
+                  (playItemRequested)="onPlayItemRequested($event)"
+                  (removeItemRequested)="onRemoveItemRequested($event)"
+                  (clearPlaylistRequested)="onClearPlaylistRequested()"
+                  (shufflePlaylistRequested)="onShufflePlaylistRequested()">
+    </app-playlist>
   </div>
+  <!-- Dropbox Authentication Section -->
+  <app-dropbox-connect (authenticationChanged)="onAuthenticationChanged($event)">
+  </app-dropbox-connect>
 </div>

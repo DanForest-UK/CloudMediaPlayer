@@ -1,0 +1,48 @@
+<div class="playlist-panel">
+  <div class="playlist-header">
+    <h3>Playlist ({{ playlist.length }} songs)</h3>
+    <div *ngIf="playlist.length > 0" class="playlist-buttons">
+      <button class="btn-secondary shuffle-btn"
+              (click)="shufflePlaylist()"
+              title="Shuffle playlist and start playing">
+        Shuffle
+      </button>
+      <button class="btn-secondary clear-btn"
+              (click)="clearPlaylist()">
+        Clear All
+      </button>
+    </div>
+  </div>
+
+  <div class="playlist-content">
+    <div *ngIf="playlist.length === 0" class="empty-playlist">
+      Click on songs in the file browser to add them to your playlist, or use the ➕ button on folders to add all songs from that folder
+    </div>
+
+    <div *ngIf="playlist.length > 0" class="playlist-items">
+      <div *ngFor="let item of playlist; let i = index"
+           class="playlist-item"
+           [class.currently-playing]="isCurrentlyPlaying(i)"
+           (click)="playPlaylistItem(i)">
+
+        <div class="playlist-item-content">
+          <div class="playlist-item-main">
+            <span class="playlist-number">{{ i + 1 }}.</span>
+            <div class="playlist-item-info">
+              <div class="playlist-title">{{ item.displayName }}</div>
+            </div>
+          </div>
+
+          <div class="playlist-item-actions">
+            <span *ngIf="isCurrentlyPlaying(i)" class="now-playing-indicator">♪</span>
+            <button class="remove-btn"
+                    (click)="removeFromPlaylist(i, $event)"
+                    title="Remove from playlist">
+              ×
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,1 +1,177 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global styles */
+
+button {
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  border: none;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
+.btn-primary:disabled {
+  background-color: #ccc;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background-color: #f1f1f1;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #e8e8e8;
+}
+
+.btn-secondary:disabled {
+  background-color: #f8f8f8;
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.panel {
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  padding: 20px;
+  border: 1px solid #ddd;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+  .panel-header h3 {
+    margin: 0;
+    color: #333;
+  }
+
+.section {
+  margin-bottom: 30px;
+  padding: 15px;
+  background-color: #f8f8f8;
+  border-radius: 5px;
+  border: 1px solid #eee;
+}
+
+.empty-state {
+  text-align: center;
+  color: #999;
+  padding: 40px 20px;
+  font-style: italic;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.flex-center {
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-between {
+  justify-content: space-between;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-gap-small {
+  gap: 8px;
+}
+
+.flex-gap-medium {
+  gap: 10px;
+}
+
+.flex-gap-large {
+  gap: 15px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-muted {
+  color: #666;
+}
+
+.text-success {
+  color: #4CAF50;
+}
+
+/* Utility classes for common patterns */
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pulse-animation {
+  animation: pulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0.5;
+  }
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  .mobile-column {
+    flex-direction: column;
+  }
+
+  .mobile-full-width {
+    width: 100%;
+  }
+
+  .mobile-center {
+    justify-content: center;
+  }
+}

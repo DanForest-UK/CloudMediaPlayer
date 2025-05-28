@@ -1,0 +1,57 @@
+<div class="file-browser-panel">
+  <h3>Browse Music</h3>
+
+  <!-- Breadcrumbs -->
+  <div class="breadcrumbs">
+    <span *ngFor="let crumb of breadcrumbs; let last = last">
+      <a (click)="navigateTo(crumb.path)" [class.active]="last">{{crumb.name}}</a>
+      <span *ngIf="!last"> / </span>
+    </span>
+  </div>
+
+  <!-- Loading Indicator -->
+  <div *ngIf="isLoading" class="loading">
+    Loading...
+  </div>
+
+  <!-- File List -->
+  <div *ngIf="!isLoading" class="file-list">
+    <div class="file-items">
+      <div *ngFor="let file of files"
+           class="file-item"
+           [class.folder-item]="file.is_folder"
+           [class.audio-item]="!file.is_folder && isAudioFile(file.name)">
+
+        <div class="file-item-main" (click)="openItem(file)">
+          <!-- Icons -->
+          <ng-container *ngIf="file.is_folder">
+            <span class="folder-icon">📁</span>
+          </ng-container>
+          <ng-container *ngIf="!file.is_folder && isAudioFile(file.name)">
+            <span class="music-icon">🎵</span>
+          </ng-container>
+          <ng-container *ngIf="!file.is_folder && !isAudioFile(file.name)">
+            <span class="file-icon">📄</span>
+          </ng-container>
+
+          <span class="file-name">{{ file.name }}</span>
+        </div>
+
+        <!-- Enqueue All button for folders -->
+        <div *ngIf="file.is_folder" class="file-item-actions">
+          <button class="enqueue-all-btn"
+                  (click)="enqueueAllFromFolder(file, $event)"
+                  [disabled]="isFolderBeingEnqueued(file.path_display)"
+                  title="Enqueue all audio files from this folder and subfolders">
+            <span *ngIf="!isFolderBeingEnqueued(file.path_display)">➕</span>
+            <span *ngIf="isFolderBeingEnqueued(file.path_display)" class="loading-spinner">⏳</span>
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="files.length === 0" class="empty-folder">
+        This folder is empty
+      </div>
+    </div>
+  </div>
+</div>
