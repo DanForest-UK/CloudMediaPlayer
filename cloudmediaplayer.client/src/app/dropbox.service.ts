@@ -47,7 +47,7 @@ export class DropboxService {
   private accessToken: string | null = null;
 
   // Rate limiting properties
-  private readonly MAX_CONCURRENT_REQUESTS = 10; // Limit concurrent requests
+  private readonly MAX_CONCURRENT_REQUESTS = 5; // Limit concurrent requests
   private readonly REQUEST_DELAY = 50; // Delay between requests in ms
   private activeRequests = 0;
 

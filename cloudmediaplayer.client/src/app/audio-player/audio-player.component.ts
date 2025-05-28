@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, OnChanges, SimpleChanges, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 /**
@@ -16,7 +16,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule]
 })
-export class AudioPlayerComponent {
+export class AudioPlayerComponent implements AfterViewInit, OnChanges {
   // Reference to the audio element in the template
   @ViewChild('mediaPlayer') mediaPlayerRef!: ElementRef;
 
@@ -42,18 +42,44 @@ export class AudioPlayerComponent {
     }
   }
 
-  ngOnChanges(): void {
-    // When mediaUrl changes, load and play the new audio
-    if (this.mediaUrl && this.mediaPlayerRef) {
+  ngOnChanges(changes: SimpleChanges): void {
+    // Handle changes to mediaUrl or isPlaying
+    if (changes['mediaUrl'] || changes['isPlaying']) {
+      // Use setTimeout to ensure DOM is ready
       setTimeout(() => {
-        const mediaElement = this.mediaPlayerRef.nativeElement;
-        if (mediaElement) {
-          mediaElement.load();
-          if (this.isPlaying) {
-            mediaElement.play();
+        this.handlePlaybackChange();
+      }, 0);
+    }
+  }
+
+  private handlePlaybackChange(): void {
+    if (!this.mediaPlayerRef) {
+      return;
+    }
+
+    const mediaElement = this.mediaPlayerRef.nativeElement;
+    if (!mediaElement) {
+      return;
+    }
+
+    // If we have a new media URL, load it
+    if (this.mediaUrl) {
+      mediaElement.src = this.mediaUrl;
+      mediaElement.load();
+
+      // If we should be playing, start playback after a reasonable delay
+      if (this.isPlaying) {       
+        setTimeout(() => {
+          if (this.isPlaying) { 
+            mediaElement.play().catch((error: any) => {
+              console.error('Error starting playback:', error);
+            });
           }
-        }
-      }, 100);
+        }, 200);
+      }
+    } else if (!this.isPlaying) {     
+      mediaElement.pause();
+      mediaElement.currentTime = 0;
     }
   }
 
