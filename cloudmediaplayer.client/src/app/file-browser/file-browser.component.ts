@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DropboxService, DropboxFile } from '../dropbox.service';
+import { DropboxService, DropboxFile, FolderScanProgress } from '../dropbox.service';
+import { Subscription } from 'rxjs';
 
 /**
  * FileBrowserComponent - Handles browsing Dropbox files and folders
@@ -9,6 +10,7 @@ import { DropboxService, DropboxFile } from '../dropbox.service';
  * - File/folder navigation with breadcrumbs
  * - Loading states
  * - File selection and folder enqueueing
+ * - Progress tracking for folder scanning
  */
 @Component({
   selector: 'app-file-browser',
@@ -17,7 +19,7 @@ import { DropboxService, DropboxFile } from '../dropbox.service';
   standalone: true,
   imports: [CommonModule]
 })
-export class FileBrowserComponent implements OnInit {
+export class FileBrowserComponent implements OnInit, OnDestroy {
   @Output() fileSelected = new EventEmitter<DropboxFile>();
   @Output() folderEnqueueRequested = new EventEmitter<DropboxFile>();
 
@@ -32,10 +34,34 @@ export class FileBrowserComponent implements OnInit {
   // Track which folders are currently being enqueued
   enqueuingFolders = new Set<string>();
 
+  // Track the specific folder being scanned
+  currentlyScannedFolder: string = '';
+
+  // Progress tracking
+  scanProgress: FolderScanProgress = {
+    currentPath: '',
+    isScanning: false,
+    totalAudioFiles: 0
+  };
+  private progressSubscription: Subscription | null = null;
+
   constructor(private dropboxService: DropboxService) { }
 
   ngOnInit(): void {
     this.loadFiles('');
+
+    // Subscribe to folder scan progress
+    this.progressSubscription = this.dropboxService.getFolderScanProgress().subscribe(
+      progress => {
+        this.scanProgress = progress;
+      }
+    );
+  }
+
+  ngOnDestroy(): void {
+    if (this.progressSubscription) {
+      this.progressSubscription.unsubscribe();
+    }
   }
 
   loadFiles(path: string): void {
@@ -112,6 +138,7 @@ export class FileBrowserComponent implements OnInit {
     }
 
     this.enqueuingFolders.add(folder.path_display);
+    this.currentlyScannedFolder = folder.path_display;
     this.folderEnqueueRequested.emit(folder);
   }
 
@@ -121,6 +148,9 @@ export class FileBrowserComponent implements OnInit {
    */
   markFolderEnqueueComplete(folderPath: string): void {
     this.enqueuingFolders.delete(folderPath);
+    if (this.currentlyScannedFolder === folderPath) {
+      this.currentlyScannedFolder = '';
+    }
   }
 
   /**
@@ -130,6 +160,28 @@ export class FileBrowserComponent implements OnInit {
    */
   isFolderBeingEnqueued(folderPath: string): boolean {
     return this.enqueuingFolders.has(folderPath);
+  }
+
+  /**
+   * Checks if a specific folder is the one currently being scanned
+   * @param folderPath The path of the folder to check
+   * @returns True if this folder is currently being scanned, false otherwise
+   */
+  isThisFolderBeingScanned(folderPath: string): boolean {
+    return this.currentlyScannedFolder === folderPath && this.scanProgress.isScanning;
+  }
+
+  /**
+   * Gets the display name for the current scan path
+   */
+  getScanPathDisplayName(): string {
+    if (!this.scanProgress.currentPath) {
+      return '';
+    }
+
+    // Extract just the folder name from the full path
+    const pathParts = this.scanProgress.currentPath.split('/').filter(p => p);
+    return pathParts.length > 0 ? pathParts[pathParts.length - 1] : 'Root';
   }
 
   isAudioFile(filename: string): boolean {

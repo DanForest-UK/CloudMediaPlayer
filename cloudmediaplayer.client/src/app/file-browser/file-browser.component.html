@@ -1,6 +1,21 @@
 <div class="file-browser-panel">
   <h3>Browse Music</h3>
 
+  <!-- Progress indicator for folder scanning -->
+  <div *ngIf="scanProgress.isScanning" class="scan-progress">
+    <div class="scan-progress-text">
+      <span class="scan-text">
+        <span class="scan-icon">🔍</span>Searching <strong class="scan-folder-name">{{ getScanPathDisplayName() }}</strong> for audio files...
+      </span>
+      <span *ngIf="scanProgress.totalAudioFiles > 0" class="files-found">
+        {{ scanProgress.totalAudioFiles }} audio files found
+      </span>
+    </div>
+    <div class="scan-progress-bar">
+      <div class="scan-progress-bar-fill"></div>
+    </div>
+  </div>
+
   <!-- Breadcrumbs -->
   <div class="breadcrumbs">
     <span *ngFor="let crumb of breadcrumbs; let last = last">
@@ -41,10 +56,10 @@
         <div *ngIf="file.is_folder" class="file-item-actions">
           <button class="enqueue-all-btn"
                   (click)="enqueueAllFromFolder(file, $event)"
-                  [disabled]="isFolderBeingEnqueued(file.path_display)"
+                  [disabled]="scanProgress.isScanning"
                   title="Enqueue all audio files from this folder and subfolders">
-            <span *ngIf="!isFolderBeingEnqueued(file.path_display)">➕</span>
-            <span *ngIf="isFolderBeingEnqueued(file.path_display)" class="loading-spinner">⏳</span>
+            <span *ngIf="!isThisFolderBeingScanned(file.path_display)">➕</span>
+            <span *ngIf="isThisFolderBeingScanned(file.path_display)" class="loading-spinner">⏳</span>
           </button>
         </div>
       </div>

@@ -1,7 +1,16 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of, Subject, forkJoin } from 'rxjs';
-import { map, catchError, scan, mergeMap, concatMap } from 'rxjs/operators';
+import { Observable, of, Subject, forkJoin, from, EMPTY, BehaviorSubject } from 'rxjs';
+import { map, catchError, scan, mergeMap, concatMap, delay, retryWhen, take, tap, takeLast, finalize } from 'rxjs/operators';
+
+/**
+ * Interface for progress updates during folder scanning
+ */
+export interface FolderScanProgress {
+  currentPath: string;
+  isScanning: boolean;
+  totalAudioFiles: number;
+}
 
 /**
  * Interface that defines the structure of a Dropbox file or folder
@@ -37,6 +46,18 @@ export class DropboxService {
   // Store the access token
   private accessToken: string | null = null;
 
+  // Rate limiting properties
+  private readonly MAX_CONCURRENT_REQUESTS = 10; // Limit concurrent requests
+  private readonly REQUEST_DELAY = 50; // Delay between requests in ms
+  private activeRequests = 0;
+
+  // Progress tracking
+  private folderScanProgress$ = new BehaviorSubject<FolderScanProgress>({
+    currentPath: '',
+    isScanning: false,
+    totalAudioFiles: 0
+  });
+
   /**
    * Constructor - Checks if a token exists in localStorage
    * @param http HttpClient for making API requests
@@ -44,6 +65,79 @@ export class DropboxService {
   constructor(private http: HttpClient) {
     // Check if token exists in localStorage
     this.accessToken = localStorage.getItem('dropbox_access_token');
+  }
+
+  /**
+   * Get the current folder scan progress as an observable
+   */
+  getFolderScanProgress(): Observable<FolderScanProgress> {
+    return this.folderScanProgress$.asObservable();
+  }
+
+  /**
+   * Update the folder scan progress
+   */
+  private updateScanProgress(currentPath: string, isScanning: boolean, totalAudioFiles: number = 0): void {
+    this.folderScanProgress$.next({
+      currentPath,
+      isScanning,
+      totalAudioFiles
+    });
+  }
+
+  /**
+   * Rate-limited request wrapper 
+   */
+  private makeRateLimitedRequest<T>(requestFn: () => Observable<T>): Observable<T> {
+    return new Observable(observer => {
+      const executeWhenSlotAvailable = () => {
+        if (this.activeRequests < this.MAX_CONCURRENT_REQUESTS) {
+          this.activeRequests++;
+
+          // Add delay if specified
+          const delayedRequest = this.REQUEST_DELAY > 0
+            ? of(null).pipe(delay(this.REQUEST_DELAY), mergeMap(() => requestFn()))
+            : requestFn();
+
+          delayedRequest.pipe(
+            finalize(() => this.activeRequests--)
+          ).subscribe(observer);
+        } else {
+          // Check again in a short interval
+          setTimeout(executeWhenSlotAvailable, 10);
+        }
+      };
+      executeWhenSlotAvailable();
+    });
+  }
+
+  /**
+   * Retry with exponential backoff
+   */
+  private retryWithBackoff<T>(maxRetries: number = 3): (source: Observable<T>) => Observable<T> {
+    return (source: Observable<T>) => source.pipe(
+      retryWhen(errors =>
+        errors.pipe(
+          scan((retryCount, error) => {
+            console.log(`Retry attempt ${retryCount + 1} for error:`, error);
+
+            // Check if it's a rate limit error (status 429 or network error with status 0)
+            const isRateLimitError = error.status === 429 || error.status === 0;
+
+            if (retryCount >= maxRetries || !isRateLimitError) {
+              throw error;
+            }
+            return retryCount + 1;
+          }, 0),
+          mergeMap((retryCount, error) => {
+            // Exponential backoff: 1s, 2s, 4s, 8s...
+            const backoffDelay = Math.pow(2, retryCount) * 1000;
+            console.log(`Waiting ${backoffDelay}ms before retry...`);
+            return of(null).pipe(delay(backoffDelay));
+          })
+        )
+      )
+    );
   }
 
   /**
@@ -87,7 +181,8 @@ export class DropboxService {
       'Content-Type': 'application/json'
     });
 
-    return this.http.post<any>(endpoint, null, { headers }).pipe(
+    const requestFn = () => this.http.post<any>(endpoint, null, { headers }).pipe(
+      this.retryWithBackoff(2),
       catchError(error => {
         console.error('Error getting current account:', error);
         if (error.error && error.error.error_summary) {
@@ -96,6 +191,8 @@ export class DropboxService {
         return of(null);
       })
     );
+
+    return this.makeRateLimitedRequest(requestFn);
   }
 
   /**
@@ -144,16 +241,19 @@ export class DropboxService {
 
       console.log(`Sending Dropbox API request for path: ${folderPath}${cursor ? ' with cursor' : ''}`);
 
-      this.http.post<any>(endpoint, body, { headers }).pipe(
+      const requestFn = () => this.http.post<any>(endpoint, body, { headers }).pipe(
+        this.retryWithBackoff(3),
         catchError(error => {
-          console.error('Error listing Dropbox folder:', error);
+          console.error('Error listing Dropbox folder after retries:', error);
           if (error.error && error.error.error_summary) {
             console.error('Dropbox API error:', error.error.error_summary);
           }
           // Return empty result on error
           return of({ entries: [], has_more: false });
         })
-      ).subscribe(response => {
+      );
+
+      this.makeRateLimitedRequest(requestFn).subscribe(response => {
         console.log('Dropbox API response:', response);
 
         // Process entries
@@ -216,8 +316,11 @@ export class DropboxService {
       return of([]);
     }
 
-    const allAudioFiles: DropboxFile[] = [];
+    // Start progress tracking
+    this.updateScanProgress(path, true, 0);
+
     const processedFolders = new Set<string>(); // avoid infinite loops
+    let totalAudioFiles = 0;
 
     const collectFromFolder = (folderPath: string): Observable<DropboxFile[]> => {
       if (processedFolders.has(folderPath)) {
@@ -225,41 +328,51 @@ export class DropboxService {
       }
       processedFolders.add(folderPath);
 
+      // Update progress with current folder being scanned
+      this.updateScanProgress(folderPath, true, totalAudioFiles);
+
       return this.listFolder(folderPath, false).pipe(
         mergeMap((files: DropboxFile[]) => {
           const audioFiles = files.filter(file => !file.is_folder && this.isMediaFile(file.name));
           const subfolders = files.filter(file => file.is_folder);
+
+          // Update total audio files count
+          totalAudioFiles += audioFiles.length;
+          this.updateScanProgress(folderPath, true, totalAudioFiles);
 
           // If no subfolders, just return the audio files
           if (subfolders.length === 0) {
             return of(audioFiles);
           }
 
-          // Process all subfolders and combine results
-          const subfolderObservables = subfolders.map(folder =>
-            collectFromFolder(folder.path_display)
-          );
-
-          // Combine current folder's audio files with all subfolder results
-          return forkJoin([of(audioFiles), ...subfolderObservables]).pipe(
-            map(results => {
-              // Flatten all results into a single array
-              const combined: DropboxFile[] = [];
-              results.forEach(fileArray => {
-                combined.push(...fileArray);
-              });
-              return combined;
-            })
+          // Process subfolders in parallel with concurrency limit
+          return from(subfolders).pipe(
+            mergeMap(folder =>
+              collectFromFolder(folder.path_display),
+              Math.min(this.MAX_CONCURRENT_REQUESTS, 20) // Limit subfolder concurrency
+            ),
+            scan((acc: DropboxFile[], files: DropboxFile[]) => [...acc, ...files], audioFiles),
+            takeLast(1) // Only emit the final accumulated result
           );
         }),
         catchError(error => {
           console.error(`Error collecting files from ${folderPath}:`, error);
-          return of([]); 
+          return of([]);
         })
       );
     };
 
-    return collectFromFolder(path);
+    return collectFromFolder(path).pipe(
+      tap(files => {
+        // Complete progress tracking
+        this.updateScanProgress('', false, files.length);
+      }),
+      catchError(error => {
+        // Complete progress tracking on error
+        this.updateScanProgress('', false, 0);
+        throw error;
+      })
+    );
   }
 
   /**
@@ -288,7 +401,8 @@ export class DropboxService {
     });
     const body = { path };
 
-    return this.http.post<any>(endpoint, body, { headers }).pipe(
+    const requestFn = () => this.http.post<any>(endpoint, body, { headers }).pipe(
+      this.retryWithBackoff(2),
       map(response => response.link),
       catchError(error => {
         console.error('Error getting temporary link:', error);
@@ -298,6 +412,8 @@ export class DropboxService {
         return of('');
       })
     );
+
+    return this.makeRateLimitedRequest(requestFn);
   }
 
   /**

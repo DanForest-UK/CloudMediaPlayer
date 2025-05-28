@@ -1,11 +1,12 @@
 /* File browser panel (left side) */
 .file-browser-panel {
-  flex: 1;
-  min-width: 300px;
+  width: 100%; 
+  height: 100%;
   background-color: #f9f9f9;
   border-radius: 5px;
   padding: 20px;
   border: 1px solid #ddd;
+  box-sizing: border-box;
 }
 
   .file-browser-panel h3 {
@@ -13,6 +14,85 @@
     margin-bottom: 15px;
     color: #333;
   }
+
+/* Progress indicator styles */
+.scan-progress {
+  background-color: #e8f5e8;
+  border: 1px solid #4CAF50;
+  border-radius: 5px;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  position: relative;
+  min-height: 45px; /* Minimum height to accommodate wrapped text */
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden; /* Prevent any overflow from affecting layout */
+}
+
+.scan-progress-text {
+  color: #2e7d2e;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  line-height: 1.4;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  width: 100%; 
+  box-sizing: border-box;
+}
+
+.scan-icon {
+  display: inline;
+  margin-right: 5px;
+}
+
+.scan-message,
+.scan-suffix {
+  display: inline;
+}
+
+.scan-folder-name {
+  display: inline;
+  font-weight: bold;
+  word-break: break-word; /* Allow long folder names to break */
+  max-width: none; 
+}
+
+.files-found {
+  color: #666;
+  font-weight: normal;
+  font-size: 13px;
+  display: block;
+  margin-top: 4px;
+  word-wrap: break-word;
+  width: 100%; 
+  box-sizing: border-box;
+}
+
+.scan-progress-bar {
+  height: 3px;
+  background-color: #d4edda;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.scan-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4CAF50, #66BB6A, #4CAF50);
+  background-size: 200% 100%;
+  animation: scanning 2s linear infinite;
+  width: 100%;
+}
+
+@keyframes scanning {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
 
 .breadcrumbs {
   margin-bottom: 15px;

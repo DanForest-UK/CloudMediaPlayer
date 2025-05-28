@@ -1,6 +1,6 @@
 /* Playlist panel */
 .playlist-panel {
-  flex: 1;
+  flex: 0 1 350px;
   min-width: 300px;
   max-width: 400px;
   background-color: #f9f9f9;
@@ -9,6 +9,7 @@
   border: 1px solid #ddd;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
 }
 
 .playlist-header {
@@ -174,8 +175,9 @@
 /* Responsive design */
 @media (max-width: 768px) {
   .playlist-panel {
+    flex: 1 1 auto; /* Allow full width on mobile */
     max-width: none;
-    order: -1; /* Show playlist above file browser on mobile */
+    order: 1; /* Show below file browser on mobile */
   }
 
   .playlist-buttons {
