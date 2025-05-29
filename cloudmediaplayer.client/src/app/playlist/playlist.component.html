@@ -27,14 +27,13 @@
 
         <div class="playlist-item-content">
           <div class="playlist-item-main">
-            <span class="playlist-number">{{ i + 1 }}.</span>
+            <span *ngIf="isCurrentlyPlaying(i)" class="now-playing-indicator">♪</span>
             <div class="playlist-item-info">
               <div class="playlist-title">{{ item.displayName }}</div>
             </div>
           </div>
 
           <div class="playlist-item-actions">
-            <span *ngIf="isCurrentlyPlaying(i)" class="now-playing-indicator">♪</span>
             <button class="remove-btn"
                     (click)="removeFromPlaylist(i, $event)"
                     title="Remove from playlist">

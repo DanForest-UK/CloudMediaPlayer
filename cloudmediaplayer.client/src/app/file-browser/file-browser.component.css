@@ -197,12 +197,12 @@
   color: #999;
 }
 
-/* Enqueue All button styles */
+/* Enqueue All button styles - Updated to square pastel green */
 .enqueue-all-btn {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 50%;
+  background-color: #a8d5a8; /* Pastel green background */
+  color: #2d5a2d; /* Darker green text */
+  border: 1px solid #8fbc8f; /* Subtle pastel green border */
+  border-radius: 4px; /* Square with slightly rounded corners */
   width: 28px;
   height: 28px;
   font-size: 14px;
@@ -214,20 +214,32 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Subtle shadow */
 }
 
   .enqueue-all-btn:hover:not(:disabled) {
-    background-color: #45a049;
+    background-color: #98c798; /* Slightly darker pastel green on hover */
+    border-color: #7fb07f;
     transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
   }
 
   .enqueue-all-btn:disabled {
-    background-color: #ccc;
+    background-color: #e8e8e8; /* Light gray when disabled */
+    color: #999;
+    border-color: #ddd;
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
+    /* Keep square shape when just disabled */
+  }
+
+  /* Special styling for the specific button that's loading */
+  .enqueue-all-btn.loading {
+    border-radius: 50%; /* Switch to circular only when this specific folder is loading */
+    background-color: #e8e8e8;
+    color: #999;
+    border-color: #ddd;
   }
 
 .loading-spinner {

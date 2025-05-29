@@ -103,6 +103,28 @@
   min-width: 20px;
 }
 
+.now-playing-indicator {
+  color: #4CAF50;
+  font-size: 16px;
+  animation: pulse 1.5s ease-in-out infinite alternate;
+  margin-right: 12px;
+  min-width: 20px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes pulse {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0.5;
+  }
+}
+
 .playlist-item-info {
   flex: 1;
   min-width: 0;
@@ -122,22 +144,6 @@
   align-items: center;
   gap: 8px;
   margin-left: 10px;
-}
-
-.now-playing-indicator {
-  color: #4CAF50;
-  font-size: 16px;
-  animation: pulse 1.5s ease-in-out infinite alternate;
-}
-
-@keyframes pulse {
-  from {
-    opacity: 1;
-  }
-
-  to {
-    opacity: 0.5;
-  }
 }
 
 .remove-btn {
