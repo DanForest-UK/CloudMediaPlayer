@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { DropboxService, AuthState } from '../dropbox.service';
 
@@ -12,7 +11,7 @@ import { DropboxService, AuthState } from '../dropbox.service';
   templateUrl: './dropbox-connect.component.html',
   styleUrls: ['./dropbox-connect.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule]
 })
 export class DropboxConnectComponent implements OnInit, OnDestroy {
   @Output() authenticationChanged = new EventEmitter<boolean>();
@@ -25,7 +24,6 @@ export class DropboxConnectComponent implements OnInit, OnDestroy {
   };
 
   isLoading = false;
-  tokenInput: string = '';
 
   private authSubscription?: Subscription;
 
@@ -77,30 +75,11 @@ export class DropboxConnectComponent implements OnInit, OnDestroy {
     }
   }
 
-  submitToken(): void {
-    try {
-      if (this.tokenInput && this.tokenInput.trim()) {
-        this.isLoading = true;
-        this.clearError();
-
-        if (this.dropboxService && this.dropboxService.setAccessToken) {
-          this.dropboxService.setAccessToken(this.tokenInput.trim());
-        }
-
-        this.tokenInput = '';
-      }
-    } catch (error) {
-      console.error('Error submitting token:', error);
-      this.isLoading = false;
-    }
-  }
-
   logout(): void {
     try {
       if (this.dropboxService && this.dropboxService.logout) {
         this.dropboxService.logout();
       }
-      this.tokenInput = '';
     } catch (error) {
       console.error('Error during logout:', error);
     }

@@ -5,7 +5,7 @@
   background-color: #f8f8f8;
   border-radius: 5px;
   border: 1px solid #eee;
-  overflow: hidden; 
+  overflow: hidden;
   box-sizing: border-box;
 }
 
@@ -37,16 +37,16 @@
   position: relative;
   width: 100%;
   box-sizing: border-box;
-  min-width: 0; 
+  min-width: 0;
 }
 
 .media-element {
   width: 100%;
   display: block;
   background-color: #333;
-  padding: 5px; 
+  padding: 5px;
   box-sizing: border-box;
-  min-width: 0; 
+  min-width: 0;
 }
 
 /* Responsive design */

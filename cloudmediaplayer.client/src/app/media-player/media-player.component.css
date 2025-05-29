@@ -18,7 +18,7 @@
 
   /* File browser panel - equal width */
   .main-content app-file-browser {
-    flex: 1 1 50%; 
+    flex: 1 1 50%;
     min-width: 300px;
     max-width: 50%;
     display: block;
@@ -26,7 +26,7 @@
 
   /* Playlist panel - equal width */
   .main-content app-playlist {
-    flex: 1 1 50%; 
+    flex: 1 1 50%;
     min-width: 300px;
     max-width: 50%;
     display: block;

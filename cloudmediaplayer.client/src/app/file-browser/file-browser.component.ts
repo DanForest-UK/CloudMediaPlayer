@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DropboxService, DropboxFile, FolderScanProgress } from '../dropbox.service'; // Updated import
+import { DropboxService, DropboxFile, FolderScanProgress } from '../dropbox.service';
 import { Subscription } from 'rxjs';
 
 /**
@@ -154,15 +154,6 @@ export class FileBrowserComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Checks if a folder is currently being enqueued
-   * @param folderPath The path of the folder to check
-   * @returns True if the folder is being enqueued, false otherwise
-   */
-  isFolderBeingEnqueued(folderPath: string): boolean {
-    return this.enqueuingFolders.has(folderPath);
-  }
-
-  /**
    * Checks if a specific folder is the one currently being scanned
    * @param folderPath The path of the folder to check
    * @returns True if this folder is currently being scanned, false otherwise
@@ -193,27 +184,5 @@ export class FileBrowserComponent implements OnInit, OnDestroy {
 
     const extension = filename.substring(filename.lastIndexOf('.')).toLowerCase();
     return audioExtensions.includes(extension);
-  }
-
-  getFileIcon(file: DropboxFile): string {
-    if (file.is_folder) {
-      return 'folder-icon';
-    }
-
-    const name = file.name.toLowerCase();
-    if (this.isAudioFile(name)) {
-      return 'music-icon';
-    } else {
-      return 'file-icon';
-    }
-  }
-
-  getCurrentFolderName(): string {
-    if (this.currentPath === '' || this.currentPath === '/') {
-      return 'Root';
-    }
-
-    const parts = this.currentPath.split('/').filter(p => p);
-    return parts[parts.length - 1];
   }
 }

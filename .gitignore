@@ -4,39 +4,21 @@ obj/
 *.dll
 *.exe
 *.pdb
-*.user
-*.suo
 *.cache
 *.log
+*.tmp
+*.temp
 
 # Visual Studio files
 .vs/
-.vscode/
 *.user
+*.suo
 *.userosscache
 *.sln.docstates
 *.userprefs
 *.dbmdl
 *.jfm
 **/Properties/launchSettings.json
-/.vs/CloudMediaPlayer/v17/.suo
-/.vs/CloudMediaPlayer/v17/DocumentLayout.json
-/.vs/CloudMediaPlayer/FileContentIndex/
-/.vs/CloudMediaPlayer/DesignTimeBuild/.dtbcache.v2
-/.vs/CloudMediaPlayer/v17/.futdcache.v2
-/.vs/CloudMediaPlayer/v17/HierarchyCache.v1.txt
-
-# Angular/Node.js files
-node_modules/
-dist/
-.angular/
-npm-debug.log
-yarn-error.log
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
 
 # IDE - Visual Studio Code
 .vscode/*
@@ -60,6 +42,26 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
+# Angular/Node.js files
+node_modules/
+dist/
+.angular/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Test coverage
+coverage/
+.nyc_output/
+
 # SSL certificates
 *.pem
 *.key
@@ -69,8 +71,14 @@ bld/
 # GitHub Copilot indices
 CloudMediaPlayer/CopilotIndices/
 
-# Miscellaneous
+# OS specific files
 Thumbs.db
 Desktop.ini
 .DS_Store
-git.ignore
+*~
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock

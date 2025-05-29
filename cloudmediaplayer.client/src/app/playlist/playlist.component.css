@@ -117,14 +117,6 @@
   text-overflow: ellipsis;
 }
 
-.playlist-artist {
-  font-size: 14px;
-  color: #666;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .playlist-item-actions {
   display: flex;
   align-items: center;

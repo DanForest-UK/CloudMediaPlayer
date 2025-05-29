@@ -19,6 +19,16 @@
   animation: pulse 1.5s ease-in-out infinite alternate;
 }
 
+@keyframes pulse {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0.5;
+  }
+}
+
 /* Error state */
 .auth-error {
   background-color: #ffe6e6;
@@ -80,24 +90,6 @@
   font-size: 20px;
 }
 
-.manual-option {
-  margin-top: 15px;
-}
-
-.btn-link {
-  background: none;
-  border: none;
-  color: #0066cc;
-  text-decoration: underline;
-  cursor: pointer;
-  font-size: 14px;
-  padding: 5px;
-}
-
-  .btn-link:hover {
-    color: #0047cc;
-  }
-
 /* Authenticated state */
 .auth-status {
   display: flex;
@@ -157,46 +149,4 @@
 .auth-actions {
   display: flex;
   gap: 10px;
-}
-
-/* Token warning */
-.warning-icon {
-  font-size: 20px;
-}
-
-.token-warning p {
-  margin: 0;
-  flex: 1;
-}
-
-.btn-small {
-  padding: 5px 15px;
-  font-size: 14px;
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-  .auth-status {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .user-info {
-    justify-content: center;
-    text-align: center;
-    margin-bottom: 15px;
-  }
-
-  .auth-actions {
-    justify-content: center;
-  }
-
-  .token-warning {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .token-input {
-    flex-direction: column;
-  }
 }
