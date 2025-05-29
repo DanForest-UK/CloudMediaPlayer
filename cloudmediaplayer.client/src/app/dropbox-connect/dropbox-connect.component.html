@@ -1,27 +1,66 @@
 <div class="auth-section">
-  <!-- Show this section if user is not authenticated and token input should be shown -->
-  <div *ngIf="!isAuthenticated() && showTokenInput">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="auth-loading">
+    <div class="loading-spinner">⏳</div>
+    <p>Connecting to Dropbox...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="authState?.error && !isLoading" class="auth-error">
+    <div class="error-icon">⚠️</div>
+    <p>{{ authState.error }}</p>
+    <button class="btn-secondary" (click)="clearError()">Try Again</button>
+  </div>
+
+  <!-- Not Authenticated State -->
+  <div *ngIf="!isAuthenticated() && !isLoading" class="auth-connect">
     <h3>Connect to Dropbox</h3>
-    <p class="auth-message">
-      Enter a Dropbox access token to connect to your account:
+    <p class="auth-description">
+      Connect your Dropbox account to access your music library
     </p>
-    <div class="token-input">
-      <input type="text" [(ngModel)]="tokenInput" placeholder="Paste your Dropbox access token here" />
-      <button class="btn-primary" (click)="submitToken()">Connect</button>
-    </div>
-    <div class="token-help">
-      <p>To get an access token:</p>
-      <ol>
-        <li>Go to <a href="https://dropbox.github.io/dropbox-api-v2-explorer/#files_list_folder" target="_blank">Dropbox API Explorer</a></li>
-        <li>Click "Get Token" and sign in to your Dropbox account</li>
-        <li>Copy the generated token and paste it above</li>
-      </ol>
+
+    <div class="connect-options">
+      <!-- Primary OAuth Button -->
+      <button class="btn-primary btn-large connect-btn"
+              (click)="connectWithOAuth()"
+              [disabled]="isLoading">
+        <span class="dropbox-icon">📦</span>
+        Connect with Dropbox
+      </button>        
     </div>
   </div>
 
-  <!-- Show this section if user is authenticated -->
-  <div *ngIf="isAuthenticated()" class="auth-status">
-    <span>Connected to Dropbox</span>
-    <button class="btn-secondary" (click)="logout()">Disconnect</button>
-  </div>
-</div>
+  <!-- Authenticated State -->
+  <div *ngIf="isAuthenticated() && !isLoading" class="auth-status">
+    <div class="user-info">
+      <div class="user-avatar">
+        <img *ngIf="authState && authState.userInfo && authState.userInfo.profile_photo_url"
+             [src]="authState.userInfo.profile_photo_url"
+             [alt]="getUserDisplayName()"
+             class="avatar-img" />
+        <div *ngIf="!authState || !authState.userInfo || !authState.userInfo.profile_photo_url" class="avatar-placeholder">
+          {{ getUserInitials() }}
+        </div>
+      </div>
+
+      <div class="user-details">
+        <h4>{{ getUserDisplayName() }}</h4>
+        <p class="user-email" *ngIf="getUserEmail()">{{ getUserEmail() }}</p>
+        <p *ngIf="authState && authState.tokenExpiry" class="token-expiry">
+          Token expires: {{ formatTokenExpiry() }}
+        </p>
+      </div>
+    </div>
+
+    <div class="auth-actions">
+      <button class="btn-secondary"
+              (click)="refreshConnection()"
+              [disabled]="isLoading"
+              title="Refresh connection">
+        🔄
+      </button>
+      <button class="btn-secondary" (click)="logout()">
+        Disconnect
+      </button>
+    </div>
+  </div> 

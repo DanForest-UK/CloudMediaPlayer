@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DropboxService, DropboxFile } from '../dropbox.service';
+import { DropboxService, DropboxFile } from '../dropbox.service'; // Updated import
 import { DropboxConnectComponent } from '../dropbox-connect/dropbox-connect.component';
 import { FileBrowserComponent } from '../file-browser/file-browser.component';
 import { PlaylistComponent, PlaylistItem } from '../playlist/playlist.component';

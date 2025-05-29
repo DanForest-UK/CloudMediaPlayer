@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DropboxService, DropboxFile, FolderScanProgress } from '../dropbox.service';
+import { DropboxService, DropboxFile, FolderScanProgress } from '../dropbox.service'; // Updated import
 import { Subscription } from 'rxjs';
 
 /**

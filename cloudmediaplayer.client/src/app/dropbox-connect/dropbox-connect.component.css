@@ -7,54 +7,196 @@
   border: 1px solid #eee;
 }
 
-.auth-message {
-  margin-top: 10px;
-  color: #666;
+/* Loading state */
+.auth-loading {
+  text-align: center;
+  padding: 20px;
 }
 
+.loading-spinner {
+  font-size: 24px;
+  margin-bottom: 10px;
+  animation: pulse 1.5s ease-in-out infinite alternate;
+}
+
+/* Error state */
+.auth-error {
+  background-color: #ffe6e6;
+  border: 1px solid #ff9999;
+  border-radius: 5px;
+  padding: 15px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.error-icon {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+/* Connect state */
+.auth-connect {
+  text-align: center;
+}
+
+.auth-description {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.connect-options {
+  margin-bottom: 20px;
+}
+
+.btn-large {
+  padding: 15px 30px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.connect-btn {
+  background: linear-gradient(135deg, #0061ff, #0047cc);
+  border: none;
+  color: white;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 97, 255, 0.3);
+}
+
+  .connect-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0047cc, #003399);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 97, 255, 0.4);
+  }
+
+  .connect-btn:disabled {
+    background: #ccc;
+    transform: none;
+    box-shadow: none;
+  }
+
+.dropbox-icon {
+  margin-right: 10px;
+  font-size: 20px;
+}
+
+.manual-option {
+  margin-top: 15px;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: #0066cc;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 5px;
+}
+
+  .btn-link:hover {
+    color: #0047cc;
+  }
+
+/* Authenticated state */
 .auth-status {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 15px;
 }
 
-/* Token input styles */
-.token-input {
+.user-info {
   display: flex;
-  margin: 15px 0;
-}
-
-.token-input input {
+  align-items: center;
+  gap: 15px;
   flex: 1;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px 0 0 4px;
-  font-size: 16px;
 }
 
-.token-input button {
-  border-radius: 0 4px 4px 0;
-  margin: 0;
+.user-avatar {
+  position: relative;
 }
 
-.token-help {
-  background-color: #f0f0f0;
-  padding: 10px 15px;
-  border-radius: 4px;
-  margin-top: 15px;
+.avatar-img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatar-placeholder {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #4CAF50;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.user-details h4 {
+  margin: 0 0 5px 0;
+  color: #333;
+}
+
+.user-email {
+  margin: 0 0 5px 0;
+  color: #666;
   font-size: 14px;
 }
 
-.token-help ol {
-  margin-top: 5px;
-  padding-left: 20px;
+.token-expiry {
+  margin: 0;
+  color: #999;
+  font-size: 12px;
 }
 
-.token-help a {
-  color: #0066cc;
-  text-decoration: none;
+.auth-actions {
+  display: flex;
+  gap: 10px;
 }
 
-.token-help a:hover {
-  text-decoration: underline;
+/* Token warning */
+.warning-icon {
+  font-size: 20px;
+}
+
+.token-warning p {
+  margin: 0;
+  flex: 1;
+}
+
+.btn-small {
+  padding: 5px 15px;
+  font-size: 14px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .auth-status {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .user-info {
+    justify-content: center;
+    text-align: center;
+    margin-bottom: 15px;
+  }
+
+  .auth-actions {
+    justify-content: center;
+  }
+
+  .token-warning {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .token-input {
+    flex-direction: column;
+  }
 }

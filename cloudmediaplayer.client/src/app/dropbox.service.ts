@@ -1,7 +1,47 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of, Subject, forkJoin, from, EMPTY, BehaviorSubject } from 'rxjs';
+import { Observable, of, Subject, forkJoin, from, EMPTY, BehaviorSubject, throwError } from 'rxjs';
 import { map, catchError, scan, mergeMap, concatMap, delay, retryWhen, take, tap, takeLast, finalize } from 'rxjs/operators';
+
+/**
+ * Interface for Dropbox user information
+ */
+export interface DropboxUser {
+  account_id: string;
+  name?: {
+    given_name?: string;
+    surname?: string;
+    familiar_name?: string;
+    display_name?: string;
+    abbreviated_name?: string;
+  };
+  email?: string;
+  email_verified?: boolean;
+  disabled?: boolean;
+  locale?: string;
+  referral_link?: string;
+  is_paired?: boolean;
+  account_type?: {
+    '.tag': string;
+  };
+  root_info?: {
+    '.tag': string;
+    root_namespace_id?: string;
+    home_namespace_id?: string;
+  };
+  profile_photo_url?: string;
+  country?: string;
+}
+
+/**
+ * Interface for authentication state
+ */
+export interface AuthState {
+  isAuthenticated: boolean;
+  userInfo: DropboxUser | null;
+  tokenExpiry: Date | null;
+  error: string | null;
+}
 
 /**
  * Interface for progress updates during folder scanning
@@ -16,24 +56,25 @@ export interface FolderScanProgress {
  * Interface that defines the structure of a Dropbox file or folder
  */
 export interface DropboxFile {
-  id: string;              // Unique identifier for the file/folder
-  name: string;            // Name of the file/folder
-  path_display: string;    // Full path of the file/folder
-  is_folder: boolean;      // Whether this is a folder (true) or file (false)
-  media_info?: {           // Optional media info (only for media files)
+  id: string;
+  name: string;
+  path_display: string;
+  is_folder: boolean;
+  media_info?: {
     metadata: {
       dimensions?: { height: number; width: number };
     };
   };
-  size?: number;           // Size of the file in bytes (undefined for folders)
-  client_modified?: string; // Last modification date (undefined for folders)
+  size?: number;
+  client_modified?: string;
 }
 
 /**
- * Service that handles all communication with the Dropbox API
+ * Enhanced service that handles all communication with the Dropbox API
+ * OAuth 2.0 authentication with PKCE
  */
 @Injectable({
-  providedIn: 'root'  // This makes the service available throughout the app
+  providedIn: 'root'
 })
 export class DropboxService {
   // Replace with your Dropbox app key
@@ -43,12 +84,22 @@ export class DropboxService {
   private readonly API_URL = 'https://api.dropboxapi.com/2';
   private readonly CONTENT_URL = 'https://content.dropboxapi.com/2';
 
-  // Store the access token
+  // Authentication state
   private accessToken: string | null = null;
+  private refreshToken: string | null = null;
+  private tokenExpiry: Date | null = null;
+
+  // Observable auth state
+  private authState$ = new BehaviorSubject<AuthState>({
+    isAuthenticated: false,
+    userInfo: null,
+    tokenExpiry: null,
+    error: null
+  });
 
   // Rate limiting properties
-  private readonly MAX_CONCURRENT_REQUESTS = 5; // Limit concurrent requests
-  private readonly REQUEST_DELAY = 50; // Delay between requests in ms
+  private readonly MAX_CONCURRENT_REQUESTS = 5;
+  private readonly REQUEST_DELAY = 50;
   private activeRequests = 0;
 
   // Progress tracking
@@ -58,13 +109,372 @@ export class DropboxService {
     totalAudioFiles: 0
   });
 
-  /**
-   * Constructor - Checks if a token exists in localStorage
-   * @param http HttpClient for making API requests
-   */
   constructor(private http: HttpClient) {
-    // Check if token exists in localStorage
-    this.accessToken = localStorage.getItem('dropbox_access_token');
+    this.initializeAuth();
+  }
+
+  /**
+   * Redirect URI selection based on environment
+   */
+  private get redirectUri(): string {
+    const hostname = window.location.hostname;
+    const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+    const isProduction = !isLocalhost && window.location.protocol === 'https:';
+
+    if (isProduction) {
+      return `${window.location.origin}/auth/callback`;
+    } else {
+      return `${window.location.origin}/`;
+    }
+  }
+
+  /**
+   * Check if we should use callback route based on environment
+   */
+  get shouldUseCallbackRoute(): boolean {
+    return this.redirectUri.includes('/auth/callback');
+  }
+
+  /**
+   * Get current authentication state as observable
+   */
+  getAuthState(): Observable<AuthState> {
+    return this.authState$.asObservable();
+  }
+
+  /**
+   * Initialize authentication from stored tokens
+   */
+  private async initializeAuth(): Promise<void> {
+    try {
+      const storedAuth = this.getStoredAuth();
+      if (storedAuth) {
+        this.accessToken = storedAuth.accessToken;
+        this.refreshToken = storedAuth.refreshToken;
+        this.tokenExpiry = storedAuth.tokenExpiry;
+
+        if (this.isTokenExpired()) {
+          if (this.refreshToken) {
+            await this.refreshAccessToken();
+          } else {
+            this.clearAuth();
+          }
+        } else {
+          this.validateToken();
+        }
+      } else {
+        // Legacy: Check for old-style token
+        const legacyToken = localStorage.getItem('dropbox_access_token');
+        if (legacyToken) {
+          this.accessToken = legacyToken;
+          await this.validateToken();
+        }
+      }
+    } catch (error) {
+      console.error('Error initializing auth:', error);
+      this.clearAuth();
+    }
+  }
+
+  /**
+   * Start OAuth flow with PKCE
+   */
+  async startOAuthFlow(): Promise<void> {
+    try {
+      const codeVerifier = this.generateCodeVerifier();
+      const codeChallenge = await this.generateCodeChallenge(codeVerifier);
+
+      sessionStorage.setItem('pkce_code_verifier', codeVerifier);
+
+      if (this.shouldUseCallbackRoute) {
+        sessionStorage.setItem('oauth_return_url', window.location.pathname + window.location.search);
+      }
+
+      const authUrl = new URL('https://www.dropbox.com/oauth2/authorize');
+      authUrl.searchParams.set('response_type', 'code');
+      authUrl.searchParams.set('client_id', this.CLIENT_ID);
+      authUrl.searchParams.set('redirect_uri', this.redirectUri);
+      authUrl.searchParams.set('code_challenge', codeChallenge);
+      authUrl.searchParams.set('code_challenge_method', 'S256');
+      authUrl.searchParams.set('scope', 'account_info.read files.metadata.read files.content.read');
+      authUrl.searchParams.set('state', this.generateState());
+
+      window.location.href = authUrl.toString();
+    } catch (error) {
+      this.updateAuthState({ error: 'Failed to start OAuth flow' });
+    }
+  }
+
+  /**
+   * Handle OAuth callback with authorization code
+   */
+  async handleOAuthCallback(code: string, state?: string): Promise<boolean> {
+    try {
+      const codeVerifier = sessionStorage.getItem('pkce_code_verifier');
+      if (!codeVerifier) {
+        throw new Error('PKCE code verifier not found');
+      }
+
+      if (state) {
+        const storedState = sessionStorage.getItem('oauth_state');
+        if (storedState && storedState !== state) {
+          throw new Error('Invalid state parameter');
+        }
+      }
+
+      const tokenResponse = await this.exchangeCodeForTokens(code, codeVerifier);
+
+      if (tokenResponse) {
+        this.accessToken = tokenResponse.access_token;
+        this.refreshToken = tokenResponse.refresh_token;
+        this.tokenExpiry = new Date(Date.now() + (tokenResponse.expires_in * 1000));
+
+        this.storeAuth();
+
+        // Use direct fetch to bypass proxy issues
+        try {
+          const userInfo = await this.validateTokenWithDirectFetch();
+          if (userInfo) {
+            this.updateAuthState({
+              isAuthenticated: true,
+              userInfo,
+              tokenExpiry: this.tokenExpiry,
+              error: null
+            });
+          } else {
+            this.updateAuthState({ error: 'Token validation failed' });
+          }
+        } catch (error) {
+          this.updateAuthState({ error: 'Token validation failed: ' + (error as Error).message });
+        }
+
+        sessionStorage.removeItem('pkce_code_verifier');
+        sessionStorage.removeItem('oauth_state');
+
+        return true;
+      }
+    } catch (error) {
+      console.error('OAuth callback error:', error);
+      this.updateAuthState({ error: 'Authentication failed: ' + (error as Error).message });
+    }
+
+    return false;
+  }
+
+  /**
+   * Get the return URL after OAuth (for callback route)
+   */
+  getOAuthReturnUrl(): string {
+    const returnUrl = sessionStorage.getItem('oauth_return_url');
+    sessionStorage.removeItem('oauth_return_url');
+    return returnUrl || '/';
+  }
+  
+  /**
+   * Refresh access token using refresh token
+   */
+  private async refreshAccessToken(): Promise<boolean> {
+    if (!this.refreshToken) {
+      return false;
+    }
+
+    try {
+      const response = await fetch('https://api.dropbox.com/oauth2/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          grant_type: 'refresh_token',
+          refresh_token: this.refreshToken,
+          client_id: this.CLIENT_ID
+        })
+      });
+
+      if (response.ok) {
+        const tokenData = await response.json();
+        this.accessToken = tokenData.access_token;
+        this.tokenExpiry = new Date(Date.now() + (tokenData.expires_in * 1000));
+
+        this.storeAuth();
+        await this.validateToken();
+        return true;
+      }
+    } catch (error) {
+      console.error('Token refresh failed:', error);
+    }
+
+    this.clearAuth();
+    return false;
+  }
+
+  /**
+   * Validate token using direct fetch (bypasses Angular HttpClient proxy issues)
+   */
+  private async validateTokenWithDirectFetch(): Promise<any> {
+    if (!this.accessToken) {
+      throw new Error('No access token available');
+    }
+
+    const response = await fetch('https://api.dropboxapi.com/2/users/get_current_account', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: 'null'
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      const errorText = await response.text();
+      throw new Error(`API validation failed: ${response.status}`);
+    }
+  }
+
+  /**
+   * Validate current token and get user info
+   */
+  private async validateToken(): Promise<void> {
+    if (!this.accessToken) {
+      this.clearAuth();
+      return;
+    }
+
+    try {
+      const userInfo = await this.validateTokenWithDirectFetch();
+      if (userInfo) {
+        this.updateAuthState({
+          isAuthenticated: true,
+          userInfo,
+          tokenExpiry: this.tokenExpiry,
+          error: null
+        });
+      } else {
+        this.clearAuth();
+      }
+    } catch (error) {
+      console.error('Token validation failed:', error);
+      this.clearAuth();
+    }
+  }
+
+  /**
+   * Checks if user is authenticated with Dropbox
+   */
+  isAuthenticated(): boolean {
+    return !!this.accessToken && !this.isTokenExpired();
+  }
+
+  /**
+   * Logs out the user by removing all auth data
+   */
+  logout(): void {
+    this.clearAuth();
+  }
+
+  /**
+  * PKCE and security helper methods
+  */
+  private generateCodeVerifier(): string {
+    const array = new Uint8Array(32);
+    crypto.getRandomValues(array);
+    return btoa(String.fromCharCode(...array))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '');
+  }
+
+  private async generateCodeChallenge(verifier: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(verifier);
+    const digest = await crypto.subtle.digest('SHA-256', data);
+    return btoa(String.fromCharCode(...new Uint8Array(digest)))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '');
+  }
+
+  private generateState(): string {
+    const state = Math.random().toString(36).substring(2, 15);
+    sessionStorage.setItem('oauth_state', state);
+    return state;
+  }
+
+  private async exchangeCodeForTokens(code: string, codeVerifier: string): Promise<any> {
+    const response = await fetch('https://api.dropbox.com/oauth2/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        code,
+        client_id: this.CLIENT_ID,
+        redirect_uri: this.redirectUri,
+        code_verifier: codeVerifier
+      })
+    });
+
+    return response.ok ? response.json() : null;
+  }
+
+  /**
+   * Token management
+   */
+  private isTokenExpired(): boolean {
+    if (!this.tokenExpiry) return false;
+    return new Date() >= this.tokenExpiry;
+  }
+
+  private storeAuth(): void {
+    const authData = {
+      accessToken: this.accessToken,
+      refreshToken: this.refreshToken,
+      tokenExpiry: this.tokenExpiry?.toISOString()
+    };
+
+    localStorage.setItem('dropbox_auth', JSON.stringify(authData));
+  }
+
+  private getStoredAuth(): any {
+    try {
+      const stored = localStorage.getItem('dropbox_auth');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return {
+          accessToken: parsed.accessToken,
+          refreshToken: parsed.refreshToken,
+          tokenExpiry: parsed.tokenExpiry ? new Date(parsed.tokenExpiry) : null
+        };
+      }
+    } catch (error) {
+      console.error('Error reading stored auth:', error);
+    }
+    return null;
+  }
+
+  private clearAuth(): void {
+    this.accessToken = null;
+    this.refreshToken = null;
+    this.tokenExpiry = null;
+
+    localStorage.removeItem('dropbox_auth');
+    localStorage.removeItem('dropbox_access_token');
+
+    this.updateAuthState({
+      isAuthenticated: false,
+      userInfo: null,
+      tokenExpiry: null,
+      error: null
+    });
+  }
+
+  private updateAuthState(state: Partial<AuthState>): void {
+    const currentState = this.authState$.value;
+    this.authState$.next({ ...currentState, ...state });
   }
 
   /**
@@ -86,24 +496,34 @@ export class DropboxService {
   }
 
   /**
-   * Rate-limited request wrapper 
+   * Rate-limited request wrapper with automatic token refresh
    */
   private makeRateLimitedRequest<T>(requestFn: () => Observable<T>): Observable<T> {
-    return new Observable(observer => {
+    return new Observable<T>(observer => {
       const executeWhenSlotAvailable = () => {
         if (this.activeRequests < this.MAX_CONCURRENT_REQUESTS) {
           this.activeRequests++;
 
-          // Add delay if specified
           const delayedRequest = this.REQUEST_DELAY > 0
             ? of(null).pipe(delay(this.REQUEST_DELAY), mergeMap(() => requestFn()))
             : requestFn();
 
           delayedRequest.pipe(
-            finalize(() => this.activeRequests--)
-          ).subscribe(observer);
+            finalize(() => this.activeRequests--),
+            catchError(error => {
+              if (error.status === 401 && this.refreshToken) {
+                return from(this.refreshAccessToken()).pipe(
+                  mergeMap(success => success ? requestFn() : throwError(() => error))
+                );
+              }
+              return throwError(() => error);
+            })
+          ).subscribe({
+            next: (value) => observer.next(value),
+            error: (error) => observer.error(error),
+            complete: () => observer.complete()
+          });
         } else {
-          // Check again in a short interval
           setTimeout(executeWhenSlotAvailable, 10);
         }
       };
@@ -119,20 +539,14 @@ export class DropboxService {
       retryWhen(errors =>
         errors.pipe(
           scan((retryCount, error) => {
-            console.log(`Retry attempt ${retryCount + 1} for error:`, error);
-
-            // Check if it's a rate limit error (status 429 or network error with status 0)
             const isRateLimitError = error.status === 429 || error.status === 0;
-
             if (retryCount >= maxRetries || !isRateLimitError) {
               throw error;
             }
             return retryCount + 1;
           }, 0),
-          mergeMap((retryCount, error) => {
-            // Exponential backoff: 1s, 2s, 4s, 8s...
+          mergeMap((retryCount) => {
             const backoffDelay = Math.pow(2, retryCount) * 1000;
-            console.log(`Waiting ${backoffDelay}ms before retry...`);
             return of(null).pipe(delay(backoffDelay));
           })
         )
@@ -141,36 +555,9 @@ export class DropboxService {
   }
 
   /**
-   * Manually set an access token (for development/testing)
-   * @param token The access token to set
-   */
-  setAccessToken(token: string): void {
-    this.accessToken = token;
-    localStorage.setItem('dropbox_access_token', token);
-  }
-
-  /**
-   * Checks if user is authenticated with Dropbox
-   * @returns True if authenticated, false otherwise
-   */
-  isAuthenticated(): boolean {
-    return !!this.accessToken;
-  }
-
-  /**
-   * Logs out the user by removing the token
-   */
-  logout(): void {
-    this.accessToken = null;
-    localStorage.removeItem('dropbox_access_token');
-  }
-
-  /**
    * Gets the current user's account information
-   * This is useful for testing if the token is valid
-   * @returns Observable with account info or null if error
    */
-  getCurrentAccount(): Observable<any> {
+  getCurrentAccount(): Observable<DropboxUser | null> {
     if (!this.isAuthenticated()) {
       return of(null);
     }
@@ -181,13 +568,10 @@ export class DropboxService {
       'Content-Type': 'application/json'
     });
 
-    const requestFn = () => this.http.post<any>(endpoint, null, { headers }).pipe(
+    const requestFn = () => this.http.post<DropboxUser>(endpoint, null, { headers }).pipe(
       this.retryWithBackoff(2),
       catchError(error => {
         console.error('Error getting current account:', error);
-        if (error.error && error.error.error_summary) {
-          console.error('Dropbox API error:', error.error.error_summary);
-        }
         return of(null);
       })
     );
@@ -197,34 +581,26 @@ export class DropboxService {
 
   /**
    * Lists files and folders in a given Dropbox path
-   * @param path The path to list files from (empty string for root)
-   * @param mediaOnly Whether to filter and return only media files (default: false)
-   * @returns Observable with array of DropboxFile objects
    */
   listFolder(path: string = '', mediaOnly: boolean = false): Observable<DropboxFile[]> {
     if (!this.isAuthenticated()) {
       return of([]);
     }
 
-    // Dropbox API expects empty string for root, not '/'
     if (path === '/') {
       path = '';
     }
 
-    // Create a subject to emit the complete file list
     const filesSubject = new Subject<DropboxFile[]>();
 
-    // Helper function to list folder contents with pagination
     const getFiles = (folderPath: string, cursor?: string) => {
       let endpoint: string;
       let body: any;
 
       if (cursor) {
-        // Continue listing with cursor if we have one
         endpoint = `${this.API_URL}/files/list_folder/continue`;
         body = { cursor };
       } else {
-        // Initial request
         endpoint = `${this.API_URL}/files/list_folder`;
         body = {
           path: folderPath,
@@ -239,24 +615,15 @@ export class DropboxService {
         'Content-Type': 'application/json'
       });
 
-      console.log(`Sending Dropbox API request for path: ${folderPath}${cursor ? ' with cursor' : ''}`);
-
       const requestFn = () => this.http.post<any>(endpoint, body, { headers }).pipe(
         this.retryWithBackoff(3),
         catchError(error => {
-          console.error('Error listing Dropbox folder after retries:', error);
-          if (error.error && error.error.error_summary) {
-            console.error('Dropbox API error:', error.error.error_summary);
-          }
-          // Return empty result on error
+          console.error('Error listing Dropbox folder:', error);
           return of({ entries: [], has_more: false });
         })
       );
 
       this.makeRateLimitedRequest(requestFn).subscribe(response => {
-        console.log('Dropbox API response:', response);
-
-        // Process entries
         const files: DropboxFile[] = [];
         if (response.entries && Array.isArray(response.entries)) {
           response.entries.forEach((entry: any) => {
@@ -270,56 +637,44 @@ export class DropboxService {
               client_modified: entry.client_modified
             };
 
-            // Apply filtering logic
             if (mediaOnly) {
-              // Include folders (for navigation) and media files only
               if (file.is_folder || this.isMediaFile(file.name)) {
                 files.push(file);
               }
             } else {
-              // Include all files
               files.push(file);
             }
           });
         }
 
-        // If there are more files, request the next batch
         if (response.has_more && response.cursor) {
-          // First emit the current batch
           filesSubject.next(files);
-          // Then get more files
           getFiles(folderPath, response.cursor);
         } else {
-          // No more files, complete the observable
           filesSubject.next(files);
           filesSubject.complete();
         }
       });
     };
 
-    // Start the first request
     getFiles(path);
 
     return filesSubject.asObservable().pipe(
-      // Collect all emitted arrays into a single array
       scan((acc: DropboxFile[], val: DropboxFile[]) => [...acc, ...val], [] as DropboxFile[])
     );
   }
 
   /**
    * Recursively collects all audio files from a folder and its subfolders
-   * @param path The folder path to start collecting from
-   * @returns Observable with array of DropboxFile objects (audio files only)
    */
   collectAllAudioFilesRecursively(path: string): Observable<DropboxFile[]> {
     if (!this.isAuthenticated()) {
       return of([]);
     }
 
-    // Start progress tracking
     this.updateScanProgress(path, true, 0);
 
-    const processedFolders = new Set<string>(); // avoid infinite loops
+    const processedFolders = new Set<string>();
     let totalAudioFiles = 0;
 
     const collectFromFolder = (folderPath: string): Observable<DropboxFile[]> => {
@@ -328,7 +683,6 @@ export class DropboxService {
       }
       processedFolders.add(folderPath);
 
-      // Update progress with current folder being scanned
       this.updateScanProgress(folderPath, true, totalAudioFiles);
 
       return this.listFolder(folderPath, false).pipe(
@@ -336,23 +690,20 @@ export class DropboxService {
           const audioFiles = files.filter(file => !file.is_folder && this.isMediaFile(file.name));
           const subfolders = files.filter(file => file.is_folder);
 
-          // Update total audio files count
           totalAudioFiles += audioFiles.length;
           this.updateScanProgress(folderPath, true, totalAudioFiles);
 
-          // If no subfolders, just return the audio files
           if (subfolders.length === 0) {
             return of(audioFiles);
           }
 
-          // Process subfolders in parallel with concurrency limit
           return from(subfolders).pipe(
             mergeMap(folder =>
               collectFromFolder(folder.path_display),
-              Math.min(this.MAX_CONCURRENT_REQUESTS, 20) // Limit subfolder concurrency
+              Math.min(this.MAX_CONCURRENT_REQUESTS, 20)
             ),
             scan((acc: DropboxFile[], files: DropboxFile[]) => [...acc, ...files], audioFiles),
-            takeLast(1) // Only emit the final accumulated result
+            takeLast(1)
           );
         }),
         catchError(error => {
@@ -364,11 +715,9 @@ export class DropboxService {
 
     return collectFromFolder(path).pipe(
       tap(files => {
-        // Complete progress tracking
         this.updateScanProgress('', false, files.length);
       }),
       catchError(error => {
-        // Complete progress tracking on error
         this.updateScanProgress('', false, 0);
         throw error;
       })
@@ -377,8 +726,6 @@ export class DropboxService {
 
   /**
    * Lists only media files in a given Dropbox path
-   * @param path The path to list files from (empty string for root)
-   * @returns Observable with array of DropboxFile objects (folders + media files only)
    */
   listMediaFiles(path: string = ''): Observable<DropboxFile[]> {
     return this.listFolder(path, true);
@@ -386,8 +733,6 @@ export class DropboxService {
 
   /**
    * Gets a temporary link to download a file
-   * @param path The path of the file to get a link for
-   * @returns Observable with the temporary download URL
    */
   getTemporaryLink(path: string): Observable<string> {
     if (!this.isAuthenticated()) {
@@ -406,9 +751,6 @@ export class DropboxService {
       map(response => response.link),
       catchError(error => {
         console.error('Error getting temporary link:', error);
-        if (error.error && error.error.error_summary) {
-          console.error('Dropbox API error:', error.error.error_summary);
-        }
         return of('');
       })
     );
@@ -418,13 +760,10 @@ export class DropboxService {
 
   /**
    * Checks if a file is an audio file based on its extension
-   * @param filename The name of the file to check
-   * @returns True if it's an audio file, false otherwise
    */
   isMediaFile(filename: string): boolean {
     if (!filename) return false;
 
-    // We only support audio files now
     const audioExtensions = [
       '.mp3', '.wav', '.ogg', '.m4a', '.flac', '.aac'
     ];

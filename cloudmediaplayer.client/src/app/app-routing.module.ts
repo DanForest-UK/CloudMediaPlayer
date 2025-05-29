@@ -1,28 +1,42 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AppComponent } from './app.component';
 import { MediaPlayerComponent } from './media-player/media-player.component';
+import { AuthCallbackComponent } from './auth-callback/auth-callback.component';
 
 /**
- * Routes configuration for the application
+ * Routes configuration for the application with OAuth callback support
  * 
- * This defines the URL paths and which component should be displayed
- * for each path. In our simplified app, we're just redirecting everything
- * to the media player component.
+ * The callback route is used in production for better UX
+ * In development, OAuth callbacks are handled on the main page
  */
 const routes: Routes = [
-  { path: 'media-player', component: MediaPlayerComponent },
-  { path: '', redirectTo: '/media-player', pathMatch: 'full' }
+  {
+    path: 'media-player',
+    component: MediaPlayerComponent
+  },
+  {
+    path: 'auth/callback',
+    component: AuthCallbackComponent
+  },
+  {
+    path: '',
+    redirectTo: '/media-player',
+    pathMatch: 'full'
+  },
+  {
+    path: '**',
+    redirectTo: '/media-player'
+  }
 ];
 
 /**
  * AppRoutingModule - Handles the application's routing
- * 
- * This module configures the routes for the application
- * and provides the RouterModule to the AppModule.
  */
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, {
+    // Enable tracing for debugging (remove in production)
+    enableTracing: false
+  })],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

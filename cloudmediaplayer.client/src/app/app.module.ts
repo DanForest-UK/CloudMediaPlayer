@@ -9,24 +9,23 @@ import { DropboxConnectComponent } from './dropbox-connect/dropbox-connect.compo
 import { FileBrowserComponent } from './file-browser/file-browser.component';
 import { PlaylistComponent } from './playlist/playlist.component';
 import { AudioPlayerComponent } from './audio-player/audio-player.component';
+import { AuthCallbackComponent } from './auth-callback/auth-callback.component'; // Add this
 
 /**
  * AppModule - The main module for the application
- * 
- * Angular modules help organize the application into cohesive blocks of functionality.
- * This module imports all necessary Angular modules and components needed for our app.
- */
+ * */
 @NgModule({
-  declarations: [], 
+  declarations: [],
   imports: [
     BrowserModule,
     FormsModule,
-    AppComponent,            
-    MediaPlayerComponent,     
-    DropboxConnectComponent, 
-    FileBrowserComponent,     
-    PlaylistComponent,         
-    AudioPlayerComponent      
+    AppComponent,
+    MediaPlayerComponent,
+    DropboxConnectComponent,
+    FileBrowserComponent,
+    PlaylistComponent,
+    AudioPlayerComponent,
+    AuthCallbackComponent    
   ],
   providers: [
     provideHttpClient(withFetch()) // Provides HttpClient with fetch API
