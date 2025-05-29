@@ -11,6 +11,7 @@
                     (nextRequested)="onNextRequested()"
                     (songEnded)="onSongEnded()">
   </app-audio-player>
+
   <!-- Main Content Area - Split Layout -->
   <div *ngIf="isAuthenticated" class="main-content">
     <!-- Left Panel - File Browser -->
@@ -22,12 +23,21 @@
     <app-playlist [playlist]="playlist"
                   [currentPlaylistIndex]="currentPlaylistIndex"
                   [isPlaying]="isPlaying"
+                  [savedPlaylists]="savedPlaylists"
+                  [currentPlaylistId]="currentPlaylistId"
+                  [currentPlaylistName]="currentPlaylistName"
                   (playItemRequested)="onPlayItemRequested($event)"
                   (removeItemRequested)="onRemoveItemRequested($event)"
                   (clearPlaylistRequested)="onClearPlaylistRequested()"
-                  (shufflePlaylistRequested)="onShufflePlaylistRequested()">
+                  (shufflePlaylistRequested)="onShufflePlaylistRequested()"
+                  (savePlaylistRequested)="onSavePlaylistRequested()"
+                  (loadPlaylistRequested)="onLoadPlaylistRequested($event)"
+                  (playlistSelectionChanged)="onPlaylistSelectionChanged($event)"
+                  (deletePlaylistRequested)="onDeletePlaylistRequested($event)"
+                  (renamePlaylistRequested)="onRenamePlaylistRequested($event.id, $event.name)">
     </app-playlist>
   </div>
+
   <!-- Dropbox Authentication Section -->
   <app-dropbox-connect (authenticationChanged)="onAuthenticationChanged($event)">
   </app-dropbox-connect>

@@ -1,10 +1,12 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DropboxService, DropboxFile } from '../dropbox.service'; // Updated import
+import { FormsModule } from '@angular/forms';
+import { DropboxService, DropboxFile } from '../dropbox.service';
 import { DropboxConnectComponent } from '../dropbox-connect/dropbox-connect.component';
 import { FileBrowserComponent } from '../file-browser/file-browser.component';
 import { PlaylistComponent, PlaylistItem } from '../playlist/playlist.component';
 import { AudioPlayerComponent } from '../audio-player/audio-player.component';
+import { PlaylistService, SavedPlaylist } from '../playlist-service';
 
 /**
  * MediaPlayerComponent - Main orchestrator component
@@ -14,15 +16,16 @@ import { AudioPlayerComponent } from '../audio-player/audio-player.component';
  * - FileBrowserComponent for browsing files
  * - PlaylistComponent for playlist management
  * - AudioPlayerComponent for audio playback
+ * - PlaylistService for playlist persistence
  */
 @Component({
   selector: 'app-media-player',
   templateUrl: './media-player.component.html',
   styleUrls: ['./media-player.component.css'],
   standalone: true,
-  imports: [CommonModule, DropboxConnectComponent, FileBrowserComponent, PlaylistComponent, AudioPlayerComponent]
+  imports: [CommonModule, FormsModule, DropboxConnectComponent, FileBrowserComponent, PlaylistComponent, AudioPlayerComponent]
 })
-export class MediaPlayerComponent {
+export class MediaPlayerComponent implements OnInit {
   @ViewChild(FileBrowserComponent) fileBrowser!: FileBrowserComponent;
 
   // Authentication state
@@ -37,7 +40,46 @@ export class MediaPlayerComponent {
   playlist: PlaylistItem[] = [];
   currentPlaylistIndex = -1;
 
-  constructor(private dropboxService: DropboxService) { }
+  // Saved playlist management
+  savedPlaylists: SavedPlaylist[] = [];
+  currentPlaylistId: string | null = null;
+  currentPlaylistName: string = 'New Playlist';
+
+  constructor(
+    private dropboxService: DropboxService,
+    private playlistService: PlaylistService
+  ) { }
+
+  ngOnInit(): void {
+    this.loadSavedPlaylists();
+    this.restoreCurrentPlaylist();
+  }
+
+  /**
+   * Load all saved playlists from storage
+   */
+  private loadSavedPlaylists(): void {
+    this.savedPlaylists = this.playlistService.getSavedPlaylists();
+  }
+
+  /**
+   * Restore the last current playlist state
+   */
+  private restoreCurrentPlaylist(): void {
+    const restored = this.playlistService.loadCurrentPlaylist();
+    if (restored && restored.items.length > 0) {
+      this.playlist = restored.items;
+      this.currentPlaylistIndex = restored.currentIndex;
+      this.currentPlaylistName = 'Restored Session';
+    }
+  }
+
+  /**
+   * Save current playlist state for auto-restore
+   */
+  private saveCurrentPlaylistState(): void {
+    this.playlistService.saveCurrentPlaylist(this.playlist, this.currentPlaylistIndex);
+  }
 
   /**
    * Get current playlist item by index
@@ -82,6 +124,7 @@ export class MediaPlayerComponent {
       this.currentPlaylistIndex = -1;
       this.mediaUrl = '';
       this.isPlaying = false;
+      this.playlistService.clearCurrentPlaylist();
     }
   }
 
@@ -111,6 +154,7 @@ export class MediaPlayerComponent {
         }));
 
         this.playlist.push(...playlistItems);
+        this.saveCurrentPlaylistState();
 
         if (!this.isPlaying && playlistItems.length > 0 && this.currentPlaylistIndex === -1) {
           this.playPlaylistItem(0);
@@ -140,6 +184,7 @@ export class MediaPlayerComponent {
     };
 
     this.playlist.push(playlistItem);
+    this.saveCurrentPlaylistState();
 
     // Play if playlist was empty
     if (!this.isPlaying && this.playlist.length === 1) {
@@ -173,6 +218,45 @@ export class MediaPlayerComponent {
    */
   onShufflePlaylistRequested(): void {
     this.shufflePlaylist();
+  }
+
+  /**
+   * Handle save playlist request from PlaylistComponent
+   */
+  onSavePlaylistRequested(): void {
+    this.saveCurrentPlaylist();
+  }
+
+  /**
+   * Handle load playlist request from PlaylistComponent
+   */
+  onLoadPlaylistRequested(playlistId: string): void {
+    this.loadPlaylist(playlistId);
+  }
+
+  /**
+   * Handle playlist selection change from PlaylistComponent
+   */
+  onPlaylistSelectionChanged(playlistId: string | null): void {
+    if (playlistId === 'new') {
+      this.createNewPlaylist();
+    } else if (playlistId && playlistId !== this.currentPlaylistId) {
+      this.loadPlaylist(playlistId);
+    }
+  }
+
+  /**
+   * Handle delete playlist request from PlaylistComponent
+   */
+  onDeletePlaylistRequested(playlistId: string): void {
+    this.deletePlaylist(playlistId);
+  }
+
+  /**
+   * Handle rename playlist request from PlaylistComponent
+   */
+  onRenamePlaylistRequested(playlistId: string, newName: string): void {
+    this.renamePlaylist(playlistId, newName);
   }
 
   /**
@@ -212,6 +296,7 @@ export class MediaPlayerComponent {
     }
 
     this.currentPlaylistIndex = index;
+    this.saveCurrentPlaylistState();
     this.playMedia(this.currentPlaylistItem!.file);
   }
 
@@ -269,6 +354,8 @@ export class MediaPlayerComponent {
         this.currentPlaylistIndex--;
       }
     }
+
+    this.saveCurrentPlaylistState();
   }
 
   /**
@@ -277,7 +364,10 @@ export class MediaPlayerComponent {
   private clearPlaylist(): void {
     this.playlist = [];
     this.currentPlaylistIndex = -1;
+    this.currentPlaylistId = null;
+    this.currentPlaylistName = 'New Playlist';
     this.stopMedia();
+    this.playlistService.clearCurrentPlaylist();
   }
 
   /**
@@ -295,6 +385,112 @@ export class MediaPlayerComponent {
     }
 
     this.playPlaylistItem(0);
+    this.saveCurrentPlaylistState();
+  }
+
+  /**
+   * Create a new empty playlist
+   */
+  private createNewPlaylist(): void {
+    this.clearPlaylist();
+    this.currentPlaylistName = 'New Playlist';
+    this.currentPlaylistId = null;
+  }
+
+  /**
+   * Save the current playlist
+   */
+  private saveCurrentPlaylist(): void {
+    if (this.playlist.length === 0) {
+      alert('Cannot save an empty playlist');
+      return;
+    }
+
+    let name = this.currentPlaylistName;
+
+    // If it's a new playlist or default name, prompt for name
+    if (!this.currentPlaylistId || name === 'New Playlist' || name === 'Restored Session') {
+      name = prompt('Enter playlist name:', name) || name;
+      if (!name.trim()) return;
+    }
+
+    // Check for name conflicts (excluding current playlist)
+    if (this.playlistService.playlistNameExists(name, this.currentPlaylistId || undefined)) {
+      if (!confirm(`A playlist named "${name}" already exists. Overwrite it?`)) {
+        return;
+      }
+    }
+
+    try {
+      const savedPlaylist = this.playlistService.savePlaylist(name, this.playlist, this.currentPlaylistId || undefined);
+      this.currentPlaylistId = savedPlaylist.id;
+      this.currentPlaylistName = savedPlaylist.name;
+      this.loadSavedPlaylists();
+
+      alert(`Playlist "${name}" saved successfully!`);
+    } catch (error) {
+      alert('Error saving playlist. Please try again.');
+      console.error('Error saving playlist:', error);
+    }
+  }
+
+  /**
+   * Load a saved playlist
+   */
+  private loadPlaylist(playlistId: string): void {
+    const savedPlaylist = this.playlistService.loadPlaylist(playlistId);
+    if (!savedPlaylist) {
+      alert('Playlist not found');
+      return;
+    }
+
+    // Stop current playback
+    this.stopMedia();
+
+    // Load the playlist
+    this.playlist = [...savedPlaylist.items];
+    this.currentPlaylistId = savedPlaylist.id;
+    this.currentPlaylistName = savedPlaylist.name;
+    this.currentPlaylistIndex = -1;
+
+    this.saveCurrentPlaylistState();
+  }
+
+  /**
+   * Delete a saved playlist
+   */
+  private deletePlaylist(playlistId: string): void {
+    const playlist = this.savedPlaylists.find(p => p.id === playlistId);
+    if (!playlist) return;
+
+    if (confirm(`Delete playlist "${playlist.name}"?`)) {
+      this.playlistService.deletePlaylist(playlistId);
+      this.loadSavedPlaylists();
+
+      // If we deleted the currently loaded playlist, reset to new
+      if (this.currentPlaylistId === playlistId) {
+        this.createNewPlaylist();
+      }
+    }
+  }
+
+  /**
+   * Rename a saved playlist
+   */
+  private renamePlaylist(playlistId: string, newName: string): void {
+    if (this.playlistService.playlistNameExists(newName, playlistId)) {
+      alert(`A playlist named "${newName}" already exists.`);
+      return;
+    }
+
+    if (this.playlistService.renamePlaylist(playlistId, newName)) {
+      this.loadSavedPlaylists();
+
+      // Update current playlist name if it's the one being renamed
+      if (this.currentPlaylistId === playlistId) {
+        this.currentPlaylistName = newName;
+      }
+    }
   }
 
   /**
