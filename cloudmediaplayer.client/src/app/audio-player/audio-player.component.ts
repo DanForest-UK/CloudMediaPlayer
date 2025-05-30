@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
  * This component manages:
  * - Audio element and playback controls
  * - Display of currently playing track
- * - Player control buttons (previous, stop, next)
+ * - Player control buttons (previous, next)
  */
 @Component({
   selector: 'app-audio-player',
@@ -39,6 +39,14 @@ export class AudioPlayerComponent implements AfterViewInit, OnChanges {
       mediaElement.onended = () => {
         this.songEnded.emit();
       };
+
+      // Listen for when user manually stops/pauses the audio
+      mediaElement.onpause = () => {
+        // Only emit stop if the audio has ended or been manually stopped
+        if (mediaElement.ended || mediaElement.currentTime === 0) {
+          this.stopRequested.emit();
+        }
+      };
     }
   }
 
@@ -68,26 +76,16 @@ export class AudioPlayerComponent implements AfterViewInit, OnChanges {
       mediaElement.load();
 
       // If we should be playing, start playback after a reasonable delay
-      if (this.isPlaying) {       
+      if (this.isPlaying) {
         setTimeout(() => {
-          if (this.isPlaying) { 
+          if (this.isPlaying) {
             mediaElement.play().catch((error: any) => {
               console.error('Error starting playback:', error);
             });
           }
         }, 200);
       }
-    } else if (!this.isPlaying) {     
-      mediaElement.pause();
-      mediaElement.currentTime = 0;
-    }
-  }
-
-  stop(): void {
-    this.stopRequested.emit();
-
-    const mediaElement = this.mediaPlayerRef?.nativeElement;
-    if (mediaElement) {
+    } else if (!this.isPlaying) {
       mediaElement.pause();
       mediaElement.currentTime = 0;
     }
