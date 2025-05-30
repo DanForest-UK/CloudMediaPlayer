@@ -22,6 +22,25 @@
             <span class="item-icon">💾</span>
             Save Current Playlist
           </button>
+          <button class="dropdown-item save-as-playlist"
+                  (click)="savePlaylistAs()"
+                  [disabled]="playlist.length === 0">
+            <span class="item-icon">📋</span>
+            Save As New Playlist
+          </button>
+        </div>
+
+        <!-- Sync Settings Section -->
+        <div class="dropdown-divider"></div>
+        <div class="sync-settings-section">
+          <div class="dropdown-label">Sync Settings</div>
+          <label class="sync-checkbox-container">
+            <input type="checkbox" 
+                   [checked]="syncSettings.enabled" 
+                   (change)="toggleSyncEnabled()"
+                   class="sync-checkbox">
+            <span class="sync-checkbox-label">Sync playlists to Dropbox</span>
+          </label>
         </div>
 
         <!-- Sync Status Display -->
@@ -29,7 +48,7 @@
         <div class="sync-status-section">
           <div class="sync-status-display">
             <span class="sync-icon" [class.syncing]="syncStatus.isSyncing">
-              {{ syncStatus.isOnline ? (syncStatus.isSyncing ? '🔄' : '☁️') : '📱' }}
+              {{ getSyncStatusHeaderIcon() }}
             </span>
             <span class="sync-text">{{ getSyncStatusDisplay() }}</span>
           </div>

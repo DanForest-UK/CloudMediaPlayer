@@ -22,6 +22,11 @@ export interface SyncStatus {
   error: string | null;
 }
 
+export interface SyncSettings {
+  enabled: boolean;
+  autoSync: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -29,6 +34,7 @@ export class PlaylistService {
   private readonly STORAGE_KEY = 'cloudMediaPlayer_playlists';
   private readonly CURRENT_PLAYLIST_KEY = 'cloudMediaPlayer_currentPlaylist';
   private readonly SYNC_STATUS_KEY = 'cloudMediaPlayer_syncStatus';
+  private readonly SYNC_SETTINGS_KEY = 'cloudMediaPlayer_syncSettings';
 
   // Sync status observable
   private syncStatus$ = new BehaviorSubject<SyncStatus>({
@@ -39,17 +45,31 @@ export class PlaylistService {
     error: null
   });
 
+  // Sync settings observable
+  private syncSettings$ = new BehaviorSubject<SyncSettings>({
+    enabled: true,
+    autoSync: true
+  });
+
   constructor(private dropboxService: DropboxService) {
+    // Load sync settings
+    this.loadSyncSettings();
+
     // Listen for online/offline events
     window.addEventListener('online', () => this.updateSyncStatus({ isOnline: true }));
     window.addEventListener('offline', () => this.updateSyncStatus({ isOnline: false }));
 
-    // Auto-sync when coming online
-    window.addEventListener('online', () => this.syncPlaylists());
+    // Auto-sync when coming online (if enabled)
+    window.addEventListener('online', () => {
+      if (this.syncSettings$.value.enabled && this.syncSettings$.value.autoSync) {
+        this.syncPlaylists();
+      }
+    });
 
     // Initial sync check
     this.dropboxService.getAuthState().subscribe((authState: AuthState) => {
-      if (authState.isAuthenticated && navigator.onLine) {
+      if (authState.isAuthenticated && navigator.onLine &&
+        this.syncSettings$.value.enabled && this.syncSettings$.value.autoSync) {
         this.syncPlaylists();
       }
     });
@@ -63,6 +83,49 @@ export class PlaylistService {
   }
 
   /**
+   * Get sync settings as observable
+   */
+  getSyncSettings(): Observable<SyncSettings> {
+    return this.syncSettings$.asObservable();
+  }
+
+  /**
+   * Update sync settings
+   */
+  updateSyncSettings(settings: Partial<SyncSettings>): void {
+    const currentSettings = this.syncSettings$.value;
+    const newSettings = { ...currentSettings, ...settings };
+    this.syncSettings$.next(newSettings);
+    this.storeSyncSettings(newSettings);
+  }
+
+  /**
+   * Load sync settings from storage
+   */
+  private loadSyncSettings(): void {
+    try {
+      const stored = localStorage.getItem(this.SYNC_SETTINGS_KEY);
+      if (stored) {
+        const settings = JSON.parse(stored);
+        this.syncSettings$.next(settings);
+      }
+    } catch (error) {
+      console.error('Error loading sync settings:', error);
+    }
+  }
+
+  /**
+   * Store sync settings to storage
+   */
+  private storeSyncSettings(settings: SyncSettings): void {
+    try {
+      localStorage.setItem(this.SYNC_SETTINGS_KEY, JSON.stringify(settings));
+    } catch (error) {
+      console.error('Error storing sync settings:', error);
+    }
+  }
+
+  /**
    * Update sync status
    */
   private updateSyncStatus(status: Partial<SyncStatus>): void {
@@ -71,7 +134,7 @@ export class PlaylistService {
   }
 
   /**
-   * Save a playlist (local + cloud sync)
+   * Save a playlist (local + cloud sync if enabled)
    */
   savePlaylist(name: string, items: PlaylistItem[], id?: string): Observable<SavedPlaylist> {
     return new Observable(observer => {
@@ -80,7 +143,7 @@ export class PlaylistService {
         const localPlaylist = this.savePlaylistLocally(name, items, id);
         observer.next(localPlaylist);
 
-        // Then sync to Dropbox if authenticated and online
+        // Then sync to Dropbox if enabled and possible
         if (this.canSync()) {
           this.syncPlaylistToDropbox(localPlaylist).subscribe({
             next: (syncedPlaylist) => {
@@ -105,6 +168,14 @@ export class PlaylistService {
         observer.error(error);
       }
     });
+  }
+
+  /**
+   * Save playlist as new (always creates a new playlist with new ID)
+   */
+  savePlaylistAs(name: string, items: PlaylistItem[]): Observable<SavedPlaylist> {
+    // Always create new playlist by not passing an ID
+    return this.savePlaylist(name, items);
   }
 
   /**
@@ -202,7 +273,7 @@ export class PlaylistService {
   }
 
   /**
-   * Delete a playlist (local + cloud)
+   * Delete a playlist (local + cloud if sync enabled)
    */
   deletePlaylist(id: string): Observable<boolean> {
     return new Observable(observer => {
@@ -222,7 +293,7 @@ export class PlaylistService {
         this.storePlaylists(playlists);
       }
 
-      // Delete from Dropbox if synced
+      // Delete from Dropbox if synced and sync is enabled
       if (this.canSync() && playlist.syncStatus === 'synced') {
         const playlistPath = this.dropboxService.getPlaylistPath(playlist.name);
         this.dropboxService.deleteFile(playlistPath).subscribe({
@@ -244,7 +315,7 @@ export class PlaylistService {
   }
 
   /**
-   * Rename a playlist (local + cloud)
+   * Rename a playlist (local + cloud if sync enabled)
    */
   renamePlaylist(id: string, newName: string): Observable<boolean> {
     return new Observable(observer => {
@@ -264,7 +335,7 @@ export class PlaylistService {
 
       this.storePlaylists(playlists);
 
-      // Sync to Dropbox if possible
+      // Sync to Dropbox if possible and enabled
       if (this.canSync()) {
         // Delete old file and upload new one
         forkJoin([
@@ -290,7 +361,7 @@ export class PlaylistService {
   }
 
   /**
-   * Sync all playlists between local and Dropbox
+   * Sync all playlists between local and Dropbox (if sync enabled)
    */
   syncPlaylists(): Observable<void> {
     if (!this.canSync()) {
@@ -468,10 +539,12 @@ export class PlaylistService {
   }
 
   /**
-   * Check if sync is possible
+   * Check if sync is possible (authentication + online + sync enabled)
    */
   private canSync(): boolean {
-    return this.dropboxService.isAuthenticated() && navigator.onLine;
+    return this.syncSettings$.value.enabled &&
+      this.dropboxService.isAuthenticated() &&
+      navigator.onLine;
   }
 
   private generateId(): string {

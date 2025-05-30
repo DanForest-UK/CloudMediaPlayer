@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angu
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { SavedPlaylist, SyncStatus, PlaylistService } from '../playlist-service';
+import { SavedPlaylist, SyncStatus, SyncSettings, PlaylistService } from '../playlist-service';
 
 /**
  * Interface for playlist item
@@ -20,6 +20,7 @@ export interface PlaylistItem {
  * - Playlist management (clear, shuffle, remove items)
  * - Visual indicators for currently playing track
  * - Playlist saving/loading via dropdown with Dropbox sync
+ * - Configurable sync settings
  */
 @Component({
   selector: 'app-playlist',
@@ -41,6 +42,7 @@ export class PlaylistComponent implements OnInit, OnDestroy {
   @Output() clearPlaylistRequested = new EventEmitter<void>();
   @Output() shufflePlaylistRequested = new EventEmitter<void>();
   @Output() savePlaylistRequested = new EventEmitter<void>();
+  @Output() savePlaylistAsRequested = new EventEmitter<void>();
   @Output() loadPlaylistRequested = new EventEmitter<string>();
   @Output() playlistSelectionChanged = new EventEmitter<string | null>();
   @Output() deletePlaylistRequested = new EventEmitter<string>();
@@ -61,7 +63,14 @@ export class PlaylistComponent implements OnInit, OnDestroy {
     error: null
   };
 
+  // Sync settings
+  syncSettings: SyncSettings = {
+    enabled: true,
+    autoSync: true
+  };
+
   private syncStatusSubscription?: Subscription;
+  private syncSettingsSubscription?: Subscription;
 
   constructor(private playlistService: PlaylistService) { }
 
@@ -70,10 +79,25 @@ export class PlaylistComponent implements OnInit, OnDestroy {
     this.syncStatusSubscription = this.playlistService.getSyncStatus().subscribe(
       status => this.syncStatus = status
     );
+
+    // Subscribe to sync settings
+    this.syncSettingsSubscription = this.playlistService.getSyncSettings().subscribe(
+      settings => this.syncSettings = settings
+    );
   }
 
   ngOnDestroy(): void {
     this.syncStatusSubscription?.unsubscribe();
+    this.syncSettingsSubscription?.unsubscribe();
+  }
+
+  /**
+   * Toggle sync enabled setting
+   */
+  toggleSyncEnabled(): void {
+    this.playlistService.updateSyncSettings({
+      enabled: !this.syncSettings.enabled
+    });
   }
 
   /**
@@ -109,6 +133,14 @@ export class PlaylistComponent implements OnInit, OnDestroy {
    */
   savePlaylist(): void {
     this.savePlaylistRequested.emit();
+    this.closeDropdown();
+  }
+
+  /**
+   * Save the current playlist as new
+   */
+  savePlaylistAs(): void {
+    this.savePlaylistAsRequested.emit();
     this.closeDropdown();
   }
 
@@ -186,6 +218,8 @@ export class PlaylistComponent implements OnInit, OnDestroy {
    * Get sync status icon for a playlist
    */
   getSyncStatusIcon(playlist: SavedPlaylist): string {
+    if (!this.syncSettings.enabled) return '💾'; // Always local when sync disabled
+
     switch (playlist.syncStatus) {
       case 'synced': return '☁️';
       case 'syncing': return '🔄';
@@ -199,6 +233,8 @@ export class PlaylistComponent implements OnInit, OnDestroy {
    * Get sync status tooltip for a playlist
    */
   getSyncStatusTooltip(playlist: SavedPlaylist): string {
+    if (!this.syncSettings.enabled) return 'Sync disabled - saved locally only';
+
     switch (playlist.syncStatus) {
       case 'synced': return 'Synced to Dropbox';
       case 'syncing': return 'Syncing to Dropbox...';
@@ -212,6 +248,7 @@ export class PlaylistComponent implements OnInit, OnDestroy {
    * Get the sync status display for the header
    */
   getSyncStatusDisplay(): string {
+    if (!this.syncSettings.enabled) return 'Sync Disabled';
     if (!this.syncStatus.isOnline) return 'Offline';
     if (this.syncStatus.isSyncing) return 'Syncing...';
     if (this.syncStatus.error) return 'Sync Error';
@@ -223,6 +260,16 @@ export class PlaylistComponent implements OnInit, OnDestroy {
       return 'Synced recently';
     }
     return 'Not synced';
+  }
+
+  /**
+   * Get the sync status icon for the header
+   */
+  getSyncStatusHeaderIcon(): string {
+    if (!this.syncSettings.enabled) return '📱';
+    if (!this.syncStatus.isOnline) return '📱';
+    if (this.syncStatus.isSyncing) return '🔄';
+    return '☁️';
   }
 
   /**
@@ -270,6 +317,8 @@ export class PlaylistComponent implements OnInit, OnDestroy {
    * Check if a playlist can be force synced
    */
   canForceSyncPlaylist(playlistId: string): boolean {
+    if (!this.syncSettings.enabled) return false;
+
     const playlist = this.savedPlaylists.find(p => p.id === playlistId);
     return playlist ? playlist.syncStatus !== 'synced' : false;
   }

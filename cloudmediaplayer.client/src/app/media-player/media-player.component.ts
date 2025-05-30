@@ -250,6 +250,13 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Handle save playlist as request from PlaylistComponent
+   */
+  onSavePlaylistAsRequested(): void {
+    this.saveCurrentPlaylistAs();
+  }
+
+  /**
    * Handle load playlist request from PlaylistComponent
    */
   onLoadPlaylistRequested(playlistId: string): void {
@@ -427,7 +434,7 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Save the current playlist (with Dropbox sync)
+   * Save the current playlist (with Dropbox sync if enabled)
    */
   private saveCurrentPlaylist(): void {
     if (this.playlist.length === 0) {
@@ -450,7 +457,7 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
       }
     }
 
-    // Save with Dropbox sync
+    // Save with Dropbox sync (if enabled)
     this.playlistService.savePlaylist(name, this.playlist, this.currentPlaylistId || undefined).subscribe({
       next: (savedPlaylist: SavedPlaylist) => {
         this.currentPlaylistId = savedPlaylist.id;
@@ -459,6 +466,42 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
 
         const syncStatus = savedPlaylist.syncStatus === 'synced' ? ' and synced to Dropbox' : '';
         alert(`Playlist "${name}" saved successfully${syncStatus}!`);
+      },
+      error: (error: any) => {
+        alert('Error saving playlist. Please try again.');
+        console.error('Error saving playlist:', error);
+      }
+    });
+  }
+
+  /**
+   * Save the current playlist as a new playlist
+   */
+  private saveCurrentPlaylistAs(): void {
+    if (this.playlist.length === 0) {
+      alert('Cannot save an empty playlist');
+      return;
+    }
+
+    const name = prompt('Enter name for new playlist:', this.currentPlaylistName) || '';
+    if (!name.trim()) return;
+
+    // Check for name conflicts
+    if (this.playlistService.playlistNameExists(name)) {
+      if (!confirm(`A playlist named "${name}" already exists. Overwrite it?`)) {
+        return;
+      }
+    }
+
+    // Save as new playlist (always creates new ID)
+    this.playlistService.savePlaylistAs(name, this.playlist).subscribe({
+      next: (savedPlaylist: SavedPlaylist) => {
+        this.currentPlaylistId = savedPlaylist.id;
+        this.currentPlaylistName = savedPlaylist.name;
+        this.loadSavedPlaylists();
+
+        const syncStatus = savedPlaylist.syncStatus === 'synced' ? ' and synced to Dropbox' : '';
+        alert(`Playlist "${name}" saved as new playlist${syncStatus}!`);
       },
       error: (error: any) => {
         alert('Error saving playlist. Please try again.');
@@ -507,7 +550,7 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Delete a saved playlist
+   * Delete a saved playlist (with Dropbox sync if enabled)
    */
   private deletePlaylist(playlistId: string): void {
     const playlist = this.savedPlaylists.find(p => p.id === playlistId);
@@ -534,7 +577,7 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Rename a saved playlist
+   * Rename a saved playlist (with Dropbox sync if enabled)
    */
   private renamePlaylist(playlistId: string, newName: string): void {
     if (this.playlistService.playlistNameExists(newName, playlistId)) {
