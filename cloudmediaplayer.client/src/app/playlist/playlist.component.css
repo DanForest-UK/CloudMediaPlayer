@@ -73,7 +73,7 @@
   border-radius: 5px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   z-index: 1000;
-  max-height: 300px;
+  max-height: 350px;
   overflow-y: auto;
   margin-top: 2px;
 }
@@ -95,6 +95,46 @@
   color: #666;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+/* Sync Status Section */
+.sync-status-section {
+  padding: 4px 0;
+}
+
+.sync-status-display {
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #666;
+  background-color: #f8f9fa;
+  border-radius: 3px;
+  margin: 0 4px;
+}
+
+.sync-icon {
+  font-size: 14px;
+  transition: transform 0.3s ease;
+}
+
+  .sync-icon.syncing {
+    animation: spin 2s linear infinite;
+  }
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.sync-text {
+  font-weight: 500;
 }
 
 .dropdown-item {
@@ -161,9 +201,16 @@
   margin-top: 2px;
 }
 
+.sync-status-icon {
+  font-size: 12px;
+  margin-left: 4px;
+  opacity: 0.8;
+}
+
 .context-menu-indicator {
   color: #4CAF50;
   font-size: 12px;
+  margin-left: 4px;
 }
 
 /* Context Menu */
@@ -174,7 +221,7 @@
   border-radius: 5px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   z-index: 1001;
-  min-width: 120px;
+  min-width: 140px;
 }
 
 .context-menu-item {

@@ -67,11 +67,13 @@ export interface DropboxFile {
   };
   size?: number;
   client_modified?: string;
+  server_modified?: string;
+  rev?: string; // revision identifier
 }
 
 /**
  * Enhanced service that handles all communication with the Dropbox API
- * OAuth 2.0 authentication with PKCE
+ * OAuth 2.0 authentication with PKCE and file operations
  */
 @Injectable({
   providedIn: 'root'
@@ -83,6 +85,9 @@ export class DropboxService {
   // Dropbox API endpoints
   private readonly API_URL = 'https://api.dropboxapi.com/2';
   private readonly CONTENT_URL = 'https://content.dropboxapi.com/2';
+
+  // App folder paths
+  private readonly PLAYLISTS_FOLDER = '/playlists';
 
   // Authentication state
   private accessToken: string | null = null;
@@ -196,7 +201,7 @@ export class DropboxService {
       authUrl.searchParams.set('redirect_uri', this.redirectUri);
       authUrl.searchParams.set('code_challenge', codeChallenge);
       authUrl.searchParams.set('code_challenge_method', 'S256');
-      authUrl.searchParams.set('scope', 'account_info.read files.metadata.read files.content.read');
+      authUrl.searchParams.set('scope', 'account_info.read files.metadata.read files.content.read files.content.write');
       authUrl.searchParams.set('state', this.generateState());
 
       window.location.href = authUrl.toString();
@@ -241,6 +246,9 @@ export class DropboxService {
               tokenExpiry: this.tokenExpiry,
               error: null
             });
+
+            // Initialize playlists folder
+            await this.initializePlaylistsFolder();
           } else {
             this.updateAuthState({ error: 'Token validation failed' });
           }
@@ -269,7 +277,7 @@ export class DropboxService {
     sessionStorage.removeItem('oauth_return_url');
     return returnUrl || '/';
   }
-  
+
   /**
    * Refresh access token using refresh token
    */
@@ -352,12 +360,28 @@ export class DropboxService {
           tokenExpiry: this.tokenExpiry,
           error: null
         });
+
+        // Initialize playlists folder
+        await this.initializePlaylistsFolder();
       } else {
         this.clearAuth();
       }
     } catch (error) {
       console.error('Token validation failed:', error);
       this.clearAuth();
+    }
+  }
+
+  /**
+   * Initialize the playlists folder in Dropbox App folder
+   */
+  private async initializePlaylistsFolder(): Promise<void> {
+    try {
+      // Create playlists folder if it doesn't exist
+      await this.createFolder(this.PLAYLISTS_FOLDER);
+    } catch (error) {
+      // Folder might already exist, that's fine
+      console.log('Playlists folder initialization:', error);
     }
   }
 
@@ -634,7 +658,9 @@ export class DropboxService {
               is_folder: entry['.tag'] === 'folder',
               media_info: entry.media_info,
               size: entry.size,
-              client_modified: entry.client_modified
+              client_modified: entry.client_modified,
+              server_modified: entry.server_modified,
+              rev: entry.rev
             };
 
             if (mediaOnly) {
@@ -756,6 +782,175 @@ export class DropboxService {
     );
 
     return this.makeRateLimitedRequest(requestFn);
+  }
+
+  // NEW FILE OPERATIONS FOR PLAYLIST STORAGE
+
+  /**
+   * Create a folder in Dropbox
+   */
+  createFolder(path: string): Observable<DropboxFile> {
+    if (!this.isAuthenticated()) {
+      return throwError(() => new Error('Not authenticated'));
+    }
+
+    const endpoint = `${this.API_URL}/files/create_folder_v2`;
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.accessToken}`,
+      'Content-Type': 'application/json'
+    });
+    const body = { path };
+
+    const requestFn = () => this.http.post<any>(endpoint, body, { headers }).pipe(
+      this.retryWithBackoff(2),
+      map(response => ({
+        id: response.metadata.id,
+        name: response.metadata.name,
+        path_display: response.metadata.path_display,
+        is_folder: true,
+        server_modified: response.metadata.server_modified
+      } as DropboxFile)),
+      catchError(error => {
+        // Folder might already exist
+        if (error.status === 409) {
+          return of({
+            id: '',
+            name: path.split('/').pop() || '',
+            path_display: path,
+            is_folder: true
+          } as DropboxFile);
+        }
+        console.error('Error creating folder:', error);
+        return throwError(() => error);
+      })
+    );
+
+    return this.makeRateLimitedRequest(requestFn);
+  }
+
+  /**
+   * Upload a file to Dropbox
+   */
+  uploadFile(path: string, content: string, mode: 'add' | 'overwrite' = 'overwrite'): Observable<DropboxFile> {
+    if (!this.isAuthenticated()) {
+      return throwError(() => new Error('Not authenticated'));
+    }
+
+    const endpoint = `${this.CONTENT_URL}/files/upload`;
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.accessToken}`,
+      'Content-Type': 'application/octet-stream',
+      'Dropbox-API-Arg': JSON.stringify({
+        path,
+        mode,
+        autorename: false
+      })
+    });
+
+    const requestFn = () => this.http.post<any>(endpoint, content, { headers }).pipe(
+      this.retryWithBackoff(2),
+      map(response => ({
+        id: response.id,
+        name: response.name,
+        path_display: response.path_display,
+        is_folder: false,
+        size: response.size,
+        client_modified: response.client_modified,
+        server_modified: response.server_modified,
+        rev: response.rev
+      } as DropboxFile)),
+      catchError(error => {
+        console.error('Error uploading file:', error);
+        return throwError(() => error);
+      })
+    );
+
+    return this.makeRateLimitedRequest(requestFn);
+  }
+
+  /**
+   * Download a file from Dropbox
+   */
+  downloadFile(path: string): Observable<string> {
+    if (!this.isAuthenticated()) {
+      return throwError(() => new Error('Not authenticated'));
+    }
+
+    const endpoint = `${this.CONTENT_URL}/files/download`;
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.accessToken}`,
+      'Dropbox-API-Arg': JSON.stringify({ path })
+    });
+
+    const requestFn = () => this.http.post(endpoint, null, {
+      headers,
+      responseType: 'text'
+    }).pipe(
+      this.retryWithBackoff(2),
+      catchError(error => {
+        console.error('Error downloading file:', error);
+        return throwError(() => error);
+      })
+    );
+
+    return this.makeRateLimitedRequest(requestFn);
+  }
+
+  /**
+   * Delete a file from Dropbox
+   */
+  deleteFile(path: string): Observable<void> {
+    if (!this.isAuthenticated()) {
+      return throwError(() => new Error('Not authenticated'));
+    }
+
+    const endpoint = `${this.API_URL}/files/delete_v2`;
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.accessToken}`,
+      'Content-Type': 'application/json'
+    });
+    const body = { path };
+
+    const requestFn = () => this.http.post<any>(endpoint, body, { headers }).pipe(
+      this.retryWithBackoff(2),
+      map(() => void 0),
+      catchError(error => {
+        console.error('Error deleting file:', error);
+        return throwError(() => error);
+      })
+    );
+
+    return this.makeRateLimitedRequest(requestFn);
+  }
+
+  /**
+   * List all playlist files in the playlists folder
+   */
+  listPlaylistFiles(): Observable<DropboxFile[]> {
+    return this.listFolder(this.PLAYLISTS_FOLDER).pipe(
+      map(files => files.filter(file =>
+        !file.is_folder &&
+        file.name.toLowerCase().endsWith('.json')
+      ))
+    );
+  }
+
+  /**
+   * Get the full path for a playlist file
+   */
+  getPlaylistPath(playlistName: string): string {
+    const sanitizedName = this.sanitizeFileName(playlistName);
+    return `${this.PLAYLISTS_FOLDER}/${sanitizedName}.json`;
+  }
+
+  /**
+   * Sanitize filename for Dropbox
+   */
+  private sanitizeFileName(name: string): string {
+    return name
+      .replace(/[<>:"/\\|?*]/g, '_') // Replace invalid characters
+      .replace(/\s+/g, '_') // Replace spaces with underscores
+      .substring(0, 255); // Limit length
   }
 
   /**

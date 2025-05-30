@@ -19,7 +19,7 @@
                       (folderEnqueueRequested)="onFolderEnqueueRequested($event)">
     </app-file-browser>
 
-    <!-- Right Panel - Playlist -->
+    <!-- Right Panel - Playlist-->
     <app-playlist [playlist]="playlist"
                   [currentPlaylistIndex]="currentPlaylistIndex"
                   [isPlaying]="isPlaying"
@@ -34,7 +34,8 @@
                   (loadPlaylistRequested)="onLoadPlaylistRequested($event)"
                   (playlistSelectionChanged)="onPlaylistSelectionChanged($event)"
                   (deletePlaylistRequested)="onDeletePlaylistRequested($event)"
-                  (renamePlaylistRequested)="onRenamePlaylistRequested($event.id, $event.name)">
+                  (renamePlaylistRequested)="onRenamePlaylistRequested($event)"
+                  (forceSyncRequested)="onForceSyncRequested($event)">
     </app-playlist>
   </div>
 

@@ -24,6 +24,17 @@
           </button>
         </div>
 
+        <!-- Sync Status Display -->
+        <div class="dropdown-divider"></div>
+        <div class="sync-status-section">
+          <div class="sync-status-display">
+            <span class="sync-icon" [class.syncing]="syncStatus.isSyncing">
+              {{ syncStatus.isOnline ? (syncStatus.isSyncing ? '🔄' : '☁️') : '📱' }}
+            </span>
+            <span class="sync-text">{{ getSyncStatusDisplay() }}</span>
+          </div>
+        </div>
+
         <div class="dropdown-divider" *ngIf="savedPlaylists.length > 0"></div>
 
         <div class="dropdown-section" *ngIf="savedPlaylists.length > 0">
@@ -37,6 +48,10 @@
             <span class="playlist-info">
               <span class="playlist-name">{{ savedPlaylist.name }}</span>
               <span class="playlist-count">({{ savedPlaylist.items.length }} songs)</span>
+            </span>
+            <span class="sync-status-icon"
+                  [title]="getSyncStatusTooltip(savedPlaylist)">
+              {{ getSyncStatusIcon(savedPlaylist) }}
             </span>
             <span class="context-menu-indicator" *ngIf="currentPlaylistId === savedPlaylist.id">●</span>
           </button>
@@ -67,6 +82,12 @@
     <button class="context-menu-item" (click)="renamePlaylist()">
       <span class="context-icon">✏️</span>
       Rename
+    </button>
+    <button class="context-menu-item"
+            (click)="forceSyncPlaylist()"
+            *ngIf="contextMenuPlaylistId && canForceSyncPlaylist(contextMenuPlaylistId)">
+      <span class="context-icon">🔄</span>
+      Force Sync
     </button>
     <button class="context-menu-item delete" (click)="deletePlaylist()">
       <span class="context-icon">🗑️</span>

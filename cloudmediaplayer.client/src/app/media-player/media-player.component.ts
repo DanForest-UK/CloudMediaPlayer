@@ -1,6 +1,7 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { DropboxService, DropboxFile } from '../dropbox.service';
 import { DropboxConnectComponent } from '../dropbox-connect/dropbox-connect.component';
 import { FileBrowserComponent } from '../file-browser/file-browser.component';
@@ -14,9 +15,9 @@ import { PlaylistService, SavedPlaylist } from '../playlist-service';
  * This component coordinates between all the sub-components:
  * - DropboxConnectComponent for authentication
  * - FileBrowserComponent for browsing files
- * - PlaylistComponent for playlist management
+ * - PlaylistComponent for playlist management with Dropbox sync
  * - AudioPlayerComponent for audio playback
- * - PlaylistService for playlist persistence
+ * - PlaylistService for playlist persistence and cloud sync
  */
 @Component({
   selector: 'app-media-player',
@@ -25,7 +26,7 @@ import { PlaylistService, SavedPlaylist } from '../playlist-service';
   standalone: true,
   imports: [CommonModule, FormsModule, DropboxConnectComponent, FileBrowserComponent, PlaylistComponent, AudioPlayerComponent]
 })
-export class MediaPlayerComponent implements OnInit {
+export class MediaPlayerComponent implements OnInit, OnDestroy {
   @ViewChild(FileBrowserComponent) fileBrowser!: FileBrowserComponent;
 
   // Authentication state
@@ -45,6 +46,9 @@ export class MediaPlayerComponent implements OnInit {
   currentPlaylistId: string | null = null;
   currentPlaylistName: string = 'New Playlist';
 
+  // Subscriptions
+  private authSubscription?: Subscription;
+
   constructor(
     private dropboxService: DropboxService,
     private playlistService: PlaylistService
@@ -53,6 +57,24 @@ export class MediaPlayerComponent implements OnInit {
   ngOnInit(): void {
     this.loadSavedPlaylists();
     this.restoreCurrentPlaylist();
+
+    // Listen for authentication changes to trigger sync
+    this.authSubscription = this.dropboxService.getAuthState().subscribe(authState => {
+      if (authState.isAuthenticated && navigator.onLine) {
+        // Auto-sync when authenticated
+        this.playlistService.syncPlaylists().subscribe({
+          next: () => {
+            console.log('Playlists synced successfully');
+            this.loadSavedPlaylists(); // Refresh the UI
+          },
+          error: (error: any) => console.error('Sync failed:', error)
+        });
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.authSubscription?.unsubscribe();
   }
 
   /**
@@ -255,8 +277,15 @@ export class MediaPlayerComponent implements OnInit {
   /**
    * Handle rename playlist request from PlaylistComponent
    */
-  onRenamePlaylistRequested(playlistId: string, newName: string): void {
-    this.renamePlaylist(playlistId, newName);
+  onRenamePlaylistRequested(data: { id: string, name: string }): void {
+    this.renamePlaylist(data.id, data.name);
+  }
+
+  /**
+   * Handle force sync request from PlaylistComponent
+   */
+  onForceSyncRequested(playlistId: string): void {
+    this.forceSyncPlaylist(playlistId);
   }
 
   /**
@@ -398,7 +427,7 @@ export class MediaPlayerComponent implements OnInit {
   }
 
   /**
-   * Save the current playlist
+   * Save the current playlist (with Dropbox sync)
    */
   private saveCurrentPlaylist(): void {
     if (this.playlist.length === 0) {
@@ -421,17 +450,21 @@ export class MediaPlayerComponent implements OnInit {
       }
     }
 
-    try {
-      const savedPlaylist = this.playlistService.savePlaylist(name, this.playlist, this.currentPlaylistId || undefined);
-      this.currentPlaylistId = savedPlaylist.id;
-      this.currentPlaylistName = savedPlaylist.name;
-      this.loadSavedPlaylists();
+    // Save with Dropbox sync
+    this.playlistService.savePlaylist(name, this.playlist, this.currentPlaylistId || undefined).subscribe({
+      next: (savedPlaylist: SavedPlaylist) => {
+        this.currentPlaylistId = savedPlaylist.id;
+        this.currentPlaylistName = savedPlaylist.name;
+        this.loadSavedPlaylists();
 
-      alert(`Playlist "${name}" saved successfully!`);
-    } catch (error) {
-      alert('Error saving playlist. Please try again.');
-      console.error('Error saving playlist:', error);
-    }
+        const syncStatus = savedPlaylist.syncStatus === 'synced' ? ' and synced to Dropbox' : '';
+        alert(`Playlist "${name}" saved successfully${syncStatus}!`);
+      },
+      error: (error: any) => {
+        alert('Error saving playlist. Please try again.');
+        console.error('Error saving playlist:', error);
+      }
+    });
   }
 
   /**
@@ -447,8 +480,25 @@ export class MediaPlayerComponent implements OnInit {
     // Stop current playback
     this.stopMedia();
 
-    // Load the playlist
-    this.playlist = [...savedPlaylist.items];
+    // Load the playlist - note that items from Dropbox might only have paths
+    this.playlist = savedPlaylist.items.map(item => {
+      // If the item only has a path (from Dropbox), reconstruct the file object
+      if (!item.file.name && item.file.path_display) {
+        const pathParts = item.file.path_display.split('/');
+        const fileName = pathParts[pathParts.length - 1];
+        return {
+          ...item,
+          file: {
+            ...item.file,
+            name: fileName,
+            id: item.file.path_display, // Use path as ID
+            is_folder: false
+          }
+        };
+      }
+      return item;
+    });
+
     this.currentPlaylistId = savedPlaylist.id;
     this.currentPlaylistName = savedPlaylist.name;
     this.currentPlaylistIndex = -1;
@@ -464,13 +514,22 @@ export class MediaPlayerComponent implements OnInit {
     if (!playlist) return;
 
     if (confirm(`Delete playlist "${playlist.name}"?`)) {
-      this.playlistService.deletePlaylist(playlistId);
-      this.loadSavedPlaylists();
+      this.playlistService.deletePlaylist(playlistId).subscribe({
+        next: (success: boolean) => {
+          if (success) {
+            this.loadSavedPlaylists();
 
-      // If we deleted the currently loaded playlist, reset to new
-      if (this.currentPlaylistId === playlistId) {
-        this.createNewPlaylist();
-      }
+            // If we deleted the currently loaded playlist, reset to new
+            if (this.currentPlaylistId === playlistId) {
+              this.createNewPlaylist();
+            }
+          }
+        },
+        error: (error: any) => {
+          alert('Error deleting playlist. Please try again.');
+          console.error('Error deleting playlist:', error);
+        }
+      });
     }
   }
 
@@ -483,14 +542,40 @@ export class MediaPlayerComponent implements OnInit {
       return;
     }
 
-    if (this.playlistService.renamePlaylist(playlistId, newName)) {
-      this.loadSavedPlaylists();
+    this.playlistService.renamePlaylist(playlistId, newName).subscribe({
+      next: (success: boolean) => {
+        if (success) {
+          this.loadSavedPlaylists();
 
-      // Update current playlist name if it's the one being renamed
-      if (this.currentPlaylistId === playlistId) {
-        this.currentPlaylistName = newName;
+          // Update current playlist name if it's the one being renamed
+          if (this.currentPlaylistId === playlistId) {
+            this.currentPlaylistName = newName;
+          }
+        }
+      },
+      error: (error: any) => {
+        alert('Error renaming playlist. Please try again.');
+        console.error('Error renaming playlist:', error);
       }
-    }
+    });
+  }
+
+  /**
+   * Force sync a specific playlist
+   */
+  private forceSyncPlaylist(playlistId: string): void {
+    this.playlistService.forceSyncPlaylist(playlistId).subscribe({
+      next: (syncedPlaylist: SavedPlaylist) => {
+        this.loadSavedPlaylists();
+
+        const status = syncedPlaylist.syncStatus === 'synced' ? 'synced successfully' : 'sync failed';
+        alert(`Playlist "${syncedPlaylist.name}" ${status}!`);
+      },
+      error: (error: any) => {
+        alert('Error syncing playlist. Please try again.');
+        console.error('Error syncing playlist:', error);
+      }
+    });
   }
 
   /**
