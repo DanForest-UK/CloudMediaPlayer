@@ -183,6 +183,7 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
       this.playlistService.clearCurrentPlaylist();
       this.hasInitialSyncCompleted = false; // Reset sync flag for next login
     } else if (!wasAuthenticated) {
+      // User just authenticated, trigger sync
       this.performInitialSync();
     }
   }
@@ -590,6 +591,14 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
     this.currentPlaylistIndex = -1;
 
     this.saveCurrentPlaylistState();
+
+    // Auto-start playback if the playlist has songs
+    if (this.playlist.length > 0) {
+      this.playPlaylistItem(0);
+      this.notificationService.showSuccess(`Loaded playlist "${savedPlaylist.name}" with ${this.playlist.length} songs`);
+    } else {
+      this.notificationService.showSuccess(`Loaded empty playlist "${savedPlaylist.name}"`);
+    }
   }
 
   /**
