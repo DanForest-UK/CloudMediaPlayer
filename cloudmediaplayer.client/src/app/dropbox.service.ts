@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of, Subject, forkJoin, from, EMPTY, BehaviorSubject, throwError } from 'rxjs';
 import { map, catchError, scan, mergeMap, concatMap, delay, retryWhen, take, tap, takeLast, finalize } from 'rxjs/operators';
+import { NotificationService } from './notification.service';
 
 /**
  * Interface for Dropbox user information
@@ -114,7 +115,10 @@ export class DropboxService {
     totalAudioFiles: 0
   });
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private notificationService: NotificationService
+  ) {
     this.initializeAuth();
   }
 
@@ -177,6 +181,7 @@ export class DropboxService {
       }
     } catch (error) {
       console.error('Error initializing auth:', error);
+      this.notificationService.showError('Error initializing Dropbox connection');
       this.clearAuth();
     }
   }
@@ -206,6 +211,8 @@ export class DropboxService {
 
       window.location.href = authUrl.toString();
     } catch (error) {
+      console.error('Error starting OAuth flow:', error);
+      this.notificationService.showError('Error connecting to Dropbox');
       this.updateAuthState({ error: 'Failed to start OAuth flow' });
     }
   }
@@ -249,10 +256,14 @@ export class DropboxService {
 
             // Initialize playlists folder
             await this.initializePlaylistsFolder();
+            this.notificationService.showSuccess('Successfully connected to Dropbox');
           } else {
             this.updateAuthState({ error: 'Token validation failed' });
+            this.notificationService.showError('Unable to verify Dropbox connection');
           }
         } catch (error) {
+          console.error('Token validation error:', error);
+          this.notificationService.showError('Unable to verify Dropbox connection');
           this.updateAuthState({ error: 'Token validation failed: ' + (error as Error).message });
         }
 
@@ -263,6 +274,7 @@ export class DropboxService {
       }
     } catch (error) {
       console.error('OAuth callback error:', error);
+      this.notificationService.showError('Unable to connect to Dropbox');
       this.updateAuthState({ error: 'Authentication failed: ' + (error as Error).message });
     }
 
@@ -310,6 +322,7 @@ export class DropboxService {
       }
     } catch (error) {
       console.error('Token refresh failed:', error);
+      this.notificationService.showError('Error refreshing Dropbox connection');
     }
 
     this.clearAuth();
@@ -368,6 +381,7 @@ export class DropboxService {
       }
     } catch (error) {
       console.error('Token validation failed:', error);
+      this.notificationService.showError('Unable to verify Dropbox connection');
       this.clearAuth();
     }
   }
@@ -397,6 +411,7 @@ export class DropboxService {
    */
   logout(): void {
     this.clearAuth();
+    this.notificationService.showSuccess('Disconnected from Dropbox');
   }
 
   /**
@@ -476,6 +491,7 @@ export class DropboxService {
       }
     } catch (error) {
       console.error('Error reading stored auth:', error);
+      this.notificationService.showError('Error reading stored authentication');
     }
     return null;
   }
@@ -596,6 +612,7 @@ export class DropboxService {
       this.retryWithBackoff(2),
       catchError(error => {
         console.error('Error getting current account:', error);
+        this.notificationService.showError('Error getting Dropbox account information');
         return of(null);
       })
     );
@@ -643,6 +660,7 @@ export class DropboxService {
         this.retryWithBackoff(3),
         catchError(error => {
           console.error('Error listing Dropbox folder:', error);
+          this.notificationService.showError('Error loading folder contents');
           return of({ entries: [], has_more: false });
         })
       );
@@ -734,6 +752,7 @@ export class DropboxService {
         }),
         catchError(error => {
           console.error(`Error collecting files from ${folderPath}:`, error);
+          this.notificationService.showError(`Error scanning folder for audio files`);
           return of([]);
         })
       );
@@ -745,6 +764,7 @@ export class DropboxService {
       }),
       catchError(error => {
         this.updateScanProgress('', false, 0);
+        this.notificationService.showError('Error scanning folder for audio files');
         throw error;
       })
     );
@@ -777,6 +797,7 @@ export class DropboxService {
       map(response => response.link),
       catchError(error => {
         console.error('Error getting temporary link:', error);
+        this.notificationService.showError('Error getting media link');
         return of('');
       })
     );
@@ -784,7 +805,7 @@ export class DropboxService {
     return this.makeRateLimitedRequest(requestFn);
   }
 
-  // NEW FILE OPERATIONS FOR PLAYLIST STORAGE
+  // FILE OPERATIONS FOR PLAYLIST STORAGE
 
   /**
    * Create a folder in Dropbox
@@ -821,6 +842,7 @@ export class DropboxService {
           } as DropboxFile);
         }
         console.error('Error creating folder:', error);
+        this.notificationService.showError('Error creating folder in Dropbox');
         return throwError(() => error);
       })
     );
@@ -861,6 +883,7 @@ export class DropboxService {
       } as DropboxFile)),
       catchError(error => {
         console.error('Error uploading file:', error);
+        this.notificationService.showError('Error uploading file to Dropbox');
         return throwError(() => error);
       })
     );
@@ -889,6 +912,7 @@ export class DropboxService {
       this.retryWithBackoff(2),
       catchError(error => {
         console.error('Error downloading file:', error);
+        this.notificationService.showError('Error downloading file from Dropbox');
         return throwError(() => error);
       })
     );
@@ -916,6 +940,7 @@ export class DropboxService {
       map(() => void 0),
       catchError(error => {
         console.error('Error deleting file:', error);
+        this.notificationService.showError('Error deleting file from Dropbox');
         return throwError(() => error);
       })
     );
@@ -931,7 +956,12 @@ export class DropboxService {
       map(files => files.filter(file =>
         !file.is_folder &&
         file.name.toLowerCase().endsWith('.json')
-      ))
+      )),
+      catchError(error => {
+        console.error('Error listing playlist files:', error);
+        this.notificationService.showError('Error loading playlists from Dropbox');
+        return of([]);
+      })
     );
   }
 

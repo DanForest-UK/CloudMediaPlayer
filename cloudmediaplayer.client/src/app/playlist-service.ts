@@ -3,6 +3,7 @@ import { Observable, of, forkJoin, EMPTY, BehaviorSubject, from } from 'rxjs';
 import { map, catchError, tap, switchMap, finalize } from 'rxjs/operators';
 import { PlaylistItem } from './playlist/playlist.component';
 import { DropboxService, DropboxFile, AuthState } from './dropbox.service';
+import { NotificationService } from './notification.service';
 
 export interface SavedPlaylist {
   id: string;
@@ -51,7 +52,10 @@ export class PlaylistService {
     autoSync: true
   });
 
-  constructor(private dropboxService: DropboxService) {
+  constructor(
+    private dropboxService: DropboxService,
+    private notificationService: NotificationService
+  ) {
     // Load sync settings
     this.loadSyncSettings();
 
@@ -111,6 +115,7 @@ export class PlaylistService {
       }
     } catch (error) {
       console.error('Error loading sync settings:', error);
+      this.notificationService.showError('Error loading sync settings');
     }
   }
 
@@ -122,6 +127,7 @@ export class PlaylistService {
       localStorage.setItem(this.SYNC_SETTINGS_KEY, JSON.stringify(settings));
     } catch (error) {
       console.error('Error storing sync settings:', error);
+      this.notificationService.showError('Error saving sync settings');
     }
   }
 
@@ -154,6 +160,7 @@ export class PlaylistService {
             },
             error: (error) => {
               console.error('Failed to sync playlist to Dropbox:', error);
+              this.notificationService.showError('Error syncing playlist to Dropbox');
               // Mark as pending sync
               localPlaylist.syncStatus = 'error';
               this.updateLocalPlaylist(localPlaylist);
@@ -165,6 +172,8 @@ export class PlaylistService {
           observer.complete();
         }
       } catch (error) {
+        console.error('Error saving playlist:', error);
+        this.notificationService.showError('Error saving playlist');
         observer.error(error);
       }
     });
@@ -233,6 +242,7 @@ export class PlaylistService {
       })),
       catchError(error => {
         console.error('Failed to upload playlist to Dropbox:', error);
+        this.notificationService.showError('Error syncing playlist to Dropbox');
         return of({
           ...playlist,
           syncStatus: 'error' as const
@@ -260,6 +270,7 @@ export class PlaylistService {
       }));
     } catch (error) {
       console.error('Error loading playlists from storage:', error);
+      this.notificationService.showError('Error loading saved playlists');
       return [];
     }
   }
@@ -303,6 +314,7 @@ export class PlaylistService {
           },
           error: (error) => {
             console.error('Failed to delete playlist from Dropbox:', error);
+            this.notificationService.showError('Error deleting playlist from Dropbox');
             observer.next(true); // Still success locally
             observer.complete();
           }
@@ -349,6 +361,7 @@ export class PlaylistService {
           },
           error: (error: any) => {
             console.error('Failed to rename playlist in Dropbox:', error);
+            this.notificationService.showError('Error renaming playlist in Dropbox');
             observer.next(true); // Still success locally
             observer.complete();
           }
@@ -404,6 +417,7 @@ export class PlaylistService {
       map(() => void 0),
       catchError((error: any) => {
         console.error('Sync failed:', error);
+        this.notificationService.showError('Error syncing playlists with Dropbox');
         this.updateSyncStatus({
           isSyncing: false,
           error: 'Sync failed: ' + error.message
@@ -441,6 +455,7 @@ export class PlaylistService {
       }),
       catchError((error: any) => {
         console.error('Failed to download playlist from Dropbox:', error);
+        this.notificationService.showError('Error downloading playlist from Dropbox');
         throw error;
       })
     );
@@ -489,6 +504,7 @@ export class PlaylistService {
       localStorage.setItem(this.CURRENT_PLAYLIST_KEY, JSON.stringify(currentState));
     } catch (error) {
       console.error('Error saving current playlist state:', error);
+      this.notificationService.showError('Error saving playlist state');
     }
   }
 
@@ -507,6 +523,7 @@ export class PlaylistService {
       };
     } catch (error) {
       console.error('Error loading current playlist state:', error);
+      this.notificationService.showError('Error loading playlist state');
       return null;
     }
   }
@@ -556,6 +573,7 @@ export class PlaylistService {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(playlists));
     } catch (error) {
       console.error('Error saving playlists to storage:', error);
+      this.notificationService.showError('Error saving playlists');
     }
   }
 }

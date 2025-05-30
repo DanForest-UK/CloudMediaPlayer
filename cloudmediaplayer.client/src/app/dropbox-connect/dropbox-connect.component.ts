@@ -2,6 +2,7 @@ import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { DropboxService, AuthState } from '../dropbox.service';
+import { NotificationService } from '../notification.service';
 
 /**
  * DropboxConnectComponent - Enhanced authentication UI with OAuth support
@@ -27,7 +28,10 @@ export class DropboxConnectComponent implements OnInit, OnDestroy {
 
   private authSubscription?: Subscription;
 
-  constructor(public dropboxService: DropboxService) { }
+  constructor(
+    public dropboxService: DropboxService,
+    private notificationService: NotificationService
+  ) { }
 
   ngOnInit(): void {
     try {
@@ -47,6 +51,7 @@ export class DropboxConnectComponent implements OnInit, OnDestroy {
       }
     } catch (error) {
       console.error('Error in ngOnInit:', error);
+      this.notificationService.showError('Error initializing Dropbox connection');
       this.isLoading = false;
     }
   }
@@ -71,6 +76,7 @@ export class DropboxConnectComponent implements OnInit, OnDestroy {
       }
     } catch (error) {
       console.error('Failed to start OAuth flow:', error);
+      this.notificationService.showError('Error connecting to Dropbox');
       this.isLoading = false;
     }
   }
@@ -82,6 +88,7 @@ export class DropboxConnectComponent implements OnInit, OnDestroy {
       }
     } catch (error) {
       console.error('Error during logout:', error);
+      this.notificationService.showError('Error disconnecting from Dropbox');
     }
   }
 
@@ -92,14 +99,22 @@ export class DropboxConnectComponent implements OnInit, OnDestroy {
     try {
       if (this.dropboxService && this.dropboxService.getCurrentAccount) {
         this.dropboxService.getCurrentAccount().subscribe({
-          next: () => this.isLoading = false,
-          error: () => this.isLoading = false
+          next: () => {
+            this.isLoading = false;
+            this.notificationService.showSuccess('Connection refreshed');
+          },
+          error: (error) => {
+            console.error('Error refreshing connection:', error);
+            this.notificationService.showError('Error refreshing Dropbox connection');
+            this.isLoading = false;
+          }
         });
       } else {
         this.isLoading = false;
       }
     } catch (error) {
       console.error('Error refreshing connection:', error);
+      this.notificationService.showError('Error refreshing Dropbox connection');
       this.isLoading = false;
     }
   }
@@ -207,6 +222,7 @@ export class DropboxConnectComponent implements OnInit, OnDestroy {
 
         if (error) {
           console.error('OAuth error:', error);
+          this.notificationService.showError('Error connecting to Dropbox');
           window.history.replaceState({}, document.title, window.location.pathname);
           return;
         }
@@ -217,6 +233,7 @@ export class DropboxConnectComponent implements OnInit, OnDestroy {
       }
     } catch (error) {
       console.error('Error handling OAuth callback:', error);
+      this.notificationService.showError('Error processing Dropbox connection');
     }
   }
 
@@ -231,12 +248,15 @@ export class DropboxConnectComponent implements OnInit, OnDestroy {
 
         if (!success) {
           console.error('Authentication failed');
+          this.notificationService.showError('Unable to connect to Dropbox');
         }
       } else {
         console.error('OAuth callback handler not available');
+        this.notificationService.showError('OAuth callback handler not available');
       }
     } catch (error) {
       console.error('OAuth callback processing failed:', error);
+      this.notificationService.showError('Error processing Dropbox connection');
     } finally {
       this.isLoading = false;
     }

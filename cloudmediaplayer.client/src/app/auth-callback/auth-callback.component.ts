@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { DropboxService } from '../dropbox.service';
+import { NotificationService } from '../notification.service';
 
 /**
  * OAuth callback component for production environments
@@ -186,7 +187,8 @@ export class AuthCallbackComponent implements OnInit {
 
   constructor(
     private dropboxService: DropboxService,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ) { }
 
   ngOnInit(): void {
@@ -204,11 +206,13 @@ export class AuthCallbackComponent implements OnInit {
 
       if (error) {
         this.error = this.getErrorMessage(error);
+        this.notificationService.showError('Unable to connect to Dropbox');
         return;
       }
 
       if (!code) {
         this.error = 'No authorization code received from Dropbox';
+        this.notificationService.showError('Error connecting to Dropbox');
         return;
       }
 
@@ -217,6 +221,7 @@ export class AuthCallbackComponent implements OnInit {
       if (success) {
         this.isComplete = true;
         this.progress = 100;
+        this.notificationService.showSuccess('Successfully connected to Dropbox');
 
         const returnUrl = this.dropboxService.getOAuthReturnUrl();
         setTimeout(() => {
@@ -224,10 +229,12 @@ export class AuthCallbackComponent implements OnInit {
         }, 1500);
       } else {
         this.error = 'Failed to complete authentication';
+        this.notificationService.showError('Unable to connect to Dropbox');
       }
     } catch (err) {
       console.error('Callback handling error:', err);
       this.error = 'An unexpected error occurred during authentication';
+      this.notificationService.showError('Error connecting to Dropbox');
     }
   }
 
@@ -264,6 +271,7 @@ export class AuthCallbackComponent implements OnInit {
       await this.dropboxService.startOAuthFlow();
     } catch (error) {
       console.error('Failed to restart OAuth flow:', error);
+      this.notificationService.showError('Error connecting to Dropbox');
       this.goHome();
     }
   }

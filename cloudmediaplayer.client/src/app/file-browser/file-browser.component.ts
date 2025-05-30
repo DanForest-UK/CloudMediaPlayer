@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DropboxService, DropboxFile, FolderScanProgress } from '../dropbox.service';
+import { NotificationService } from '../notification.service';
 import { Subscription } from 'rxjs';
 
 /**
@@ -45,7 +46,10 @@ export class FileBrowserComponent implements OnInit, OnDestroy {
   };
   private progressSubscription: Subscription | null = null;
 
-  constructor(private dropboxService: DropboxService) { }
+  constructor(
+    private dropboxService: DropboxService,
+    private notificationService: NotificationService
+  ) { }
 
   ngOnInit(): void {
     this.loadFiles('');
@@ -71,17 +75,18 @@ export class FileBrowserComponent implements OnInit, OnDestroy {
 
     console.log(`Loading files from path: ${path}`);
 
-    this.dropboxService.listFolder(path, true).subscribe(
-      files => {
+    this.dropboxService.listFolder(path, true).subscribe({
+      next: (files) => {
         console.log(`Received ${files.length} files from Dropbox for path: ${path}`);
         this.files = this.sortFiles(files);
         this.isLoading = false;
       },
-      error => {
+      error: (error) => {
         console.error('Error loading files:', error);
+        this.notificationService.showError('Error loading folder contents');
         this.isLoading = false;
       }
-    );
+    });
   }
 
   sortFiles(files: DropboxFile[]): DropboxFile[] {

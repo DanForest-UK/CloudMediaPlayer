@@ -8,6 +8,7 @@ import { FileBrowserComponent } from '../file-browser/file-browser.component';
 import { PlaylistComponent, PlaylistItem } from '../playlist/playlist.component';
 import { AudioPlayerComponent } from '../audio-player/audio-player.component';
 import { PlaylistService, SavedPlaylist } from '../playlist-service';
+import { NotificationService } from '../notification.service';
 
 /**
  * MediaPlayerComponent - Main orchestrator component
@@ -51,7 +52,8 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
 
   constructor(
     private dropboxService: DropboxService,
-    private playlistService: PlaylistService
+    private playlistService: PlaylistService,
+    private notificationService: NotificationService
   ) { }
 
   ngOnInit(): void {
@@ -66,8 +68,12 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
           next: () => {
             console.log('Playlists synced successfully');
             this.loadSavedPlaylists(); // Refresh the UI
+            this.notificationService.showSuccess('Playlists synced with Dropbox');
           },
-          error: (error: any) => console.error('Sync failed:', error)
+          error: (error: any) => {
+            console.error('Sync failed:', error);
+            this.notificationService.showError('Error syncing playlists with Dropbox');
+          }
         });
       }
     });
@@ -186,9 +192,12 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
         if (this.fileBrowser) {
           this.fileBrowser.markFolderEnqueueComplete(folder.path_display);
         }
+
+        this.notificationService.showSuccess(`Added ${playlistItems.length} songs from ${folder.name}`);
       },
       error => {
         console.error(`Error enqueuing files from ${folder.path_display}:`, error);
+        this.notificationService.showError(`Error loading songs from ${folder.name}`);
         if (this.fileBrowser) {
           this.fileBrowser.markFolderEnqueueComplete(folder.path_display);
         }
@@ -212,6 +221,8 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
     if (!this.isPlaying && this.playlist.length === 1) {
       this.playPlaylistItem(0);
     }
+
+    this.notificationService.showSuccess(`Added "${file.name}" to playlist`);
   }
 
   /**
@@ -363,7 +374,6 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
     if (index < 0 || index >= this.playlist.length) {
       return;
     }
-
     // If we're removing the currently playing song
     if (index === this.currentPlaylistIndex) {
       this.playlist.splice(index, 1);
@@ -398,6 +408,7 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
    * Clears the entire playlist
    */
   private clearPlaylist(): void {
+
     this.playlist = [];
     this.currentPlaylistIndex = -1;
     this.currentPlaylistId = null;
@@ -438,7 +449,7 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
    */
   private saveCurrentPlaylist(): void {
     if (this.playlist.length === 0) {
-      alert('Cannot save an empty playlist');
+      this.notificationService.showError('Cannot save an empty playlist');
       return;
     }
 
@@ -464,12 +475,15 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
         this.currentPlaylistName = savedPlaylist.name;
         this.loadSavedPlaylists();
 
-        const syncStatus = savedPlaylist.syncStatus === 'synced' ? ' and synced to Dropbox' : '';
-        alert(`Playlist "${name}" saved successfully${syncStatus}!`);
+        if (savedPlaylist.syncStatus === 'synced') {
+          this.notificationService.showSuccess(`Playlist "${name}" saved and synced to Dropbox`);
+        } else {
+          this.notificationService.showSuccess(`Playlist "${name}" saved locally`);
+        }
       },
       error: (error: any) => {
-        alert('Error saving playlist. Please try again.');
         console.error('Error saving playlist:', error);
+        this.notificationService.showError('Error saving playlist');
       }
     });
   }
@@ -479,7 +493,7 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
    */
   private saveCurrentPlaylistAs(): void {
     if (this.playlist.length === 0) {
-      alert('Cannot save an empty playlist');
+      this.notificationService.showError('Cannot save an empty playlist');
       return;
     }
 
@@ -500,12 +514,10 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
         this.currentPlaylistName = savedPlaylist.name;
         this.loadSavedPlaylists();
 
-        const syncStatus = savedPlaylist.syncStatus === 'synced' ? ' and synced to Dropbox' : '';
-        alert(`Playlist "${name}" saved as new playlist${syncStatus}!`);
       },
       error: (error: any) => {
-        alert('Error saving playlist. Please try again.');
         console.error('Error saving playlist:', error);
+        this.notificationService.showError('Error saving playlist');
       }
     });
   }
@@ -516,7 +528,7 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
   private loadPlaylist(playlistId: string): void {
     const savedPlaylist = this.playlistService.loadPlaylist(playlistId);
     if (!savedPlaylist) {
-      alert('Playlist not found');
+      this.notificationService.showError('Playlist not found');
       return;
     }
 
@@ -569,8 +581,8 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
           }
         },
         error: (error: any) => {
-          alert('Error deleting playlist. Please try again.');
           console.error('Error deleting playlist:', error);
+          this.notificationService.showError('Error deleting playlist');
         }
       });
     }
@@ -581,7 +593,7 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
    */
   private renamePlaylist(playlistId: string, newName: string): void {
     if (this.playlistService.playlistNameExists(newName, playlistId)) {
-      alert(`A playlist named "${newName}" already exists.`);
+      this.notificationService.showError(`A playlist named "${newName}" already exists`);
       return;
     }
 
@@ -597,8 +609,8 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
         }
       },
       error: (error: any) => {
-        alert('Error renaming playlist. Please try again.');
         console.error('Error renaming playlist:', error);
+        this.notificationService.showError('Error renaming playlist');
       }
     });
   }
@@ -611,12 +623,15 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
       next: (syncedPlaylist: SavedPlaylist) => {
         this.loadSavedPlaylists();
 
-        const status = syncedPlaylist.syncStatus === 'synced' ? 'synced successfully' : 'sync failed';
-        alert(`Playlist "${syncedPlaylist.name}" ${status}!`);
+        if (syncedPlaylist.syncStatus === 'synced') {
+          this.notificationService.showSuccess(`Playlist "${syncedPlaylist.name}" synced to Dropbox`);
+        } else {
+          this.notificationService.showError(`Error syncing playlist "${syncedPlaylist.name}"`);
+        }
       },
       error: (error: any) => {
-        alert('Error syncing playlist. Please try again.');
         console.error('Error syncing playlist:', error);
+        this.notificationService.showError('Error syncing playlist');
       }
     });
   }
@@ -629,11 +644,18 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
 
     console.log(`Getting temporary link for file: ${file.path_display}`);
 
-    this.dropboxService.getTemporaryLink(file.path_display).subscribe(url => {
-      console.log(`Received temporary link: ${url.substring(0, 50)}...`);
-      this.mediaUrl = url;
-      this.isLoading = false;
-      this.isPlaying = true;
+    this.dropboxService.getTemporaryLink(file.path_display).subscribe({
+      next: (url) => {
+        console.log(`Received temporary link: ${url.substring(0, 50)}...`);
+        this.mediaUrl = url;
+        this.isLoading = false;
+        this.isPlaying = true;
+      },
+      error: (error) => {
+        console.error('Error getting media link:', error);
+        this.notificationService.showError('Error loading media file');
+        this.isLoading = false;
+      }
     });
   }
 

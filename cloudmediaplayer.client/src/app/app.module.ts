@@ -9,7 +9,8 @@ import { DropboxConnectComponent } from './dropbox-connect/dropbox-connect.compo
 import { FileBrowserComponent } from './file-browser/file-browser.component';
 import { PlaylistComponent } from './playlist/playlist.component';
 import { AudioPlayerComponent } from './audio-player/audio-player.component';
-import { AuthCallbackComponent } from './auth-callback/auth-callback.component'; // Add this
+import { AuthCallbackComponent } from './auth-callback/auth-callback.component';
+import { NotificationComponent } from './notification/notification.component';
 
 /**
  * AppModule - The main module for the application
@@ -25,7 +26,8 @@ import { AuthCallbackComponent } from './auth-callback/auth-callback.component';
     FileBrowserComponent,
     PlaylistComponent,
     AudioPlayerComponent,
-    AuthCallbackComponent    
+    AuthCallbackComponent,
+    NotificationComponent
   ],
   providers: [
     provideHttpClient(withFetch()) // Provides HttpClient with fetch API
