@@ -62,25 +62,52 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
 
     // Listen for authentication changes to trigger sync
     this.authSubscription = this.dropboxService.getAuthState().subscribe(authState => {
-      if (authState.isAuthenticated && navigator.onLine) {
-        // Auto-sync when authenticated
-        this.playlistService.syncPlaylists().subscribe({
-          next: () => {
-            console.log('Playlists synced successfully');
-            this.loadSavedPlaylists(); // Refresh the UI
-            this.notificationService.showSuccess('Playlists synced with Dropbox');
-          },
-          error: (error: any) => {
-            console.error('Sync failed:', error);
-            this.notificationService.showError('Error syncing playlists with Dropbox');
-          }
-        });
+      const wasAuthenticated = this.isAuthenticated;
+      this.isAuthenticated = authState.isAuthenticated;
+
+      // If we just became authenticated OR we're already authenticated on startup
+      if (authState.isAuthenticated && (!wasAuthenticated || !this.hasInitialSyncCompleted)) {
+        this.performInitialSync();
       }
     });
+
+    // If already authenticated on startup, trigger sync immediately
+    if (this.dropboxService.isAuthenticated()) {
+      this.performInitialSync();
+    }
   }
 
   ngOnDestroy(): void {
     this.authSubscription?.unsubscribe();
+  }
+
+  private hasInitialSyncCompleted = false;
+
+  /**
+   * Perform initial sync when app starts or user authenticates
+   */
+  private performInitialSync(): void {
+    if (this.hasInitialSyncCompleted) return;
+
+    if (navigator.onLine) {
+      console.log('Performing initial playlist sync...');
+      this.playlistService.syncPlaylists().subscribe({
+        next: () => {
+          console.log('Initial sync completed successfully');
+          this.loadSavedPlaylists(); // Refresh the UI with synced playlists
+          this.notificationService.showSuccess('Playlists synced with Dropbox');
+          this.hasInitialSyncCompleted = true;
+        },
+        error: (error: any) => {
+          console.error('Initial sync failed:', error);
+          this.notificationService.showError('Error syncing playlists with Dropbox');
+          this.hasInitialSyncCompleted = true; // Don't retry automatically
+        }
+      });
+    } else {
+      console.log('App is offline, skipping initial sync');
+      this.hasInitialSyncCompleted = true;
+    }
   }
 
   /**
@@ -144,6 +171,7 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
    * Handle authentication status changes from DropboxConnectComponent
    */
   onAuthenticationChanged(authenticated: boolean): void {
+    const wasAuthenticated = this.isAuthenticated;
     this.isAuthenticated = authenticated;
 
     if (!authenticated) {
@@ -153,6 +181,9 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
       this.mediaUrl = '';
       this.isPlaying = false;
       this.playlistService.clearCurrentPlaylist();
+      this.hasInitialSyncCompleted = false; // Reset sync flag for next login
+    } else if (!wasAuthenticated) {
+      this.performInitialSync();
     }
   }
 

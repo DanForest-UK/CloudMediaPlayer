@@ -382,10 +382,9 @@ export class PlaylistService {
     }
 
     this.updateSyncStatus({ isSyncing: true, error: null });
-
     return this.dropboxService.listPlaylistFiles().pipe(
       switchMap(dropboxFiles => {
-        const localPlaylists = this.getSavedPlaylists();
+       const localPlaylists = this.getSavedPlaylists();
         const syncOperations: Observable<any>[] = [];
 
         // Download playlists from Dropbox that aren't local or are newer
@@ -393,7 +392,9 @@ export class PlaylistService {
           const playlistName = file.name.replace('.json', '');
           const localPlaylist = localPlaylists.find(p => p.name === playlistName);
 
-          if (!localPlaylist || (file.server_modified && new Date(file.server_modified) > localPlaylist.lastModified)) {
+          if (!localPlaylist) {
+            syncOperations.push(this.downloadPlaylistFromDropbox(file));
+          } else if (file.server_modified && new Date(file.server_modified) > localPlaylist.lastModified) {
             syncOperations.push(this.downloadPlaylistFromDropbox(file));
           }
         });
@@ -401,10 +402,16 @@ export class PlaylistService {
         // Upload local playlists that aren't synced
         localPlaylists.forEach(playlist => {
           if (playlist.syncStatus !== 'synced') {
-            syncOperations.push(this.syncPlaylistToDropbox(playlist));
+            const dropboxFile = dropboxFiles.find(f => f.name.replace('.json', '') === playlist.name);
+            if (!dropboxFile) {             
+              syncOperations.push(this.syncPlaylistToDropbox(playlist));
+            } else if (playlist.lastModified > new Date(dropboxFile.server_modified || 0)) {
+              
+              syncOperations.push(this.syncPlaylistToDropbox(playlist));
+            }
           }
         });
-
+                
         return syncOperations.length > 0 ? forkJoin(syncOperations) : of([]);
       }),
       tap(() => {
@@ -450,7 +457,7 @@ export class PlaylistService {
         };
 
         // Update local storage
-        this.updateLocalPlaylist(playlist);
+        this.updateLocalPlaylist(playlist);        
         return playlist;
       }),
       catchError((error: any) => {
