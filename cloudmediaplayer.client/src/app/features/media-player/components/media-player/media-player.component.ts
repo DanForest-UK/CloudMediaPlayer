@@ -2,13 +2,14 @@ import { Component, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { DropboxService, DropboxFile } from '../dropbox.service';
-import { DropboxConnectComponent } from '../dropbox-connect/dropbox-connect.component';
-import { FileBrowserComponent } from '../file-browser/file-browser.component';
-import { PlaylistComponent, PlaylistItem } from '../playlist/playlist.component';
-import { AudioPlayerComponent } from '../audio-player/audio-player.component';
-import { PlaylistService, SavedPlaylist } from '../playlist-service';
-import { NotificationService } from '../notification.service';
+import { DropboxConnectComponent } from '@features/dropbox/components/dropbox-connect/dropbox-connect.component';
+import { FileBrowserComponent } from '@features/dropbox/components/file-browser/file-browser.component';
+import { PlaylistComponent } from '@features/playlist/components/playlist/playlist.component';
+import { AudioPlayerComponent } from '@features/media-player/components/audio-player/audio-player.component';
+import { DropboxService } from '@services/dropbox.service';
+import { PlaylistService } from '@services/playlist.service';
+import { NotificationService } from '@services/notification.service';
+import { DropboxFile, PlaylistItem, SavedPlaylist } from '@models/index';
 
 /**
  * MediaPlayerComponent - Main orchestrator component

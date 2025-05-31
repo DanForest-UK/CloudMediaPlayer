@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { MediaPlayerComponent } from './media-player/media-player.component';
+import { MediaPlayerComponent } from './features/media-player/components/media-player/media-player.component';
 import { AuthCallbackComponent } from './auth-callback/auth-callback.component';
 
 /**

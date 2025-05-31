@@ -1,9 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MediaPlayerComponent } from './media-player/media-player.component';
-import { NotificationComponent } from './notification/notification.component';
-
+import { MediaPlayerComponent } from '@features/media-player/components/media-player/media-player.component';
+import { NotificationComponent } from '@components/notification/notification.component';
 /**
  * AppComponent - Root component of the application
  * 

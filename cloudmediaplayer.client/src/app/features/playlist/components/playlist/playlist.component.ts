@@ -2,15 +2,8 @@ import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angu
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { SavedPlaylist, SyncStatus, SyncSettings, PlaylistService } from '../playlist-service';
-
-/**
- * Interface for playlist item
- */
-export interface PlaylistItem {
-  file: any; // DropboxFile
-  displayName: string;
-}
+import { PlaylistService } from '@services/playlist.service';
+import { PlaylistItem, SavedPlaylist, SyncStatus, SyncSettings } from '@models/index';
 
 /**
  * PlaylistComponent - Manages the playlist UI and interactions

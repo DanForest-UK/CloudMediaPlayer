@@ -1,8 +1,10 @@
 import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DropboxService, DropboxFile, FolderScanProgress } from '../dropbox.service';
-import { NotificationService } from '../notification.service';
+import { DropboxService } from '@services/dropbox.service';
+import { NotificationService } from '@services/notification.service';
+import { DropboxFile, FolderScanProgress } from '@models/index';
 import { Subscription } from 'rxjs';
+
 
 /**
  * FileBrowserComponent - Handles browsing Dropbox files and folders
@@ -20,6 +22,7 @@ import { Subscription } from 'rxjs';
   standalone: true,
   imports: [CommonModule]
 })
+
 export class FileBrowserComponent implements OnInit, OnDestroy {
   @Output() fileSelected = new EventEmitter<DropboxFile>();
   @Output() folderEnqueueRequested = new EventEmitter<DropboxFile>();

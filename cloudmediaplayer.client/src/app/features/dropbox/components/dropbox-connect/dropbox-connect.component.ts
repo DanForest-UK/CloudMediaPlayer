@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { DropboxService, AuthState } from '../dropbox.service';
-import { NotificationService } from '../notification.service';
+import { DropboxService, AuthState } from '@services/dropbox.service';
+import { NotificationService } from '@services/notification.service';
 
 /**
  * DropboxConnectComponent - Enhanced authentication UI with OAuth support

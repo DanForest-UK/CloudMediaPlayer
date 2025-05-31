@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { NotificationService, NotificationMessage } from '../notification.service';
+import { NotificationService } from '@services/notification.service';
+import { NotificationMessage } from '@models/notification.model';
 
 @Component({
   selector: 'app-notifications',

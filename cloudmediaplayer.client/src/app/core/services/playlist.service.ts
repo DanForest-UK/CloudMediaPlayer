@@ -1,32 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, forkJoin, EMPTY, BehaviorSubject, from } from 'rxjs';
 import { map, catchError, tap, switchMap, finalize } from 'rxjs/operators';
-import { PlaylistItem } from './playlist/playlist.component';
-import { DropboxService, DropboxFile, AuthState } from './dropbox.service';
-import { NotificationService } from './notification.service';
-
-export interface SavedPlaylist {
-  id: string;
-  name: string;
-  items: PlaylistItem[];
-  created: Date;
-  lastModified: Date;
-  syncStatus?: 'local' | 'synced' | 'syncing' | 'error';
-  dropboxRev?: string; // Dropbox revision for conflict detection
-}
-
-export interface SyncStatus {
-  isOnline: boolean;
-  isSyncing: boolean;
-  lastSync: Date | null;
-  pendingUploads: number;
-  error: string | null;
-}
-
-export interface SyncSettings {
-  enabled: boolean;
-  autoSync: boolean;
-}
+import { DropboxService, AuthState } from '@services/dropbox.service';
+import { NotificationService } from '@services/notification.service';
+import { PlaylistItem, SavedPlaylist, SyncStatus, SyncSettings, DropboxFile } from '@models/index';
 
 @Injectable({
   providedIn: 'root'
@@ -382,9 +359,14 @@ export class PlaylistService {
     }
 
     this.updateSyncStatus({ isSyncing: true, error: null });
+    console.log('Starting playlist sync...');
+
     return this.dropboxService.listPlaylistFiles().pipe(
       switchMap(dropboxFiles => {
-       const localPlaylists = this.getSavedPlaylists();
+        console.log(`Found ${dropboxFiles.length} playlist files in Dropbox`);
+        const localPlaylists = this.getSavedPlaylists();
+        console.log(`Found ${localPlaylists.length} local playlists`);
+
         const syncOperations: Observable<any>[] = [];
 
         // Download playlists from Dropbox that aren't local or are newer
@@ -393,9 +375,13 @@ export class PlaylistService {
           const localPlaylist = localPlaylists.find(p => p.name === playlistName);
 
           if (!localPlaylist) {
+            console.log(`Downloading new playlist from Dropbox: ${playlistName}`);
             syncOperations.push(this.downloadPlaylistFromDropbox(file));
           } else if (file.server_modified && new Date(file.server_modified) > localPlaylist.lastModified) {
+            console.log(`Downloading updated playlist from Dropbox: ${playlistName}`);
             syncOperations.push(this.downloadPlaylistFromDropbox(file));
+          } else {
+            console.log(`Local playlist is up to date: ${playlistName}`);
           }
         });
 
@@ -403,18 +389,21 @@ export class PlaylistService {
         localPlaylists.forEach(playlist => {
           if (playlist.syncStatus !== 'synced') {
             const dropboxFile = dropboxFiles.find(f => f.name.replace('.json', '') === playlist.name);
-            if (!dropboxFile) {             
+            if (!dropboxFile) {
+              console.log(`Uploading new playlist to Dropbox: ${playlist.name}`);
               syncOperations.push(this.syncPlaylistToDropbox(playlist));
             } else if (playlist.lastModified > new Date(dropboxFile.server_modified || 0)) {
-              
+              console.log(`Uploading updated playlist to Dropbox: ${playlist.name}`);
               syncOperations.push(this.syncPlaylistToDropbox(playlist));
             }
           }
         });
-                
+
+        console.log(`Executing ${syncOperations.length} sync operations`);
         return syncOperations.length > 0 ? forkJoin(syncOperations) : of([]);
       }),
       tap(() => {
+        console.log('Playlist sync completed successfully');
         this.updateSyncStatus({
           isSyncing: false,
           lastSync: new Date(),
@@ -457,7 +446,8 @@ export class PlaylistService {
         };
 
         // Update local storage
-        this.updateLocalPlaylist(playlist);        
+        this.updateLocalPlaylist(playlist);
+        console.log(`Downloaded playlist: ${playlist.name} with ${playlist.items.length} items`);
         return playlist;
       }),
       catchError((error: any) => {

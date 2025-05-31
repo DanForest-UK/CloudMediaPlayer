@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { DropboxService } from '../dropbox.service';
-import { NotificationService } from '../notification.service';
+import { DropboxService } from '@services/dropbox.service';
+import { NotificationService } from '@services/notification.service';
 
 /**
  * OAuth callback component for production environments
