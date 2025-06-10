@@ -26,6 +26,11 @@ export class DropboxService {
   // App folder paths
   private readonly PLAYLISTS_FOLDER = '/playlists';
 
+  // Supported audio extensions - single source of truth
+  public readonly audioExtensions = [
+    '.mp3', '.wav', '.ogg', '.m4a', '.flac', '.aac'
+  ];
+
   // Authentication state
   private accessToken: string | null = null;
   private refreshToken: string | null = null;
@@ -41,7 +46,7 @@ export class DropboxService {
 
   // Rate limiting properties
   private readonly MAX_CONCURRENT_REQUESTS = 5;
-  private readonly REQUEST_DELAY = 50;
+  public readonly REQUEST_DELAY = 50;
   private activeRequests = 0;
 
   // Progress tracking
@@ -51,6 +56,9 @@ export class DropboxService {
     totalAudioFiles: 0
   });
 
+  /**
+   * Initialize the service with HTTP client and notification service dependencies
+   */
   constructor(
     private http: HttpClient,
     private notificationService: NotificationService
@@ -59,7 +67,7 @@ export class DropboxService {
   }
 
   /**
-   * Business logic method: Get the full path for a playlist file
+   * Get the full path for a playlist file
    */
   getPlaylistPath(playlistName: string): string {
     const sanitizedName = this.sanitizeFileName(playlistName);
@@ -67,7 +75,7 @@ export class DropboxService {
   }
 
   /**
-   * Business logic method: Sanitize filename for Dropbox
+   * Sanitize filename for Dropbox
    */
   sanitizeFileName(name: string): string {
     return name
@@ -78,21 +86,17 @@ export class DropboxService {
   }
 
   /**
-   * Business logic method: Check if a file is an audio file based on its extension
+   * Check if a file is an audio file based on its extension
    */
   isMediaFile(filename: string): boolean {
     if (!filename) return false;
 
-    const audioExtensions = [
-      '.mp3', '.wav', '.ogg', '.m4a', '.flac', '.aac'
-    ];
-
     const extension = filename.substring(filename.lastIndexOf('.')).toLowerCase();
-    return audioExtensions.includes(extension);
+    return this.audioExtensions.includes(extension);
   }
 
   /**
-   * Business logic method: Check if token is expired
+   * Check if token is expired
    */
   isTokenExpired(): boolean {
     if (!this.tokenExpiry) return false;
@@ -100,14 +104,14 @@ export class DropboxService {
   }
 
   /**
-   * Business logic method: Validate authentication state
+   * Check if authentication is valid and not expired
    */
-  validateAuthenticationState(): boolean {
+  isAuthenticated(): boolean {
     return !!this.accessToken && !this.isTokenExpired();
   }
 
   /**
-   * Business logic method: Get OAuth error message for user display
+   * Get OAuth error message for user display
    */
   getOAuthErrorMessage(error: string): string {
     switch (error) {
@@ -123,30 +127,23 @@ export class DropboxService {
   }
 
   /**
-   * Business logic method: Check if should use callback route based on environment
+   * Check if should use callback route 
    */
   shouldUseCallbackRoute(): boolean {
     return this.redirectUri.includes('/auth/callback');
   }
 
   /**
-   * Business logic method: Get supported audio file extensions
+   * Filter files audio files and folders
    */
-  getSupportedAudioExtensions(): string[] {
-    return ['.mp3', '.wav', '.ogg', '.m4a', '.flac', '.aac'];
-  }
-
-  /**
-   * Business logic method: Filter files by type (audio files and folders)
-   */
-  filterMediaFiles(files: DropboxFile[]): DropboxFile[] {
+  filterAudioFilesAndFolders(files: DropboxFile[]): DropboxFile[] {
     return files.filter(file =>
       file.is_folder || this.isMediaFile(file.name)
     );
   }
 
   /**
-   * Business logic method: Filter only audio files (no folders)
+   * Filter only audio files
    */
   filterAudioFilesOnly(files: DropboxFile[]): DropboxFile[] {
     return files.filter(file =>
@@ -155,7 +152,7 @@ export class DropboxService {
   }
 
   /**
-   * Business logic method: Sort files with folders first, then alphabetically
+   * Sort files with folders first, then alphabetically
    */
   sortFiles(files: DropboxFile[]): DropboxFile[] {
     return files.sort((a, b) => {
@@ -167,7 +164,7 @@ export class DropboxService {
   }
 
   /**
-   * Business logic method: Generate breadcrumbs from path
+   * Generate breadcrumbs from path
    */
   generateBreadcrumbs(path: string): { name: string; path: string }[] {
     if (path === '' || path === '/') {
@@ -190,20 +187,13 @@ export class DropboxService {
   }
 
   /**
-   * Business logic method: Extract folder name from path for display
+   * Extract folder name from path for display
    */
   getDisplayNameFromPath(path: string): string {
     if (!path) return '';
 
     const pathParts = path.split('/').filter(p => p);
     return pathParts.length > 0 ? pathParts[pathParts.length - 1] : 'Root';
-  }
-
-  /**
-   * Business logic method: Check if authentication is valid and not expired
-   */
-  isAuthenticated(): boolean {
-    return this.validateAuthenticationState();
   }
 
   /**
@@ -222,7 +212,7 @@ export class DropboxService {
   }
 
   /**
-   * Get current authentication state as observable
+   * Get current authentication state
    */
   getAuthState(): Observable<AuthState> {
     return this.authState$.asObservable();
@@ -247,13 +237,6 @@ export class DropboxService {
           }
         } else {
           this.validateToken();
-        }
-      } else {
-        // Legacy: Check for old-style token
-        const legacyToken = localStorage.getItem('dropbox_access_token');
-        if (legacyToken) {
-          this.accessToken = legacyToken;
-          await this.validateToken();
         }
       }
     } catch (error) {
@@ -339,6 +322,7 @@ export class DropboxService {
             this.notificationService.showError('Unable to verify Dropbox connection');
           }
         } catch (error) {
+          this.notificationService.showError('Error validating Dropbox token');
           console.error('Token validation error:', error);
           this.notificationService.showError('Unable to verify Dropbox connection');
           this.updateAuthState({ error: 'Token validation failed: ' + (error as Error).message });
@@ -354,7 +338,6 @@ export class DropboxService {
       this.notificationService.showError('Unable to connect to Dropbox');
       this.updateAuthState({ error: 'Authentication failed: ' + (error as Error).message });
     }
-
     return false;
   }
 
@@ -407,7 +390,7 @@ export class DropboxService {
   }
 
   /**
-   * Validate token using direct fetch (bypasses Angular HttpClient proxy issues)
+   * Validate token using direct fetch
    */
   private async validateTokenWithDirectFetch(): Promise<any> {
     if (!this.accessToken) {
@@ -471,7 +454,7 @@ export class DropboxService {
       // Create playlists folder if it doesn't exist
       await this.createFolder(this.PLAYLISTS_FOLDER);
     } catch (error) {
-      // Folder might already exist, that's fine
+      // Folder might already exist
       console.log('Playlists folder initialization:', error);
     }
   }
@@ -485,8 +468,8 @@ export class DropboxService {
   }
 
   /**
-  * PKCE and security helper methods
-  */
+   * Generate a cryptographically secure code verifier for PKCE flow
+   */
   private generateCodeVerifier(): string {
     const array = new Uint8Array(32);
     crypto.getRandomValues(array);
@@ -496,6 +479,9 @@ export class DropboxService {
       .replace(/=/g, '');
   }
 
+  /**
+   * Generate code challenge from verifier using SHA-256
+   */
   private async generateCodeChallenge(verifier: string): Promise<string> {
     const encoder = new TextEncoder();
     const data = encoder.encode(verifier);
@@ -506,12 +492,18 @@ export class DropboxService {
       .replace(/=/g, '');
   }
 
+  /**
+   * Generates state parameter for OAuth flow
+   */
   private generateState(): string {
     const state = Math.random().toString(36).substring(2, 15);
     sessionStorage.setItem('oauth_state', state);
     return state;
   }
 
+  /**
+   * Exchange authorization code for access and refresh tokens
+   */
   private async exchangeCodeForTokens(code: string, codeVerifier: string): Promise<any> {
     const response = await fetch('https://api.dropbox.com/oauth2/token', {
       method: 'POST',
@@ -530,6 +522,9 @@ export class DropboxService {
     return response.ok ? response.json() : null;
   }
 
+  /**
+   * Store authentication data in localStorage
+   */
   private storeAuth(): void {
     const authData = {
       accessToken: this.accessToken,
@@ -540,6 +535,9 @@ export class DropboxService {
     localStorage.setItem('dropbox_auth', JSON.stringify(authData));
   }
 
+  /**
+   * Retrieve stored authentication data from localStorage
+   */
   private getStoredAuth(): any {
     try {
       const stored = localStorage.getItem('dropbox_auth');
@@ -558,6 +556,9 @@ export class DropboxService {
     return null;
   }
 
+  /**
+   * Clear all authentication data and reset state
+   */
   private clearAuth(): void {
     this.accessToken = null;
     this.refreshToken = null;
@@ -574,6 +575,9 @@ export class DropboxService {
     });
   }
 
+  /**
+   * Update the authentication state with new values
+   */
   private updateAuthState(state: Partial<AuthState>): void {
     const currentState = this.authState$.value;
     this.authState$.next({ ...currentState, ...state });
@@ -659,9 +663,6 @@ export class DropboxService {
   /**
    * Gets the current user's account information
    */
-  /**
- * Gets the current user's account information
- */
   getCurrentAccount(): Observable<DropboxUser | null> {
     if (!this.isAuthenticated()) {
       return of(null);
@@ -692,8 +693,8 @@ export class DropboxService {
   }
 
   /**
-  * Lists files and folders in a given Dropbox path
-  */
+   * Lists files and folders in a given Dropbox path
+   */
   listFolder(path: string = '', mediaOnly: boolean = false): Observable<DropboxFile[]> {
     if (!this.isAuthenticated()) {
       return of([]);
@@ -786,6 +787,7 @@ export class DropboxService {
       scan((acc: DropboxFile[], val: DropboxFile[]) => [...acc, ...val], [] as DropboxFile[])
     );
   }
+
   /**
    * Recursively collects all audio files from a folder and its subfolders
    */
@@ -856,8 +858,8 @@ export class DropboxService {
   }
 
   /**
- * Gets a temporary link to download a file
- */
+   * Gets a temporary link to download a file
+   */
   getTemporaryLink(path: string): Observable<string> {
     if (!this.isAuthenticated()) {
       return of('');
@@ -889,7 +891,7 @@ export class DropboxService {
     );
   }
 
-  // FILE OPERATIONS FOR PLAYLIST STORAGE
+  // File operations for playlist storage
 
   /**
    * Create a folder in Dropbox
