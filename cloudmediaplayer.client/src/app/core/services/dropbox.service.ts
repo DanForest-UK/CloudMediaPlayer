@@ -59,6 +59,154 @@ export class DropboxService {
   }
 
   /**
+   * Business logic method: Get the full path for a playlist file
+   */
+  getPlaylistPath(playlistName: string): string {
+    const sanitizedName = this.sanitizeFileName(playlistName);
+    return `${this.PLAYLISTS_FOLDER}/${sanitizedName}.json`;
+  }
+
+  /**
+   * Business logic method: Sanitize filename for Dropbox
+   */
+  sanitizeFileName(name: string): string {
+    return name
+      .replace(/[<>:"/\\|?*\s]+/g, '_')
+      .replace(/^_+|_+$/g, '')
+      .substring(0, 255)
+      || 'Untitled';
+  }
+
+  /**
+   * Business logic method: Check if a file is an audio file based on its extension
+   */
+  isMediaFile(filename: string): boolean {
+    if (!filename) return false;
+
+    const audioExtensions = [
+      '.mp3', '.wav', '.ogg', '.m4a', '.flac', '.aac'
+    ];
+
+    const extension = filename.substring(filename.lastIndexOf('.')).toLowerCase();
+    return audioExtensions.includes(extension);
+  }
+
+  /**
+   * Business logic method: Check if token is expired
+   */
+  isTokenExpired(): boolean {
+    if (!this.tokenExpiry) return false;
+    return new Date() >= this.tokenExpiry;
+  }
+
+  /**
+   * Business logic method: Validate authentication state
+   */
+  validateAuthenticationState(): boolean {
+    return !!this.accessToken && !this.isTokenExpired();
+  }
+
+  /**
+   * Business logic method: Get OAuth error message for user display
+   */
+  getOAuthErrorMessage(error: string): string {
+    switch (error) {
+      case 'access_denied':
+        return 'You cancelled the authorization process. Please try again if you want to connect to Dropbox.';
+      case 'invalid_request':
+        return 'There was a problem with the authorization request. Please try again.';
+      case 'unsupported_response_type':
+        return 'This authorization method is not supported. Please contact support.';
+      default:
+        return `Authorization failed: ${error}. Please try again.`;
+    }
+  }
+
+  /**
+   * Business logic method: Check if should use callback route based on environment
+   */
+  shouldUseCallbackRoute(): boolean {
+    return this.redirectUri.includes('/auth/callback');
+  }
+
+  /**
+   * Business logic method: Get supported audio file extensions
+   */
+  getSupportedAudioExtensions(): string[] {
+    return ['.mp3', '.wav', '.ogg', '.m4a', '.flac', '.aac'];
+  }
+
+  /**
+   * Business logic method: Filter files by type (audio files and folders)
+   */
+  filterMediaFiles(files: DropboxFile[]): DropboxFile[] {
+    return files.filter(file =>
+      file.is_folder || this.isMediaFile(file.name)
+    );
+  }
+
+  /**
+   * Business logic method: Filter only audio files (no folders)
+   */
+  filterAudioFilesOnly(files: DropboxFile[]): DropboxFile[] {
+    return files.filter(file =>
+      !file.is_folder && this.isMediaFile(file.name)
+    );
+  }
+
+  /**
+   * Business logic method: Sort files with folders first, then alphabetically
+   */
+  sortFiles(files: DropboxFile[]): DropboxFile[] {
+    return files.sort((a, b) => {
+      if (a.is_folder === b.is_folder) {
+        return a.name.localeCompare(b.name);
+      }
+      return a.is_folder ? -1 : 1;
+    });
+  }
+
+  /**
+   * Business logic method: Generate breadcrumbs from path
+   */
+  generateBreadcrumbs(path: string): { name: string; path: string }[] {
+    if (path === '' || path === '/') {
+      return [{ name: 'Root', path: '/' }];
+    }
+
+    const parts = path.split('/').filter(p => p);
+    const breadcrumbs = [{ name: 'Root', path: '/' }];
+
+    let currentPath = '';
+    for (let i = 0; i < parts.length; i++) {
+      currentPath += '/' + parts[i];
+      breadcrumbs.push({
+        name: parts[i],
+        path: currentPath
+      });
+    }
+
+    return breadcrumbs;
+  }
+
+  /**
+   * Business logic method: Extract folder name from path for display
+   */
+  getDisplayNameFromPath(path: string): string {
+    if (!path) return '';
+
+    const pathParts = path.split('/').filter(p => p);
+    return pathParts.length > 0 ? pathParts[pathParts.length - 1] : 'Root';
+  }
+
+  /**
+   * Business logic method: Check if authentication is valid and not expired
+   */
+  isAuthenticated(): boolean {
+    return this.validateAuthenticationState();
+  }
+
+  /**
    * Redirect URI selection based on environment
    */
   private get redirectUri(): string {
@@ -71,13 +219,6 @@ export class DropboxService {
     } else {
       return `${window.location.origin}/`;
     }
-  }
-
-  /**
-   * Check if we should use callback route based on environment
-   */
-  get shouldUseCallbackRoute(): boolean {
-    return this.redirectUri.includes('/auth/callback');
   }
 
   /**
@@ -132,7 +273,7 @@ export class DropboxService {
 
       sessionStorage.setItem('pkce_code_verifier', codeVerifier);
 
-      if (this.shouldUseCallbackRoute) {
+      if (this.shouldUseCallbackRoute()) {
         sessionStorage.setItem('oauth_return_url', window.location.pathname + window.location.search);
       }
 
@@ -336,13 +477,6 @@ export class DropboxService {
   }
 
   /**
-   * Checks if user is authenticated with Dropbox
-   */
-  isAuthenticated(): boolean {
-    return !!this.accessToken && !this.isTokenExpired();
-  }
-
-  /**
    * Logs out the user by removing all auth data
    */
   logout(): void {
@@ -394,14 +528,6 @@ export class DropboxService {
     });
 
     return response.ok ? response.json() : null;
-  }
-
-  /**
-   * Token management
-   */
-  private isTokenExpired(): boolean {
-    if (!this.tokenExpiry) return false;
-    return new Date() >= this.tokenExpiry;
   }
 
   private storeAuth(): void {
@@ -533,6 +659,9 @@ export class DropboxService {
   /**
    * Gets the current user's account information
    */
+  /**
+ * Gets the current user's account information
+ */
   getCurrentAccount(): Observable<DropboxUser | null> {
     if (!this.isAuthenticated()) {
       return of(null);
@@ -553,12 +682,18 @@ export class DropboxService {
       })
     );
 
-    return this.makeRateLimitedRequest(requestFn);
+    return this.makeRateLimitedRequest(requestFn).pipe(
+      catchError(error => {
+        console.error('Error in makeRateLimitedRequest for getCurrentAccount:', error);
+        this.notificationService.showError('Error getting Dropbox account information');
+        return of(null);
+      })
+    );
   }
 
   /**
-   * Lists files and folders in a given Dropbox path
-   */
+  * Lists files and folders in a given Dropbox path
+  */
   listFolder(path: string = '', mediaOnly: boolean = false): Observable<DropboxFile[]> {
     if (!this.isAuthenticated()) {
       return of([]);
@@ -601,37 +736,45 @@ export class DropboxService {
         })
       );
 
-      this.makeRateLimitedRequest(requestFn).subscribe(response => {
-        const files: DropboxFile[] = [];
-        if (response.entries && Array.isArray(response.entries)) {
-          response.entries.forEach((entry: any) => {
-            const file: DropboxFile = {
-              id: entry.id,
-              name: entry.name,
-              path_display: entry.path_display,
-              is_folder: entry['.tag'] === 'folder',
-              media_info: entry.media_info,
-              size: entry.size,
-              client_modified: entry.client_modified,
-              server_modified: entry.server_modified,
-              rev: entry.rev
-            };
+      this.makeRateLimitedRequest(requestFn).subscribe({
+        next: (response) => {
+          const files: DropboxFile[] = [];
+          if (response.entries && Array.isArray(response.entries)) {
+            response.entries.forEach((entry: any) => {
+              const file: DropboxFile = {
+                id: entry.id,
+                name: entry.name,
+                path_display: entry.path_display,
+                is_folder: entry['.tag'] === 'folder',
+                media_info: entry.media_info,
+                size: entry.size,
+                client_modified: entry.client_modified,
+                server_modified: entry.server_modified,
+                rev: entry.rev
+              };
 
-            if (mediaOnly) {
-              if (file.is_folder || this.isMediaFile(file.name)) {
+              if (mediaOnly) {
+                if (file.is_folder || this.isMediaFile(file.name)) {
+                  files.push(file);
+                }
+              } else {
                 files.push(file);
               }
-            } else {
-              files.push(file);
-            }
-          });
-        }
+            });
+          }
 
-        if (response.has_more && response.cursor) {
-          filesSubject.next(files);
-          getFiles(folderPath, response.cursor);
-        } else {
-          filesSubject.next(files);
+          if (response.has_more && response.cursor) {
+            filesSubject.next(files);
+            getFiles(folderPath, response.cursor);
+          } else {
+            filesSubject.next(files);
+            filesSubject.complete();
+          }
+        },
+        error: (error) => {
+          console.error('Error in makeRateLimitedRequest:', error);
+          this.notificationService.showError('Error loading folder contents');
+          filesSubject.next([]);
           filesSubject.complete();
         }
       });
@@ -643,7 +786,6 @@ export class DropboxService {
       scan((acc: DropboxFile[], val: DropboxFile[]) => [...acc, ...val], [] as DropboxFile[])
     );
   }
-
   /**
    * Recursively collects all audio files from a folder and its subfolders
    */
@@ -667,7 +809,7 @@ export class DropboxService {
 
       return this.listFolder(folderPath, false).pipe(
         mergeMap((files: DropboxFile[]) => {
-          const audioFiles = files.filter(file => !file.is_folder && this.isMediaFile(file.name));
+          const audioFiles = this.filterAudioFilesOnly(files);
           const subfolders = files.filter(file => file.is_folder);
 
           totalAudioFiles += audioFiles.length;
@@ -714,8 +856,8 @@ export class DropboxService {
   }
 
   /**
-   * Gets a temporary link to download a file
-   */
+ * Gets a temporary link to download a file
+ */
   getTemporaryLink(path: string): Observable<string> {
     if (!this.isAuthenticated()) {
       return of('');
@@ -738,7 +880,13 @@ export class DropboxService {
       })
     );
 
-    return this.makeRateLimitedRequest(requestFn);
+    return this.makeRateLimitedRequest(requestFn).pipe(
+      catchError(error => {
+        console.error('Error in makeRateLimitedRequest for getTemporaryLink:', error);
+        this.notificationService.showError('Error getting media link');
+        return of('');
+      })
+    );
   }
 
   // FILE OPERATIONS FOR PLAYLIST STORAGE
@@ -899,37 +1047,5 @@ export class DropboxService {
         return of([]);
       })
     );
-  }
-
-  /**
-   * Get the full path for a playlist file
-   */
-  getPlaylistPath(playlistName: string): string {
-    const sanitizedName = this.sanitizeFileName(playlistName);
-    return `${this.PLAYLISTS_FOLDER}/${sanitizedName}.json`;
-  }
-
-  /**
-   * Sanitize filename for Dropbox
-   */
-  private sanitizeFileName(name: string): string {
-    return name
-      .replace(/[<>:"/\\|?*]/g, '_') // Replace invalid characters
-      .replace(/\s+/g, '_') // Replace spaces with underscores
-      .substring(0, 255); // Limit length
-  }
-
-  /**
-   * Checks if a file is an audio file based on its extension
-   */
-  isMediaFile(filename: string): boolean {
-    if (!filename) return false;
-
-    const audioExtensions = [
-      '.mp3', '.wav', '.ogg', '.m4a', '.flac', '.aac'
-    ];
-
-    const extension = filename.substring(filename.lastIndexOf('.')).toLowerCase();
-    return audioExtensions.includes(extension);
   }
 }
