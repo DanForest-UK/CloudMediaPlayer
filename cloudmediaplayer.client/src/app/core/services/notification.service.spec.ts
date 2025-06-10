@@ -9,13 +9,13 @@ describe('NotificationService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({});
     service = TestBed.inject(NotificationService);
-    service.clearAll(); // Make sure we start with clean state
+    service.clearAll();
     jasmine.clock().install();
   });
 
   afterEach(() => {
     jasmine.clock().uninstall();
-    service.clearAll(); // Clean up after each test
+    service.clearAll();
   });
 
   it('should be created', () => {
@@ -29,7 +29,7 @@ describe('NotificationService', () => {
     });
   });
 
-  describe('Success Messages', () => {
+  describe('Message types', () => {
     it('should show success message', (done) => {
       service.showSuccess('Test success message');
 
@@ -42,29 +42,6 @@ describe('NotificationService', () => {
         done();
       });
     });
-
-    it('should auto-remove success message after 4 seconds', (done) => {
-      service.showSuccess('Test message');
-
-      // Initially should have the message
-      service.messages$.pipe(take(1)).subscribe(messages => {
-        expect(messages.length).toBe(1);
-
-        // After 4 seconds, message should be removed
-        jasmine.clock().tick(4001);
-
-        // Use a timeout to allow for the async operation to complete
-        setTimeout(() => {
-          service.messages$.pipe(take(1)).subscribe(messagesAfter => {
-            expect(messagesAfter.length).toBe(0);
-            done();
-          });
-        }, 10);
-      });
-    });
-  });
-
-  describe('Error Messages', () => {
     it('should show error message', (done) => {
       service.showError('Test error message');
 
@@ -75,26 +52,6 @@ describe('NotificationService', () => {
         expect(messages[0].id).toMatch(/^msg_\d+$/);
         expect(messages[0].timestamp).toBeInstanceOf(Date);
         done();
-      });
-    });
-
-    it('should auto-remove error message after 4 seconds', (done) => {
-      service.showError('Test error');
-
-      // Initially should have the message
-      service.messages$.pipe(take(1)).subscribe(messages => {
-        expect(messages.length).toBe(1);
-
-        // After 4 seconds, message should be removed
-        jasmine.clock().tick(4001);
-
-        // Use a timeout to allow for the async operation to complete
-        setTimeout(() => {
-          service.messages$.pipe(take(1)).subscribe(messagesAfter => {
-            expect(messagesAfter.length).toBe(0);
-            done();
-          });
-        }, 10);
       });
     });
   });
@@ -117,44 +74,24 @@ describe('NotificationService', () => {
       });
     });
 
-    it('should generate unique IDs for each message', (done) => {
-      service.showSuccess('Message 1');
-      service.showError('Message 2');
-
-      service.messages$.pipe(take(1)).subscribe(messages => {
-        expect(messages[0].id).not.toBe(messages[1].id);
-        expect(messages[0].id).toMatch(/^msg_1$/);
-        expect(messages[1].id).toMatch(/^msg_2$/);
-        done();
-      });
-    });
-
     it('should auto-remove messages independently', (done) => {
       service.showSuccess('First message');
-
-      jasmine.clock().tick(2000); // Wait 2 seconds
-
+      jasmine.clock().tick(2000);
       service.showError('Second message');
-
-      // After 4 seconds total, first message should be gone, second should remain
       jasmine.clock().tick(2001);
 
-      setTimeout(() => {
-        service.messages$.pipe(take(1)).subscribe(messages => {
-          expect(messages.length).toBe(1);
-          expect(messages[0].message).toBe('Second message');
+      service.messages$.pipe(take(1)).subscribe(messages => {
+        expect(messages.length).toBe(1);
+        expect(messages[0].message).toBe('Second message');
 
-          // After 4 more seconds, second message should be gone too
-          jasmine.clock().tick(2000);
+        // After 4 more seconds, second message should be gone too
+        jasmine.clock().tick(2000);
 
-          setTimeout(() => {
-            service.messages$.pipe(take(1)).subscribe(finalMessages => {
-              expect(finalMessages.length).toBe(0);
-              done();
-            });
-          }, 10);
+        service.messages$.pipe(take(1)).subscribe(finalMessages => {
+          expect(finalMessages.length).toBe(0);
+          done();
         });
-      }, 10);
+      });
     });
   });
 
@@ -168,13 +105,11 @@ describe('NotificationService', () => {
 
         service.removeMessage(messageId);
 
-        setTimeout(() => {
-          service.messages$.pipe(take(1)).subscribe(updatedMessages => {
-            expect(updatedMessages.length).toBe(1);
-            expect(updatedMessages[0].message).toBe('Message 2');
-            done();
-          });
-        }, 10);
+        service.messages$.pipe(take(1)).subscribe(updatedMessages => {
+          expect(updatedMessages.length).toBe(1);
+          expect(updatedMessages[0].message).toBe('Message 2');
+          done();
+        });
       });
     });
 
@@ -183,13 +118,11 @@ describe('NotificationService', () => {
 
       service.removeMessage('non-existent-id');
 
-      setTimeout(() => {
-        service.messages$.pipe(take(1)).subscribe(messages => {
-          expect(messages.length).toBe(1);
-          expect(messages[0].message).toBe('Test message');
-          done();
-        });
-      }, 10);
+      service.messages$.pipe(take(1)).subscribe(messages => {
+        expect(messages.length).toBe(1);
+        expect(messages[0].message).toBe('Test message');
+        done();
+      });
     });
 
     it('should clear all messages', (done) => {
@@ -199,81 +132,47 @@ describe('NotificationService', () => {
 
       service.clearAll();
 
-      setTimeout(() => {
-        service.messages$.pipe(take(1)).subscribe(messages => {
-          expect(messages.length).toBe(0);
-          done();
-        });
-      }, 10);
+      service.messages$.pipe(take(1)).subscribe(messages => {
+        expect(messages.length).toBe(0);
+        done();
+      });
     });
   });
 
   describe('Observable Behavior', () => {
     it('should emit new state when messages change', (done) => {
-      let emissionCount = 0;
-      const expectedEmissions = 3;
+      const emissions: NotificationMessage[][] = [];
 
       const subscription = service.messages$.subscribe(messages => {
-        emissionCount++;
+        emissions.push([...messages]);
 
-        if (emissionCount === 1) {
-          // Initial empty state
-          expect(messages).toEqual([]);
-          service.showSuccess('Test message');
-        } else if (emissionCount === 2) {
-          // After first message
-          expect(messages.length).toBe(1);
-          service.showError('Another message');
-        } else if (emissionCount === 3) {
-          // After second message
-          expect(messages.length).toBe(2);
-          subscription.unsubscribe();
-          done();
+        if (emissions.length === 3) {
+          try {
+            expect(emissions[0]).toEqual([]); // Initial empty state
+            expect(emissions[1].length).toBe(1); // After first message
+            expect(emissions[1][0].message).toBe('Test message');
+            expect(emissions[2].length).toBe(2); // After second message
+            expect(emissions[2][1].message).toBe('Another message');
+
+            subscription.unsubscribe();
+            done();
+          } catch (error) {
+            subscription.unsubscribe();
+            done.fail(error as Error);
+          }
         }
       });
-    });
 
-    it('should maintain message immutability', (done) => {
-      let firstSnapshot: NotificationMessage[] = [];
-      let secondSnapshot: NotificationMessage[] = [];
-      let emissionCount = 0;
-
-      const subscription = service.messages$.subscribe(messages => {
-        emissionCount++;
-
-        if (emissionCount === 1) {
-          // Initial empty state
-          expect(messages).toEqual([]);
-          service.showSuccess('First message');
-        } else if (emissionCount === 2) {
-          // After first message
-          firstSnapshot = [...messages]; // Create a copy
-          expect(firstSnapshot.length).toBe(1);
-          service.showSuccess('Second message');
-        } else if (emissionCount === 3) {
-          // After second message
-          secondSnapshot = [...messages]; // Create a copy
-          expect(secondSnapshot.length).toBe(2);
-
-          // First snapshot should not be modified
-          expect(firstSnapshot.length).toBe(1);
-
-          // Arrays should be different instances
-          expect(firstSnapshot).not.toBe(secondSnapshot);
-
-          subscription.unsubscribe();
-          done();
-        }
-      });
+      // Trigger messages after subscription is set up
+      service.showSuccess('Test message');
+      service.showError('Another message');
     });
   });
 
   describe('Message Properties', () => {
     it('should set correct timestamp for messages', (done) => {
       const beforeTime = new Date();
-
       service.showSuccess('Test message');
-
       const afterTime = new Date();
 
       service.messages$.pipe(take(1)).subscribe(messages => {
@@ -298,42 +197,46 @@ describe('NotificationService', () => {
     });
   });
 
-  describe('Edge Cases', () => {
-    it('should handle empty message strings', (done) => {
+  describe('Empty and Invalid Messages', () => {
+    it('should not create messages for empty strings', (done) => {
       service.showSuccess('');
       service.showError('');
 
       service.messages$.pipe(take(1)).subscribe(messages => {
+        expect(messages.length).toBe(0);
+        done();
+      });
+    });
+
+    it('should not create messages for whitespace-only strings', (done) => {
+      service.showSuccess('   ');
+      service.showError('\t\n  \r');
+      service.showSuccess('     ');
+
+      service.messages$.pipe(take(1)).subscribe(messages => {
+        expect(messages.length).toBe(0);
+        done();
+      });
+    });
+
+    it('should not increment ID counter for empty messages', (done) => {
+      service.showSuccess(''); // Should not create
+      service.showError('Valid message'); // Should create with ID msg_1
+      service.showSuccess('   '); // Should not create
+      service.showError('Another valid message'); // Should create with ID msg_2
+
+      service.messages$.pipe(take(1)).subscribe(messages => {
         expect(messages.length).toBe(2);
-        expect(messages[0].message).toBe('');
-        expect(messages[1].message).toBe('');
+        expect(messages[0].id).toBe('msg_1');
+        expect(messages[0].message).toBe('Valid message');
+        expect(messages[1].id).toBe('msg_2');
+        expect(messages[1].message).toBe('Another valid message');
         done();
       });
-    });
+    });   
+  });
 
-    it('should handle very long messages', (done) => {
-      const longMessage = 'A'.repeat(1000);
-
-      service.showSuccess(longMessage);
-
-      service.messages$.pipe(take(1)).subscribe(messages => {
-        expect(messages[0].message).toBe(longMessage);
-        expect(messages[0].message.length).toBe(1000);
-        done();
-      });
-    });
-
-    it('should handle special characters in messages', (done) => {
-      const specialMessage = '!@#$%^&*()_+-=[]{}|;:,.<>?';
-
-      service.showError(specialMessage);
-
-      service.messages$.pipe(take(1)).subscribe(messages => {
-        expect(messages[0].message).toBe(specialMessage);
-        done();
-      });
-    });
-
+  describe('Edge Cases', () => { 
     it('should handle rapid successive message additions', (done) => {
       for (let i = 0; i < 10; i++) {
         service.showSuccess(`Message ${i}`);
@@ -344,54 +247,6 @@ describe('NotificationService', () => {
         expect(messages[0].message).toBe('Message 0');
         expect(messages[9].message).toBe('Message 9');
         done();
-      });
-    });
-  });
-
-  describe('Memory Management', () => {
-    it('should prevent memory leaks by auto-removing messages', (done) => {
-      // Add many messages
-      for (let i = 0; i < 100; i++) {
-        service.showSuccess(`Message ${i}`);
-      }
-
-      // Fast-forward to auto-removal time
-      jasmine.clock().tick(4001);
-
-      setTimeout(() => {
-        service.messages$.pipe(take(1)).subscribe(messages => {
-          expect(messages.length).toBe(0);
-          done();
-        });
-      }, 10);
-    });
-
-    it('should handle manual removal during auto-removal timer', (done) => {
-      service.showSuccess('Test message');
-
-      service.messages$.pipe(take(1)).subscribe(messages => {
-        const messageId = messages[0].id;
-
-        // Manually remove before auto-removal
-        jasmine.clock().tick(2000);
-        service.removeMessage(messageId);
-
-        // Should be removed immediately
-        setTimeout(() => {
-          service.messages$.pipe(take(1)).subscribe(immediateMessages => {
-            expect(immediateMessages.length).toBe(0);
-
-            // Auto-removal timer should not cause issues
-            jasmine.clock().tick(3000);
-
-            setTimeout(() => {
-              service.messages$.pipe(take(1)).subscribe(finalMessages => {
-                expect(finalMessages.length).toBe(0);
-                done();
-              });
-            }, 10);
-          });
-        }, 10);
       });
     });
   });

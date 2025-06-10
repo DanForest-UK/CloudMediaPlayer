@@ -31,8 +31,14 @@ export class NotificationService {
 
   /**
    * Add a message and auto-remove it after 4 seconds
+   * Does nothing if message is empty or only whitespace
    */
   private addMessage(type: 'success' | 'error', message: string): void {
+    // Don't create notification if message is empty or only whitespace
+    if (!message || message.trim().length === 0) {
+      return;
+    }
+
     const notification: NotificationMessage = {
       id: `msg_${++this.messageIdCounter}`,
       type,
@@ -40,7 +46,7 @@ export class NotificationService {
       timestamp: new Date()
     };
 
-    // Always create a new array instance to ensure immutability
+    // new array instance to ensure immutability
     const currentMessages = [...(this.messagesSubject.value || [])];
     const newMessages = [...currentMessages, notification];
     this.messagesSubject.next(newMessages);
@@ -65,7 +71,6 @@ export class NotificationService {
       this.timeouts.delete(id);
     }
 
-    // Always create a new array instance to ensure immutability
     const currentMessages = [...(this.messagesSubject.value || [])];
     const filteredMessages = currentMessages.filter(msg => msg && msg.id !== id);
 
@@ -79,7 +84,6 @@ export class NotificationService {
    * Clear all messages
    */
   clearAll(): void {
-    // Clear all timeouts
     this.timeouts.forEach(timeoutId => window.clearTimeout(timeoutId));
     this.timeouts.clear();
 
