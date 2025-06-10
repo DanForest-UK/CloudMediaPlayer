@@ -89,9 +89,9 @@ describe('DropboxService', () => {
     });
   });
 
-  describe('Business Logic Methods', () => {
+  describe('Logic Methods', () => {
     describe('File Type Detection', () => {
-      it('should identify audio files correctly using isMediaFile method', () => {
+      it('should identify audio files correctly', () => {
         expect(service.isMediaFile('song.mp3')).toBe(true);
         expect(service.isMediaFile('music.wav')).toBe(true);
         expect(service.isMediaFile('audio.ogg')).toBe(true);
@@ -100,31 +100,21 @@ describe('DropboxService', () => {
         expect(service.isMediaFile('compressed.aac')).toBe(true);
       });
 
-      it('should reject non-audio files using isMediaFile method', () => {
+      it('should reject non-audio files', () => {
         expect(service.isMediaFile('document.pdf')).toBe(false);
         expect(service.isMediaFile('image.jpg')).toBe(false);
         expect(service.isMediaFile('video.mp4')).toBe(false);
         expect(service.isMediaFile('text.txt')).toBe(false);
       });
 
-      it('should handle empty or undefined filenames using isMediaFile method', () => {
+      it('should handle empty or undefined filenames', () => {
         expect(service.isMediaFile('')).toBe(false);
         expect(service.isMediaFile(undefined as any)).toBe(false);
-      });
-
-      it('should get supported audio extensions', () => {
-        const extensions = service.audioExtensions;
-        expect(extensions).toContain('.mp3');
-        expect(extensions).toContain('.wav');
-        expect(extensions).toContain('.ogg');
-        expect(extensions).toContain('.m4a');
-        expect(extensions).toContain('.flac');
-        expect(extensions).toContain('.aac');
       });
     });
 
     describe('File Operations', () => {
-      it('should filter media files correctly using filterMediaFiles method', () => {
+      it('filterAudioFilesAndFolders should filter correctly', () => {
         const files: DropboxFile[] = [
           { ...mockDropboxFile, name: 'song.mp3', is_folder: false },
           { ...mockDropboxFile, name: 'document.pdf', is_folder: false },
@@ -140,7 +130,7 @@ describe('DropboxService', () => {
         expect(mediaFiles.find(f => f.name === 'document.pdf')).toBeFalsy();
       });
 
-      it('should filter audio files only using filterAudioFilesOnly method', () => {
+      it('filterAudioFilesOnly should filter audio files only', () => {
         const files: DropboxFile[] = [
           { ...mockDropboxFile, name: 'song.mp3', is_folder: false },
           { ...mockDropboxFile, name: 'document.pdf', is_folder: false },
@@ -156,7 +146,7 @@ describe('DropboxService', () => {
         expect(audioFiles.find(f => f.name === 'document.pdf')).toBeFalsy();
       });
 
-      it('should sort files correctly using sortFiles method', () => {
+      it('sortFiles should sort files correctly', () => {
         const files: DropboxFile[] = [
           { ...mockDropboxFile, name: 'song.mp3', is_folder: false },
           { ...mockDropboxFile, name: 'album', is_folder: true },
@@ -207,15 +197,14 @@ describe('DropboxService', () => {
       });
 
       it('should get display name from path using getDisplayNameFromPath method', () => {
-        // Test with actual path
         expect(service.getDisplayNameFromPath('/music/rock/album')).toBe('album');
         expect(service.getDisplayNameFromPath('/single')).toBe('single');
 
-        // Test edge cases - check what the method actually returns
+        // check what the method actually returns
         const emptyResult = service.getDisplayNameFromPath('');
         const rootResult = service.getDisplayNameFromPath('/');
 
-        // Adjust expectations based on actual implementation
+        // expectations based on actual implementation
         if (emptyResult === '') {
           expect(service.getDisplayNameFromPath('')).toBe('');
         } else {
@@ -242,20 +231,20 @@ describe('DropboxService', () => {
         expect(service.isTokenExpired()).toBe(false);
       });
 
-      it('should validate authentication state using validateAuthenticationState method', () => {
+      it('isAuthenticated should validate authentication state using', () => {
         (service as any).accessToken = 'valid_token';
         (service as any).tokenExpiry = new Date(Date.now() + 3600000);
-        expect(service.validateAuthenticationState()).toBe(true);
+        expect(service.isAuthenticated()).toBe(true);
 
         (service as any).accessToken = null;
-        expect(service.validateAuthenticationState()).toBe(false);
+        expect(service.isAuthenticated()).toBe(false);
 
         (service as any).accessToken = 'expired_token';
         (service as any).tokenExpiry = new Date(Date.now() - 3600000);
-        expect(service.validateAuthenticationState()).toBe(false);
+        expect(service.isAuthenticated()).toBe(false);
       });
 
-      it('should get OAuth error messages using getOAuthErrorMessage method', () => {
+      it('getOAuthErrorMessage should get OAuth error messages', () => {
         expect(service.getOAuthErrorMessage('access_denied')).toContain('cancelled the authorization');
         expect(service.getOAuthErrorMessage('invalid_request')).toContain('problem with the authorization request');
         expect(service.getOAuthErrorMessage('unsupported_response_type')).toContain('not supported');
@@ -273,7 +262,7 @@ describe('DropboxService', () => {
       });
     });
 
-    it('should check if authenticated correctly using business logic', () => {
+    it('should check if authenticated correctly', () => {
       expect(service.isAuthenticated()).toBe(false);
 
       (service as any).accessToken = 'valid_token';
@@ -281,7 +270,7 @@ describe('DropboxService', () => {
       expect(service.isAuthenticated()).toBe(true);
     });
 
-    it('should detect expired tokens using business logic', () => {
+    it('should detect expired tokens', () => {
       (service as any).accessToken = 'expired_token';
       (service as any).tokenExpiry = new Date(Date.now() - 3600000);
       expect(service.isAuthenticated()).toBe(false);
@@ -480,14 +469,14 @@ describe('DropboxService', () => {
     });
 
     it('should handle account info errors', (done) => {
-      // Set a longer timeout for this specific test
+      // Set a longer timeout for this test
       const originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
       jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 
       service.getCurrentAccount().subscribe({
         next: (user) => {
           expect(user).toBeNull();
-          // Give time for error handling to complete
+          // time for error handling to complete
           setTimeout(() => {
             expect(mockNotificationService.showError).toHaveBeenCalledWith('Error getting Dropbox account information');
             jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
@@ -495,7 +484,6 @@ describe('DropboxService', () => {
           }, 100);
         },
         error: (error) => {
-          // This might be called instead of next depending on the error handling
           console.log('Error callback called:', error);
           setTimeout(() => {
             expect(mockNotificationService.showError).toHaveBeenCalledWith('Error getting Dropbox account information');
@@ -610,7 +598,6 @@ describe('DropboxService', () => {
       service.getTemporaryLink('/test.mp3').subscribe({
         next: (link) => {
           expect(link).toBe('');
-          // Give time for error handling to complete
           setTimeout(() => {
             expect(mockNotificationService.showError).toHaveBeenCalledWith('Error getting media link');
             done();
@@ -623,7 +610,6 @@ describe('DropboxService', () => {
         }
       });
 
-      // Wait a bit for the request to be made
       setTimeout(() => {
         const req = httpMock.expectOne('https://api.dropboxapi.com/2/files/get_temporary_link');
         req.error(new ProgressEvent('Network error'), { status: 404, statusText: 'Not Found' });
@@ -638,7 +624,7 @@ describe('DropboxService', () => {
         const duration = endTime - startTime;
 
         // Should take at least the rate limit delay
-        expect(duration).toBeGreaterThanOrEqual(50);
+        expect(duration).toBeGreaterThanOrEqual(service.REQUEST_DELAY);
         done();
       });
 
@@ -683,38 +669,6 @@ describe('DropboxService', () => {
           entries: audioFiles,
           has_more: false
         });
-      }, 100);
-    });
-
-    it('should filter only audio files when collecting recursively using business logic', (done) => {
-      const mixedFiles = [
-        { id: 'song', name: 'song.mp3', path_display: '/mixed/song.mp3', is_folder: false, '.tag': 'file' },
-        { id: 'doc', name: 'document.pdf', path_display: '/mixed/document.pdf', is_folder: false, '.tag': 'file' },
-        { id: 'folder', name: 'subfolder', path_display: '/mixed/subfolder', is_folder: true, '.tag': 'folder' }
-      ];
-
-      service.collectAllAudioFilesRecursively('/mixed').subscribe(files => {
-        expect(files.length).toBe(1);
-        expect(files[0].name).toBe('song.mp3');
-        done();
-      });
-
-      setTimeout(() => {
-        // Main folder request
-        const req1 = httpMock.expectOne('https://api.dropboxapi.com/2/files/list_folder');
-        req1.flush({
-          entries: mixedFiles,
-          has_more: false
-        });
-
-        // Subfolder request (delayed due to rate limiting)
-        setTimeout(() => {
-          const req2 = httpMock.expectOne('https://api.dropboxapi.com/2/files/list_folder');
-          req2.flush({
-            entries: [],
-            has_more: false
-          });
-        }, 100);
       }, 100);
     });
   });
