@@ -36,17 +36,12 @@ export class DropboxConnectComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     try {
       this.authSubscription = this.dropboxService.getAuthState().subscribe(state => {
-        this.authState = state || {
-          isAuthenticated: false,
-          userInfo: null,
-          tokenExpiry: null,
-          error: null
-        };
+        this.authState = state || this.getDefaultAuthState();
         this.authenticationChanged.emit(state?.isAuthenticated === true);
         this.isLoading = false;
       });
 
-      if (this.dropboxService && !this.dropboxService.shouldUseCallbackRoute) {
+      if (this.dropboxService && !this.shouldUseCallbackRoute()) {
         this.handleOAuthCallback();
       }
     } catch (error) {
@@ -64,84 +59,61 @@ export class DropboxConnectComponent implements OnInit, OnDestroy {
     }
   }
 
-  async connectWithOAuth(): Promise<void> {
-    this.isLoading = true;
-    this.clearError();
-
-    try {
-      if (this.dropboxService && this.dropboxService.startOAuthFlow) {
-        await this.dropboxService.startOAuthFlow();
-      } else {
-        throw new Error('OAuth flow not available');
-      }
-    } catch (error) {
-      console.error('Failed to start OAuth flow:', error);
-      this.notificationService.showError('Error connecting to Dropbox');
-      this.isLoading = false;
-    }
+  /**
+   * Get default auth state
+   */
+  getDefaultAuthState(): AuthState {
+    return {
+      isAuthenticated: false,
+      userInfo: null,
+      tokenExpiry: null,
+      error: null
+    };
   }
 
-  logout(): void {
-    try {
-      if (this.dropboxService && this.dropboxService.logout) {
-        this.dropboxService.logout();
-      }
-    } catch (error) {
-      console.error('Error during logout:', error);
-      this.notificationService.showError('Error disconnecting from Dropbox');
-    }
+  /**
+   * Check if should use callback route
+   */
+  shouldUseCallbackRoute(): boolean {
+    return this.dropboxService?.shouldUseCallbackRoute() || false;
   }
 
-  async refreshConnection(): Promise<void> {
-    this.isLoading = true;
-    this.clearError();
-
-    try {
-      if (this.dropboxService && this.dropboxService.getCurrentAccount) {
-        this.dropboxService.getCurrentAccount().subscribe({
-          next: () => {
-            this.isLoading = false;
-            this.notificationService.showSuccess('Connection refreshed');
-          },
-          error: (error) => {
-            console.error('Error refreshing connection:', error);
-            this.notificationService.showError('Error refreshing Dropbox connection');
-            this.isLoading = false;
-          }
-        });
-      } else {
-        this.isLoading = false;
-      }
-    } catch (error) {
-      console.error('Error refreshing connection:', error);
-      this.notificationService.showError('Error refreshing Dropbox connection');
-      this.isLoading = false;
-    }
+  /**
+   * Check if current path matches OAuth callback paths
+   */
+  isOAuthCallbackPath(): boolean {
+    const path = window.location.pathname;
+    return path === '/' || path === '/media-player';
   }
 
-  clearError(): void {
-    // Error clearing handled by service
+  /**
+   * Extract OAuth parameters from URL
+   */
+  extractOAuthParams(): { code?: string; error?: string; state?: string } {
+    const urlParams = new URLSearchParams(window.location.search);
+    return {
+      code: urlParams.get('code') || undefined,
+      error: urlParams.get('error') || undefined,
+      state: urlParams.get('state') || undefined
+    };
   }
 
-  isAuthenticated(): boolean {
-    try {
-      return this.authState?.isAuthenticated === true;
-    } catch (error) {
-      console.warn('Error checking authentication status:', error);
-      return false;
-    }
+  /**
+   * Clean URL after OAuth callback processing
+   */
+  cleanOAuthUrl(): void {
+    window.history.replaceState({}, document.title, window.location.pathname);
   }
 
+  /**
+   * Get user initials from user info
+   */
   getUserInitials(): string {
     try {
       const userInfo = this.authState?.userInfo;
       if (!userInfo || !userInfo.name) return 'U';
 
-      const displayName = userInfo.name.display_name ||
-        userInfo.name.familiar_name ||
-        userInfo.name.given_name ||
-        'Unknown User';
-
+      const displayName = this.getUserDisplayName();
       if (!displayName || displayName.trim() === '') return 'U';
 
       return displayName.trim()
@@ -157,12 +129,13 @@ export class DropboxConnectComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Get user display name with fallbacks
+   */
   getUserDisplayName(): string {
     try {
       const userInfo = this.authState?.userInfo;
-      if (!userInfo) return 'Dropbox User';
-
-      if (!userInfo.name) return 'Dropbox User';
+      if (!userInfo || !userInfo.name) return 'Dropbox User';
 
       return userInfo.name.display_name ||
         userInfo.name.familiar_name ||
@@ -174,6 +147,9 @@ export class DropboxConnectComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Get user email
+   */
   getUserEmail(): string {
     try {
       return this.authState?.userInfo?.email || '';
@@ -183,6 +159,9 @@ export class DropboxConnectComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Format token expiry for display
+   */
   formatTokenExpiry(): string {
     try {
       const tokenExpiry = this.authState?.tokenExpiry;
@@ -212,23 +191,129 @@ export class DropboxConnectComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Calculate time difference for expiry
+   */
+  calculateExpiryTimeDifference(tokenExpiry: Date): { days: number; hours: number; expired: boolean } {
+    const now = new Date();
+    const expiry = new Date(tokenExpiry);
+    const diffMs = expiry.getTime() - now.getTime();
+
+    if (diffMs <= 0) {
+      return { days: 0, hours: 0, expired: true };
+    }
+
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffHours / 24);
+
+    return { days: diffDays, hours: diffHours, expired: false };
+  }
+
+  /**
+   * Validate OAuth state parameter
+   */
+  validateOAuthState(receivedState?: string): boolean {
+    if (!receivedState) return true; // State is optional
+
+    const storedState = sessionStorage.getItem('oauth_state');
+    return !storedState || storedState === receivedState;
+  }
+
+  /**
+   * Check if authentication is valid
+   */
+  isAuthenticated(): boolean {
+    try {
+      return this.authState?.isAuthenticated === true;
+    } catch (error) {
+      console.warn('Error checking authentication status:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Check if there's an authentication error
+   */
+  hasAuthError(): boolean {
+    return !!(this.authState?.error && !this.isLoading);
+  }
+
+  /**
+   * Check if should show connect interface
+   */
+  shouldShowConnectInterface(): boolean {
+    return !this.isAuthenticated() && !this.isLoading;
+  }
+
+  /**
+   * Check if should show authenticated interface
+   */
+  shouldShowAuthenticatedInterface(): boolean {
+    return this.isAuthenticated() && !this.isLoading;
+  }
+
+  async connectWithOAuth(): Promise<void> {
+    this.isLoading = true;
+
+    try {
+      if (this.dropboxService && this.dropboxService.startOAuthFlow) {
+        await this.dropboxService.startOAuthFlow();
+      } else {
+        throw new Error('OAuth flow not available');
+      }
+    } catch (error) {
+      console.error('Failed to start OAuth flow:', error);
+      this.notificationService.showError('Error connecting to Dropbox');
+      this.isLoading = false;
+    }
+  }
+
+  logout(): void {
+    try {
+      if (this.dropboxService && this.dropboxService.logout) {
+        this.dropboxService.logout();
+      }
+    } catch (error) {
+      console.error('Error during logout:', error);
+      this.notificationService.showError('Error disconnecting from Dropbox');
+    }
+  }
+
+  refreshConnection(): void {
+    this.isLoading = true;
+
+    if (!this.dropboxService?.getCurrentAccount) {
+      this.isLoading = false;
+      return;
+    }
+
+    this.dropboxService.getCurrentAccount().subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.notificationService.showSuccess('Connection refreshed');
+      },
+      error: (error) => {
+        console.error('Error refreshing connection:', error);
+        this.notificationService.showError('Error refreshing Dropbox connection');
+        this.isLoading = false;
+      }
+    });
+  }
+  
   private handleOAuthCallback(): void {
     try {
-      if (window.location.pathname === '/' || window.location.pathname === '/media-player') {
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
-        const error = urlParams.get('error');
-        const state = urlParams.get('state');
+      if (this.isOAuthCallbackPath()) {
+        const params = this.extractOAuthParams();
 
-        if (error) {
-          console.error('OAuth error:', error);
+        if (params.error) {
+          console.error('OAuth error:', params.error);
           this.notificationService.showError('Error connecting to Dropbox');
-          window.history.replaceState({}, document.title, window.location.pathname);
+          this.cleanOAuthUrl();
           return;
         }
 
-        if (code) {
-          this.processOAuthCode(code, state);
+        if (params.code) {
+          this.processOAuthCode(params.code, params.state);
         }
       }
     } catch (error) {
@@ -237,14 +322,18 @@ export class DropboxConnectComponent implements OnInit, OnDestroy {
     }
   }
 
-  private async processOAuthCode(code: string, state?: string | null): Promise<void> {
+  private async processOAuthCode(code: string, state?: string): Promise<void> {
     this.isLoading = true;
 
     try {
-      if (this.dropboxService && this.dropboxService.handleOAuthCallback) {
-        const success = await this.dropboxService.handleOAuthCallback(code, state || undefined);
+      if (!this.validateOAuthState(state)) {
+        throw new Error('Invalid OAuth state parameter');
+      }
 
-        window.history.replaceState({}, document.title, window.location.pathname);
+      if (this.dropboxService && this.dropboxService.handleOAuthCallback) {
+        const success = await this.dropboxService.handleOAuthCallback(code, state);
+
+        this.cleanOAuthUrl();
 
         if (!success) {
           console.error('Authentication failed');
