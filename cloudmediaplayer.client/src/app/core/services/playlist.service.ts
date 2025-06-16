@@ -42,18 +42,267 @@ export class PlaylistService {
 
     // Auto-sync when coming online (if enabled)
     window.addEventListener('online', () => {
-      if (this.syncSettings$.value.enabled && this.syncSettings$.value.autoSync) {
+      if (this.canSync()) {
         this.syncPlaylists();
       }
     });
 
     // Initial sync check
     this.dropboxService.getAuthState().subscribe((authState: AuthState) => {
-      if (authState.isAuthenticated && navigator.onLine &&
-        this.syncSettings$.value.enabled && this.syncSettings$.value.autoSync) {
+      if (this.canSync()) {
         this.syncPlaylists();
       }
     });
+  }
+
+  /**
+   * Business logic method: Check if sync is possible
+   */
+  canSync(): boolean {
+    const settings = this.syncSettings$.value;
+    const status = this.syncStatus$.value;
+    return settings.enabled &&
+      settings.autoSync &&
+      this.dropboxService.isAuthenticated() &&
+      status.isOnline;
+  }
+
+  /**
+   * Business logic method: Validate sync conditions for operations
+   */
+  validateSyncConditions(enabled: boolean, authenticated: boolean, online: boolean): boolean {
+    return enabled && authenticated && online;
+  }
+
+  /**
+   * Business logic method: Merge local and remote playlists, resolving conflicts by preferring newer versions
+   */
+  mergePlaylists(localPlaylists: SavedPlaylist[], remotePlaylists: SavedPlaylist[]): SavedPlaylist[] {
+    const merged = [...localPlaylists];
+
+    remotePlaylists.forEach(remotePlaylist => {
+      const existingIndex = merged.findIndex(p => p.name === remotePlaylist.name);
+
+      if (existingIndex === -1) {
+        // New remote playlist - add it
+        merged.push(remotePlaylist);
+      } else {
+        // Conflict resolution - prefer newer lastModified date
+        const existingPlaylist = merged[existingIndex];
+        if (remotePlaylist.lastModified > existingPlaylist.lastModified) {
+          merged[existingIndex] = remotePlaylist;
+        }
+      }
+    });
+
+    return merged;
+  }
+
+  /**
+   * Business logic method: Check if a playlist name already exists (case-insensitive)
+   */
+  playlistNameExists(name: string, excludeId?: string): boolean {
+    const playlists = this.getSavedPlaylists();
+    return playlists.some(p =>
+      p.name.toLowerCase() === name.toLowerCase().trim() &&
+      p.id !== excludeId
+    );
+  }
+
+  /**
+   * Business logic method: Generate Dropbox-safe playlist path
+   */
+  generatePlaylistPath(name: string): string {
+    const sanitizedName = this.sanitizePlaylistName(name);
+    return `/playlists/${sanitizedName}.json`;
+  }
+
+  /**
+   * Business logic method: Sanitize playlist name for Dropbox storage
+   */
+  sanitizePlaylistName(name: string): string {
+    return name
+      .replace(/[<>:"/\\|?*\s]+/g, '_')  // Replace sequences of invalid chars + whitespace with single _
+      .replace(/^_+|_+$/g, '')           // Remove leading/trailing underscores
+      .substring(0, 255)
+      || 'Untitled';                     // Fallback for empty names
+  }
+
+  /**
+   * Business logic method: Generate unique ID for playlists
+   */
+  generatePlaylistId(): string {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+  }
+
+  /**
+   * Business logic method: Get playlist display name with song count
+   */
+  getPlaylistDisplayName(name: string, songCount: number): string {
+    const songText = songCount === 1 ? 'song' : 'songs';
+    return `${name} (${songCount} ${songText})`;
+  }
+
+  /**
+   * Business logic method: Get sync status icon for a playlist
+   */
+  getSyncStatusIcon(playlist: SavedPlaylist, syncEnabled: boolean): string {
+    if (!syncEnabled) return '💾'; // Always local when sync disabled
+
+    switch (playlist.syncStatus) {
+      case 'synced': return '☁️';
+      case 'syncing': return '🔄';
+      case 'local': return '💾';
+      case 'error': return '⚠️';
+      default: return '💾';
+    }
+  }
+
+  /**
+   * Business logic method: Get sync status tooltip for a playlist
+   */
+  getSyncStatusTooltip(playlist: SavedPlaylist, syncEnabled: boolean): string {
+    if (!syncEnabled) return 'Sync disabled - saved locally only';
+
+    switch (playlist.syncStatus) {
+      case 'synced': return 'Synced to Dropbox';
+      case 'syncing': return 'Syncing to Dropbox...';
+      case 'local': return 'Saved locally only';
+      case 'error': return 'Sync failed - right-click to retry';
+      default: return 'Unknown sync status';
+    }
+  }
+
+  /**
+   * Business logic method: Get the sync status display for the header
+   */
+  getSyncStatusHeaderDisplay(syncSettings: SyncSettings, syncStatus: SyncStatus): string {
+    if (!syncSettings.enabled) return 'Sync Disabled';
+    if (!syncStatus.isOnline) return 'Offline';
+    if (syncStatus.isSyncing) return 'Syncing...';
+    if (syncStatus.error) return 'Sync Error';
+    if (syncStatus.lastSync) {
+      const timeDiff = Date.now() - syncStatus.lastSync.getTime();
+      const minutes = Math.floor(timeDiff / 60000);
+      if (minutes < 1) return 'Just synced';
+      if (minutes < 60) return `Synced ${minutes}m ago`;
+      return 'Synced recently';
+    }
+    return 'Not synced';
+  }
+
+  /**
+   * Business logic method: Get the sync status icon for the header
+   */
+  getSyncStatusHeaderIcon(syncSettings: SyncSettings, syncStatus: SyncStatus): string {
+    if (!syncSettings.enabled) return '📱';
+    if (!syncStatus.isOnline) return '📱';
+    if (syncStatus.isSyncing) return '🔄';
+    return '☁️';
+  }
+
+  /**
+   * Business logic method: Check if a playlist can be force synced
+   */
+  canForceSyncPlaylist(playlistId: string, syncEnabled: boolean): boolean {
+    if (!syncEnabled) return false;
+
+    const playlist = this.getSavedPlaylists().find(p => p.id === playlistId);
+    return playlist ? playlist.syncStatus !== 'synced' : false;
+  }
+   
+
+  /**
+   * Transform playlist to Dropbox format
+   */
+  transformPlaylistToDropboxFormat(playlist: SavedPlaylist): any {
+    return {
+      id: playlist.id,
+      name: playlist.name,
+      created: playlist.created.toISOString(),
+      lastModified: playlist.lastModified.toISOString(),
+      items: playlist.items.map(item => ({
+        path: item.file.path_display,
+        displayName: item.displayName
+      }))
+    };
+  }
+
+  /**
+   * Business logic method: Transform Dropbox playlist to local format
+   */
+  transformDropboxPlaylistToLocal(dropboxPlaylist: any, file?: DropboxFile): SavedPlaylist {
+    return {
+      id: dropboxPlaylist.id || this.generatePlaylistId(),
+      name: dropboxPlaylist.name,
+      created: new Date(dropboxPlaylist.created),
+      lastModified: new Date(dropboxPlaylist.lastModified),
+      syncStatus: 'synced',
+      dropboxRev: file?.rev,
+      items: dropboxPlaylist.items.map((item: any) => ({
+        file: { path_display: item.path },
+        displayName: item.displayName
+      }))
+    };
+  }
+
+  /**
+   * Business logic method: Create default sync settings
+   */
+  getDefaultSyncSettings(): SyncSettings {
+    return {
+      enabled: true,
+      autoSync: true
+    };
+  }
+
+  /**
+   * Business logic method: Create default sync status
+   */
+  getDefaultSyncStatus(): SyncStatus {
+    return {
+      isOnline: navigator.onLine,
+      isSyncing: false,
+      lastSync: null,
+      pendingUploads: 0,
+      error: null
+    };
+  }
+
+  /**
+   * Business logic method: Validate playlist data before saving
+   */
+  validatePlaylistData(name: string, items: PlaylistItem[]): { valid: boolean; error?: string } {
+    if (!name || !name.trim()) {
+      return { valid: false, error: 'Playlist name cannot be empty' };
+    }
+
+    if (name.trim().length > 255) {
+      return { valid: false, error: 'Playlist name is too long' };
+    }
+
+    if (!Array.isArray(items)) {
+      return { valid: false, error: 'Invalid playlist items' };
+    }
+
+    return { valid: true };
+  }
+
+  /**
+   * Business logic method: Create playlist item from file
+   */
+  createPlaylistItem(file: DropboxFile, displayName?: string): PlaylistItem {
+    return {
+      file: file,
+      displayName: displayName || file.name
+    };
+  }
+
+  /**
+   * Business logic method: Check if playlist is currently playing
+   */
+  isPlaylistCurrentlyPlaying(playlistIndex: number, currentIndex: number, isPlaying: boolean): boolean {
+    return isPlaying && currentIndex === playlistIndex;
   }
 
   /**
@@ -122,15 +371,27 @@ export class PlaylistService {
   savePlaylist(name: string, items: PlaylistItem[], id?: string): Observable<SavedPlaylist> {
     return new Observable(observer => {
       try {
+        console.log('savePlaylist called with:', { name, itemCount: items.length, id });
+
+        // Validate input
+        const validation = this.validatePlaylistData(name, items);
+        if (!validation.valid) {
+          observer.error(new Error(validation.error));
+          return;
+        }
+
         // Save locally first for immediate response
         const localPlaylist = this.savePlaylistLocally(name, items, id);
         observer.next(localPlaylist);
 
         // Then sync to Dropbox if enabled and possible
-        if (this.canSync()) {
+        const canSyncResult = this.canSync();
+        console.log('Can sync check result:', canSyncResult);
+
+        if (canSyncResult) {
+          console.log('Starting sync to Dropbox...');
           this.syncPlaylistToDropbox(localPlaylist).subscribe({
             next: (syncedPlaylist) => {
-              // Update local storage with synced status
               this.updateLocalPlaylist(syncedPlaylist);
               observer.next(syncedPlaylist);
               observer.complete();
@@ -138,7 +399,6 @@ export class PlaylistService {
             error: (error) => {
               console.error('Failed to sync playlist to Dropbox:', error);
               this.notificationService.showError('Error syncing playlist to Dropbox');
-              // Mark as pending sync
               localPlaylist.syncStatus = 'error';
               this.updateLocalPlaylist(localPlaylist);
               observer.next(localPlaylist);
@@ -146,6 +406,7 @@ export class PlaylistService {
             }
           });
         } else {
+          console.log('Sync conditions not met, completing with local save only');
           observer.complete();
         }
       } catch (error) {
@@ -157,7 +418,7 @@ export class PlaylistService {
   }
 
   /**
-   * Save playlist as new (always creates a new playlist with new ID)
+   * Save as new playlist 
    */
   savePlaylistAs(name: string, items: PlaylistItem[]): Observable<SavedPlaylist> {
     // Always create new playlist by not passing an ID
@@ -170,7 +431,7 @@ export class PlaylistService {
   private savePlaylistLocally(name: string, items: PlaylistItem[], id?: string): SavedPlaylist {
     const playlists = this.getSavedPlaylists();
 
-    const playlistId = id || this.generateId();
+    const playlistId = id || this.generatePlaylistId();
     const now = new Date();
 
     const playlist: SavedPlaylist = {
@@ -198,25 +459,18 @@ export class PlaylistService {
    * Sync a playlist to Dropbox
    */
   private syncPlaylistToDropbox(playlist: SavedPlaylist): Observable<SavedPlaylist> {
-    const playlistPath = this.dropboxService.getPlaylistPath(playlist.name);
 
-    const dropboxPlaylist = {
-      id: playlist.id,
-      name: playlist.name,
-      created: playlist.created.toISOString(),
-      lastModified: playlist.lastModified.toISOString(),
-      items: playlist.items.map(item => ({
-        path: item.file.path_display,
-        displayName: item.displayName
-      }))
-    };
+    const playlistPath = this.generatePlaylistPath(playlist.name);
+    const dropboxPlaylist = this.transformPlaylistToDropboxFormat(playlist);
 
     return this.dropboxService.uploadFile(playlistPath, JSON.stringify(dropboxPlaylist, null, 2)).pipe(
-      map(uploadedFile => ({
-        ...playlist,
-        syncStatus: 'synced' as const,
-        dropboxRev: uploadedFile.rev
-      })),
+      map(uploadedFile => {
+        return {
+          ...playlist,
+          syncStatus: 'synced' as const,
+          dropboxRev: uploadedFile.rev
+        };
+      }),
       catchError(error => {
         console.error('Failed to upload playlist to Dropbox:', error);
         this.notificationService.showError('Error syncing playlist to Dropbox');
@@ -229,8 +483,8 @@ export class PlaylistService {
   }
 
   /**
-   * Get all saved playlists (local + synced from Dropbox)
-   */
+  * Get all saved playlists from local storage
+  */
   getSavedPlaylists(): SavedPlaylist[] {
     try {
       const stored = localStorage.getItem(this.STORAGE_KEY);
@@ -238,7 +492,7 @@ export class PlaylistService {
 
       const playlists = JSON.parse(stored) as SavedPlaylist[];
 
-      // Convert date strings back to Date objects
+
       return playlists.map(playlist => ({
         ...playlist,
         created: new Date(playlist.created),
@@ -283,7 +537,7 @@ export class PlaylistService {
 
       // Delete from Dropbox if synced and sync is enabled
       if (this.canSync() && playlist.syncStatus === 'synced') {
-        const playlistPath = this.dropboxService.getPlaylistPath(playlist.name);
+        const playlistPath = this.generatePlaylistPath(playlist.name);
         this.dropboxService.deleteFile(playlistPath).subscribe({
           next: () => {
             observer.next(true);
@@ -292,7 +546,7 @@ export class PlaylistService {
           error: (error) => {
             console.error('Failed to delete playlist from Dropbox:', error);
             this.notificationService.showError('Error deleting playlist from Dropbox');
-            observer.next(true); // Still success locally
+            observer.next(true); // Still success as saved locally, can sync later
             observer.complete();
           }
         });
@@ -324,22 +578,21 @@ export class PlaylistService {
 
       this.storePlaylists(playlists);
 
-      // Sync to Dropbox if possible and enabled
       if (this.canSync()) {
         // Delete old file and upload new one
         forkJoin([
-          this.dropboxService.deleteFile(this.dropboxService.getPlaylistPath(oldName)),
+          this.dropboxService.deleteFile(this.generatePlaylistPath(oldName)),
           this.syncPlaylistToDropbox(playlist)
         ]).subscribe({
           next: ([_, syncedPlaylist]: [void, SavedPlaylist]) => {
-            this.updateLocalPlaylist(syncedPlaylist);
+            this.updateLocalPlaylist(syncedPlaylist); // need to update rev no and synced status
             observer.next(true);
             observer.complete();
           },
           error: (error: any) => {
             console.error('Failed to rename playlist in Dropbox:', error);
             this.notificationService.showError('Error renaming playlist in Dropbox');
-            observer.next(true); // Still success locally
+            observer.next(true); // Still success as saved locally
             observer.complete();
           }
         });
@@ -350,8 +603,9 @@ export class PlaylistService {
     });
   }
 
+
   /**
-   * Sync all playlists between local and Dropbox (if sync enabled)
+   * Sync all playlists between local and Dropbox
    */
   syncPlaylists(): Observable<void> {
     if (!this.canSync()) {
@@ -359,58 +613,70 @@ export class PlaylistService {
     }
 
     this.updateSyncStatus({ isSyncing: true, error: null });
-    console.log('Starting playlist sync...');
 
     return this.dropboxService.listPlaylistFiles().pipe(
       switchMap(dropboxFiles => {
-        console.log(`Found ${dropboxFiles.length} playlist files in Dropbox`);
         const localPlaylists = this.getSavedPlaylists();
-        console.log(`Found ${localPlaylists.length} local playlists`);
-
         const syncOperations: Observable<any>[] = [];
+        const processedLocalIds = new Set<string>();
 
-        // Download playlists from Dropbox that aren't local or are newer
+        // Process Dropbox files
         dropboxFiles.forEach(file => {
-          const playlistName = file.name.replace('.json', '');
-          const localPlaylist = localPlaylists.find(p => p.name === playlistName);
+          const operation = this.downloadPlaylistMetadata(file).pipe(
+            switchMap(dropboxPlaylist => {
+              const localPlaylist = this.findMatchingLocalPlaylist(dropboxPlaylist, localPlaylists);
 
-          if (!localPlaylist) {
-            console.log(`Downloading new playlist from Dropbox: ${playlistName}`);
-            syncOperations.push(this.downloadPlaylistFromDropbox(file));
-          } else if (file.server_modified && new Date(file.server_modified) > localPlaylist.lastModified) {
-            console.log(`Downloading updated playlist from Dropbox: ${playlistName}`);
-            syncOperations.push(this.downloadPlaylistFromDropbox(file));
-          } else {
-            console.log(`Local playlist is up to date: ${playlistName}`);
-          }
+              if (!localPlaylist) {
+                return this.downloadPlaylistFromDropbox(file);
+              } else {
+                // Mark local playlist as processed
+                processedLocalIds.add(localPlaylist.id);
+
+                const dropboxModified = new Date(dropboxPlaylist.lastModified);
+                const localModified = localPlaylist.lastModified;
+
+                if (dropboxModified > localModified) {                 
+                  return this.downloadPlaylistFromDropbox(file);
+                } else if (localModified > dropboxModified) {                  
+                  return this.syncPlaylistToDropbox(localPlaylist);
+                } else {                  
+                  return of(null); 
+                }
+              }
+            }),
+            catchError(error => {
+              console.error(`Failed to process Dropbox file ${file.name}:`, error);
+              return of(null); // Continue processing other files
+            })
+          );
+
+          syncOperations.push(operation);
         });
-
-        // Upload local playlists that aren't synced
+               
         localPlaylists.forEach(playlist => {
           if (playlist.syncStatus !== 'synced') {
-            const dropboxFile = dropboxFiles.find(f => f.name.replace('.json', '') === playlist.name);
-            if (!dropboxFile) {
-              console.log(`Uploading new playlist to Dropbox: ${playlist.name}`);
-              syncOperations.push(this.syncPlaylistToDropbox(playlist));
-            } else if (playlist.lastModified > new Date(dropboxFile.server_modified || 0)) {
-              console.log(`Uploading updated playlist to Dropbox: ${playlist.name}`);
+            // Check if this playlist matches any Dropbox file by name (quick check)
+            const hasDropboxMatch = dropboxFiles.some(file =>
+              file.name.replace('.json', '') === playlist.name
+            );
+
+            if (!hasDropboxMatch) {             
               syncOperations.push(this.syncPlaylistToDropbox(playlist));
             }
+            // If there is a Dropbox match, it will be handled above
           }
         });
 
-        console.log(`Executing ${syncOperations.length} sync operations`);
         return syncOperations.length > 0 ? forkJoin(syncOperations) : of([]);
       }),
       tap(() => {
-        console.log('Playlist sync completed successfully');
         this.updateSyncStatus({
           isSyncing: false,
           lastSync: new Date(),
           pendingUploads: 0
         });
       }),
-      map(() => void 0),
+      map(() => void 0), // Mark completed, dont care about results
       catchError((error: any) => {
         console.error('Sync failed:', error);
         this.notificationService.showError('Error syncing playlists with Dropbox');
@@ -424,6 +690,44 @@ export class PlaylistService {
   }
 
   /**
+   * Download playlist metadata only (ID matching)
+   */
+  private downloadPlaylistMetadata(file: DropboxFile): Observable<any> {
+    return this.dropboxService.downloadFile(file.path_display).pipe(
+      map(content => JSON.parse(content)),
+      catchError(error => {
+        console.error(`Failed to download metadata for ${file.name}:`, error);
+        throw error;
+      })
+    );
+  }
+
+  /**
+   * Find matching local playlist
+   */
+  private findMatchingLocalPlaylist(dropboxPlaylist: any, localPlaylists: SavedPlaylist[]): SavedPlaylist | undefined {
+    // First try to match by ID (most reliable)
+    if (dropboxPlaylist.id) {
+      const matchById = localPlaylists.find(p => p.id === dropboxPlaylist.id);
+      if (matchById) {       
+        return matchById;
+      }
+    }
+
+    // Fallback to name matching (for legacy files or edge cases)
+    const matchByName = localPlaylists.find(p => p.name === dropboxPlaylist.name);
+    if (matchByName) {
+      console.log(`Matched playlist by name (legacy): ${dropboxPlaylist.name}, assigning ID ${dropboxPlaylist.id} to local playlist ${matchByName.id}`);
+
+      // Update local playlist with the Dropbox ID for future syncs
+      matchByName.id = dropboxPlaylist.id;
+      this.updateLocalPlaylist(matchByName);
+    }
+
+    return matchByName;
+  }  
+
+  /**
    * Download a playlist from Dropbox
    */
   private downloadPlaylistFromDropbox(file: DropboxFile): Observable<SavedPlaylist> {
@@ -431,23 +735,9 @@ export class PlaylistService {
       map(content => {
         const dropboxPlaylist = JSON.parse(content);
 
-        // Convert Dropbox playlist to local format
-        const playlist: SavedPlaylist = {
-          id: dropboxPlaylist.id || this.generateId(),
-          name: dropboxPlaylist.name,
-          created: new Date(dropboxPlaylist.created),
-          lastModified: new Date(dropboxPlaylist.lastModified),
-          syncStatus: 'synced',
-          dropboxRev: file.rev,
-          items: dropboxPlaylist.items.map((item: any) => ({
-            file: { path_display: item.path },
-            displayName: item.displayName
-          }))
-        };
+        const playlist = this.transformDropboxPlaylistToLocal(dropboxPlaylist, file);
 
-        // Update local storage
-        this.updateLocalPlaylist(playlist);
-        console.log(`Downloaded playlist: ${playlist.name} with ${playlist.items.length} items`);
+        this.updateLocalPlaylist(playlist);     
         return playlist;
       }),
       catchError((error: any) => {
@@ -489,7 +779,7 @@ export class PlaylistService {
   }
 
   /**
-   * Save current playlist state for auto-restore
+   * Save current playlist state
    */
   saveCurrentPlaylist(items: PlaylistItem[], currentIndex: number): void {
     try {
@@ -506,7 +796,7 @@ export class PlaylistService {
   }
 
   /**
-   * Load current playlist state for auto-restore
+   * Load current playlist state 
    */
   loadCurrentPlaylist(): { items: PlaylistItem[], currentIndex: number } | null {
     try {
@@ -530,39 +820,6 @@ export class PlaylistService {
    */
   clearCurrentPlaylist(): void {
     localStorage.removeItem(this.CURRENT_PLAYLIST_KEY);
-  }
-
-  /**
-   * Check if a playlist name already exists
-   */
-  playlistNameExists(name: string, excludeId?: string): boolean {
-    const playlists = this.getSavedPlaylists();
-    return playlists.some(p =>
-      p.name.toLowerCase() === name.toLowerCase().trim() &&
-      p.id !== excludeId
-    );
-  }
-
-  /**
-   * Get playlists that need syncing
-   */
-  getUnsyncedPlaylists(): SavedPlaylist[] {
-    return this.getSavedPlaylists().filter(p =>
-      p.syncStatus === 'local' || p.syncStatus === 'error'
-    );
-  }
-
-  /**
-   * Check if sync is possible (authentication + online + sync enabled)
-   */
-  private canSync(): boolean {
-    return this.syncSettings$.value.enabled &&
-      this.dropboxService.isAuthenticated() &&
-      navigator.onLine;
-  }
-
-  private generateId(): string {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
 
   private storePlaylists(playlists: SavedPlaylist[]): void {
