@@ -56,7 +56,7 @@ export class PlaylistService {
   }
 
   /**
-   * Business logic method: Check if sync is possible
+   * Check if sync is possible
    */
   canSync(): boolean {
     const settings = this.syncSettings$.value;
@@ -68,14 +68,14 @@ export class PlaylistService {
   }
 
   /**
-   * Business logic method: Validate sync conditions for operations
+   * Validate sync conditions for operations
    */
   validateSyncConditions(enabled: boolean, authenticated: boolean, online: boolean): boolean {
     return enabled && authenticated && online;
   }
 
   /**
-   * Business logic method: Merge local and remote playlists, resolving conflicts by preferring newer versions
+   * Merge local and remote playlists, resolving conflicts by preferring newer versions
    */
   mergePlaylists(localPlaylists: SavedPlaylist[], remotePlaylists: SavedPlaylist[]): SavedPlaylist[] {
     const merged = [...localPlaylists];
@@ -99,7 +99,7 @@ export class PlaylistService {
   }
 
   /**
-   * Business logic method: Check if a playlist name already exists (case-insensitive)
+   * Check if a playlist name already exists (case-insensitive)
    */
   playlistNameExists(name: string, excludeId?: string): boolean {
     const playlists = this.getSavedPlaylists();
@@ -110,7 +110,7 @@ export class PlaylistService {
   }
 
   /**
-   * Business logic method: Generate Dropbox-safe playlist path
+   * Generate Dropbox-safe playlist path
    */
   generatePlaylistPath(name: string): string {
     const sanitizedName = this.sanitizePlaylistName(name);
@@ -118,7 +118,7 @@ export class PlaylistService {
   }
 
   /**
-   * Business logic method: Sanitize playlist name for Dropbox storage
+   * Sanitize playlist name for Dropbox storage
    */
   sanitizePlaylistName(name: string): string {
     return name
@@ -129,14 +129,14 @@ export class PlaylistService {
   }
 
   /**
-   * Business logic method: Generate unique ID for playlists
+   * Generate unique ID for playlists
    */
   generatePlaylistId(): string {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
 
   /**
-   * Business logic method: Get playlist display name with song count
+   * Get playlist display name with song count
    */
   getPlaylistDisplayName(name: string, songCount: number): string {
     const songText = songCount === 1 ? 'song' : 'songs';
@@ -144,7 +144,7 @@ export class PlaylistService {
   }
 
   /**
-   * Business logic method: Get sync status icon for a playlist
+   * Get sync status icon for a playlist
    */
   getSyncStatusIcon(playlist: SavedPlaylist, syncEnabled: boolean): string {
     if (!syncEnabled) return '💾'; // Always local when sync disabled
@@ -159,7 +159,7 @@ export class PlaylistService {
   }
 
   /**
-   * Business logic method: Get sync status tooltip for a playlist
+   * Get sync status tooltip for a playlist
    */
   getSyncStatusTooltip(playlist: SavedPlaylist, syncEnabled: boolean): string {
     if (!syncEnabled) return 'Sync disabled - saved locally only';
@@ -174,7 +174,7 @@ export class PlaylistService {
   }
 
   /**
-   * Business logic method: Get the sync status display for the header
+   * Get the sync status display for the header
    */
   getSyncStatusHeaderDisplay(syncSettings: SyncSettings, syncStatus: SyncStatus): string {
     if (!syncSettings.enabled) return 'Sync Disabled';
@@ -192,7 +192,7 @@ export class PlaylistService {
   }
 
   /**
-   * Business logic method: Get the sync status icon for the header
+   * Get the sync status icon for the header
    */
   getSyncStatusHeaderIcon(syncSettings: SyncSettings, syncStatus: SyncStatus): string {
     if (!syncSettings.enabled) return '📱';
@@ -202,7 +202,7 @@ export class PlaylistService {
   }
 
   /**
-   * Business logic method: Check if a playlist can be force synced
+   * Check if a playlist can be force synced
    */
   canForceSyncPlaylist(playlistId: string, syncEnabled: boolean): boolean {
     if (!syncEnabled) return false;
@@ -229,7 +229,7 @@ export class PlaylistService {
   }
 
   /**
-   * Business logic method: Transform Dropbox playlist to local format
+   * Transform Dropbox playlist to local format
    */
   transformDropboxPlaylistToLocal(dropboxPlaylist: any, file?: DropboxFile): SavedPlaylist {
     return {
@@ -247,7 +247,7 @@ export class PlaylistService {
   }
 
   /**
-   * Business logic method: Create default sync settings
+   * Create default sync settings
    */
   getDefaultSyncSettings(): SyncSettings {
     return {
@@ -257,7 +257,7 @@ export class PlaylistService {
   }
 
   /**
-   * Business logic method: Create default sync status
+   * Create default sync status
    */
   getDefaultSyncStatus(): SyncStatus {
     return {
@@ -270,7 +270,7 @@ export class PlaylistService {
   }
 
   /**
-   * Business logic method: Validate playlist data before saving
+   * Validate playlist data before saving
    */
   validatePlaylistData(name: string, items: PlaylistItem[]): { valid: boolean; error?: string } {
     if (!name || !name.trim()) {
@@ -289,7 +289,7 @@ export class PlaylistService {
   }
 
   /**
-   * Business logic method: Create playlist item from file
+   * Create playlist item from file
    */
   createPlaylistItem(file: DropboxFile, displayName?: string): PlaylistItem {
     return {
@@ -299,7 +299,7 @@ export class PlaylistService {
   }
 
   /**
-   * Business logic method: Check if playlist is currently playing
+   * Check if playlist is currently playing
    */
   isPlaylistCurrentlyPlaying(playlistIndex: number, currentIndex: number, isPlaying: boolean): boolean {
     return isPlaying && currentIndex === playlistIndex;
