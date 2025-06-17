@@ -3,6 +3,7 @@ import { Observable, of, forkJoin, EMPTY, BehaviorSubject, from } from 'rxjs';
 import { map, catchError, tap, switchMap, finalize } from 'rxjs/operators';
 import { DropboxService, AuthState } from '@services/dropbox.service';
 import { NotificationService } from '@services/notification.service';
+import { FileUtilService } from '@services/file-util.service';
 import { PlaylistItem, SavedPlaylist, SyncStatus, SyncSettings, DropboxFile } from '@models/index';
 
 @Injectable({
@@ -31,7 +32,8 @@ export class PlaylistService {
 
   constructor(
     private dropboxService: DropboxService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private fileUtilService: FileUtilService
   ) {
     // Load sync settings
     this.loadSyncSettings();
@@ -68,13 +70,6 @@ export class PlaylistService {
   }
 
   /**
-   * Validate sync conditions for operations
-   */
-  validateSyncConditions(enabled: boolean, authenticated: boolean, online: boolean): boolean {
-    return enabled && authenticated && online;
-  }
-
-  /**
    * Merge local and remote playlists, resolving conflicts by preferring newer versions
    */
   mergePlaylists(localPlaylists: SavedPlaylist[], remotePlaylists: SavedPlaylist[]): SavedPlaylist[] {
@@ -107,25 +102,6 @@ export class PlaylistService {
       p.name.toLowerCase() === name.toLowerCase().trim() &&
       p.id !== excludeId
     );
-  }
-
-  /**
-   * Generate Dropbox-safe playlist path
-   */
-  generatePlaylistPath(name: string): string {
-    const sanitizedName = this.sanitizePlaylistName(name);
-    return `/playlists/${sanitizedName}.json`;
-  }
-
-  /**
-   * Sanitize playlist name for Dropbox storage
-   */
-  sanitizePlaylistName(name: string): string {
-    return name
-      .replace(/[<>:"/\\|?*\s]+/g, '_')  // Replace sequences of invalid chars + whitespace with single _
-      .replace(/^_+|_+$/g, '')           // Remove leading/trailing underscores
-      .substring(0, 255)
-      || 'Untitled';                     // Fallback for empty names
   }
 
   /**
@@ -209,64 +185,6 @@ export class PlaylistService {
 
     const playlist = this.getSavedPlaylists().find(p => p.id === playlistId);
     return playlist ? playlist.syncStatus !== 'synced' : false;
-  }
-   
-
-  /**
-   * Transform playlist to Dropbox format
-   */
-  transformPlaylistToDropboxFormat(playlist: SavedPlaylist): any {
-    return {
-      id: playlist.id,
-      name: playlist.name,
-      created: playlist.created.toISOString(),
-      lastModified: playlist.lastModified.toISOString(),
-      items: playlist.items.map(item => ({
-        path: item.file.path_display,
-        displayName: item.displayName
-      }))
-    };
-  }
-
-  /**
-   * Transform Dropbox playlist to local format
-   */
-  transformDropboxPlaylistToLocal(dropboxPlaylist: any, file?: DropboxFile): SavedPlaylist {
-    return {
-      id: dropboxPlaylist.id || this.generatePlaylistId(),
-      name: dropboxPlaylist.name,
-      created: new Date(dropboxPlaylist.created),
-      lastModified: new Date(dropboxPlaylist.lastModified),
-      syncStatus: 'synced',
-      dropboxRev: file?.rev,
-      items: dropboxPlaylist.items.map((item: any) => ({
-        file: { path_display: item.path },
-        displayName: item.displayName
-      }))
-    };
-  }
-
-  /**
-   * Create default sync settings
-   */
-  getDefaultSyncSettings(): SyncSettings {
-    return {
-      enabled: true,
-      autoSync: true
-    };
-  }
-
-  /**
-   * Create default sync status
-   */
-  getDefaultSyncStatus(): SyncStatus {
-    return {
-      isOnline: navigator.onLine,
-      isSyncing: false,
-      lastSync: null,
-      pendingUploads: 0,
-      error: null
-    };
   }
 
   /**
@@ -366,6 +284,40 @@ export class PlaylistService {
   }
 
   /**
+   * Transform playlist to Dropbox format
+   */
+  private transformPlaylistToDropboxFormat(playlist: SavedPlaylist): any {
+    return {
+      id: playlist.id,
+      name: playlist.name,
+      created: playlist.created.toISOString(),
+      lastModified: playlist.lastModified.toISOString(),
+      items: playlist.items.map(item => ({
+        path: item.file.path_display,
+        displayName: item.displayName
+      }))
+    };
+  }
+
+  /**
+   * Transform Dropbox playlist to local format
+   */
+  private transformDropboxPlaylistToLocal(dropboxPlaylist: any, file?: DropboxFile): SavedPlaylist {
+    return {
+      id: dropboxPlaylist.id || this.generatePlaylistId(),
+      name: dropboxPlaylist.name,
+      created: new Date(dropboxPlaylist.created),
+      lastModified: new Date(dropboxPlaylist.lastModified),
+      syncStatus: 'synced',
+      dropboxRev: file?.rev,
+      items: dropboxPlaylist.items.map((item: any) => ({
+        file: { path_display: item.path },
+        displayName: item.displayName
+      }))
+    };
+  }
+
+  /**
    * Save a playlist (local + cloud sync if enabled)
    */
   savePlaylist(name: string, items: PlaylistItem[], id?: string): Observable<SavedPlaylist> {
@@ -459,8 +411,7 @@ export class PlaylistService {
    * Sync a playlist to Dropbox
    */
   private syncPlaylistToDropbox(playlist: SavedPlaylist): Observable<SavedPlaylist> {
-
-    const playlistPath = this.generatePlaylistPath(playlist.name);
+    const playlistPath = this.fileUtilService.generatePlaylistPath(playlist.name);
     const dropboxPlaylist = this.transformPlaylistToDropboxFormat(playlist);
 
     return this.dropboxService.uploadFile(playlistPath, JSON.stringify(dropboxPlaylist, null, 2)).pipe(
@@ -491,7 +442,6 @@ export class PlaylistService {
       if (!stored) return [];
 
       const playlists = JSON.parse(stored) as SavedPlaylist[];
-
 
       return playlists.map(playlist => ({
         ...playlist,
@@ -537,7 +487,7 @@ export class PlaylistService {
 
       // Delete from Dropbox if synced and sync is enabled
       if (this.canSync() && playlist.syncStatus === 'synced') {
-        const playlistPath = this.generatePlaylistPath(playlist.name);
+        const playlistPath = this.fileUtilService.generatePlaylistPath(playlist.name);
         this.dropboxService.deleteFile(playlistPath).subscribe({
           next: () => {
             observer.next(true);
@@ -581,7 +531,7 @@ export class PlaylistService {
       if (this.canSync()) {
         // Delete old file and upload new one
         forkJoin([
-          this.dropboxService.deleteFile(this.generatePlaylistPath(oldName)),
+          this.dropboxService.deleteFile(this.fileUtilService.generatePlaylistPath(oldName)),
           this.syncPlaylistToDropbox(playlist)
         ]).subscribe({
           next: ([_, syncedPlaylist]: [void, SavedPlaylist]) => {
@@ -602,7 +552,6 @@ export class PlaylistService {
       }
     });
   }
-
 
   /**
    * Sync all playlists between local and Dropbox
@@ -635,12 +584,12 @@ export class PlaylistService {
                 const dropboxModified = new Date(dropboxPlaylist.lastModified);
                 const localModified = localPlaylist.lastModified;
 
-                if (dropboxModified > localModified) {                 
+                if (dropboxModified > localModified) {
                   return this.downloadPlaylistFromDropbox(file);
-                } else if (localModified > dropboxModified) {                  
+                } else if (localModified > dropboxModified) {
                   return this.syncPlaylistToDropbox(localPlaylist);
-                } else {                  
-                  return of(null); 
+                } else {
+                  return of(null);
                 }
               }
             }),
@@ -652,7 +601,7 @@ export class PlaylistService {
 
           syncOperations.push(operation);
         });
-               
+
         localPlaylists.forEach(playlist => {
           if (playlist.syncStatus !== 'synced') {
             // Check if this playlist matches any Dropbox file by name (quick check)
@@ -660,7 +609,7 @@ export class PlaylistService {
               file.name.replace('.json', '') === playlist.name
             );
 
-            if (!hasDropboxMatch) {             
+            if (!hasDropboxMatch) {
               syncOperations.push(this.syncPlaylistToDropbox(playlist));
             }
             // If there is a Dropbox match, it will be handled above
@@ -709,7 +658,7 @@ export class PlaylistService {
     // First try to match by ID (most reliable)
     if (dropboxPlaylist.id) {
       const matchById = localPlaylists.find(p => p.id === dropboxPlaylist.id);
-      if (matchById) {       
+      if (matchById) {
         return matchById;
       }
     }
@@ -725,7 +674,7 @@ export class PlaylistService {
     }
 
     return matchByName;
-  }  
+  }
 
   /**
    * Download a playlist from Dropbox
@@ -737,7 +686,7 @@ export class PlaylistService {
 
         const playlist = this.transformDropboxPlaylistToLocal(dropboxPlaylist, file);
 
-        this.updateLocalPlaylist(playlist);     
+        this.updateLocalPlaylist(playlist);
         return playlist;
       }),
       catchError((error: any) => {
