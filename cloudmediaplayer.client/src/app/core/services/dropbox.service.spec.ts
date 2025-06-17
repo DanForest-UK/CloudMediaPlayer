@@ -474,13 +474,19 @@ describe('DropboxService', () => {
 
     it('should collect audio files recursively', (done) => {
       const audioFiles = [
-        { id: 'song1', name: 'song1.mp3', path_display: '/music/song1.mp3', is_folder: false, '.tag': 'file' },
+        { id: 'song1', name: 'test.mp3', path_display: '/music/test.mp3', is_folder: false, '.tag': 'file' },
         { id: 'song2', name: 'song2.wav', path_display: '/music/song2.wav', is_folder: false, '.tag': 'file' }
       ];
 
+      // Mock the filterAudioFilesOnly to return the expected files
+      mockFileUtilsService.filterAudioFilesOnly.and.returnValue([
+        { id: 'song1', name: 'test.mp3', path_display: '/music/test.mp3', is_folder: false },
+        { id: 'song2', name: 'song2.wav', path_display: '/music/song2.wav', is_folder: false }
+      ]);
+
       service.collectAllAudioFilesRecursively('/music').subscribe(files => {
         expect(files.length).toBe(2);
-        expect(files[0].name).toBe('song1.mp3');
+        expect(files[0].name).toBe('test.mp3');
         expect(files[1].name).toBe('song2.wav');
         done();
       });
