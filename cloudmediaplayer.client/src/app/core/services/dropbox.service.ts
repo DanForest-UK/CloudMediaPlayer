@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of, Subject, forkJoin, from, EMPTY, BehaviorSubject, throwError } from 'rxjs';
 import { map, catchError, scan, mergeMap, concatMap, delay, retryWhen, take, tap, takeLast, finalize } from 'rxjs/operators';
 import { NotificationService } from '@services/notification.service';
+import { FileUtilService } from '@services/file-util.service';
 import { DropboxUser, AuthState, FolderScanProgress, DropboxFile } from '@models/index';
 
 // Export the interfaces that are used by other modules
@@ -25,11 +26,6 @@ export class DropboxService {
 
   // App folder paths
   private readonly PLAYLISTS_FOLDER = '/playlists';
-
-  // Supported audio extensions - single source of truth
-  public readonly audioExtensions = [
-    '.mp3', '.wav', '.ogg', '.m4a', '.flac', '.aac'
-  ];
 
   // Authentication state
   private accessToken: string | null = null;
@@ -61,38 +57,10 @@ export class DropboxService {
    */
   constructor(
     private http: HttpClient,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private fileUtil: FileUtilService
   ) {
     this.initializeAuth();
-  }
-
-  /**
-   * Get the full path for a playlist file
-   */
-  getPlaylistPath(playlistName: string): string {
-    const sanitizedName = this.sanitizeFileName(playlistName);
-    return `${this.PLAYLISTS_FOLDER}/${sanitizedName}.json`;
-  }
-
-  /**
-   * Sanitize filename for Dropbox
-   */
-  sanitizeFileName(name: string): string {
-    return name
-      .replace(/[<>:"/\\|?*\s]+/g, '_')
-      .replace(/^_+|_+$/g, '')
-      .substring(0, 255)
-      || 'Untitled';
-  }
-
-  /**
-   * Check if a file is an audio file based on its extension
-   */
-  isMediaFile(filename: string): boolean {
-    if (!filename) return false;
-
-    const extension = filename.substring(filename.lastIndexOf('.')).toLowerCase();
-    return this.audioExtensions.includes(extension);
   }
 
   /**
@@ -111,89 +79,10 @@ export class DropboxService {
   }
 
   /**
-   * Get OAuth error message for user display
-   */
-  getOAuthErrorMessage(error: string): string {
-    switch (error) {
-      case 'access_denied':
-        return 'You cancelled the authorization process. Please try again if you want to connect to Dropbox.';
-      case 'invalid_request':
-        return 'There was a problem with the authorization request. Please try again.';
-      case 'unsupported_response_type':
-        return 'This authorization method is not supported. Please contact support.';
-      default:
-        return `Authorization failed: ${error}. Please try again.`;
-    }
-  }
-
-  /**
    * Check if should use callback route 
    */
   shouldUseCallbackRoute(): boolean {
     return this.redirectUri.includes('/auth/callback');
-  }
-
-  /**
-   * Filter files audio files and folders
-   */
-  filterAudioFilesAndFolders(files: DropboxFile[]): DropboxFile[] {
-    return files.filter(file =>
-      file.is_folder || this.isMediaFile(file.name)
-    );
-  }
-
-  /**
-   * Filter only audio files
-   */
-  filterAudioFilesOnly(files: DropboxFile[]): DropboxFile[] {
-    return files.filter(file =>
-      !file.is_folder && this.isMediaFile(file.name)
-    );
-  }
-
-  /**
-   * Sort files with folders first, then alphabetically
-   */
-  sortFiles(files: DropboxFile[]): DropboxFile[] {
-    return files.sort((a, b) => {
-      if (a.is_folder === b.is_folder) {
-        return a.name.localeCompare(b.name);
-      }
-      return a.is_folder ? -1 : 1;
-    });
-  }
-
-  /**
-   * Generate breadcrumbs from path
-   */
-  generateBreadcrumbs(path: string): { name: string; path: string }[] {
-    if (path === '' || path === '/') {
-      return [{ name: 'Root', path: '/' }];
-    }
-
-    const parts = path.split('/').filter(p => p);
-    const breadcrumbs = [{ name: 'Root', path: '/' }];
-
-    let currentPath = '';
-    for (let i = 0; i < parts.length; i++) {
-      currentPath += '/' + parts[i];
-      breadcrumbs.push({
-        name: parts[i],
-        path: currentPath
-      });
-    }
-
-    return breadcrumbs;
-  }
-
-  /**
-   * Extract folder name from path for display
-   */
-  getDisplayNameFromPath(path: string): string {
-    if (!path) return '';
-
-    const pathParts = path.split('/').filter(p => p);
-    return pathParts.length > 0 ? pathParts[pathParts.length - 1] : 'Root';
   }
 
   /**
@@ -255,10 +144,6 @@ export class DropboxService {
       const codeChallenge = await this.generateCodeChallenge(codeVerifier);
 
       sessionStorage.setItem('pkce_code_verifier', codeVerifier);
-
-      if (this.shouldUseCallbackRoute()) {
-        sessionStorage.setItem('oauth_return_url', window.location.pathname + window.location.search);
-      }
 
       const authUrl = new URL('https://www.dropbox.com/oauth2/authorize');
       authUrl.searchParams.set('response_type', 'code');
@@ -339,15 +224,6 @@ export class DropboxService {
       this.updateAuthState({ error: 'Authentication failed: ' + (error as Error).message });
     }
     return false;
-  }
-
-  /**
-   * Get the return URL after OAuth (for callback route)
-   */
-  getOAuthReturnUrl(): string {
-    const returnUrl = sessionStorage.getItem('oauth_return_url');
-    sessionStorage.removeItem('oauth_return_url');
-    return returnUrl || '/';
   }
 
   /**
@@ -755,7 +631,7 @@ export class DropboxService {
               };
 
               if (mediaOnly) {
-                if (file.is_folder || this.isMediaFile(file.name)) {
+                if (file.is_folder || this.fileUtil.isAudioFile(file.name)) {
                   files.push(file);
                 }
               } else {
@@ -811,7 +687,7 @@ export class DropboxService {
 
       return this.listFolder(folderPath, false).pipe(
         mergeMap((files: DropboxFile[]) => {
-          const audioFiles = this.filterAudioFilesOnly(files);
+          const audioFiles = this.fileUtil.filterAudioFilesOnly(files);
           const subfolders = files.filter(file => file.is_folder);
 
           totalAudioFiles += audioFiles.length;
