@@ -2,18 +2,16 @@ import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { DropboxService } from '@services/dropbox.service';
 import { NotificationService } from '@services/notification.service';
+import { FileUtilService } from '@services/file-util.service';
 import { DropboxFile, FolderScanProgress } from '@models/index';
 import { Subscription } from 'rxjs';
-
 
 /**
  * FileBrowserComponent - Handles browsing Dropbox files and folders
  * 
- * This component manages:
  * - File/folder navigation with breadcrumbs
- * - Loading states
  * - File selection and folder enqueueing
- * - Progress tracking for folder scanning
+ * - Progress tracking, sorting, filtering..
  */
 @Component({
   selector: 'app-file-browser',
@@ -22,7 +20,6 @@ import { Subscription } from 'rxjs';
   standalone: true,
   imports: [CommonModule]
 })
-
 export class FileBrowserComponent implements OnInit, OnDestroy {
   @Output() fileSelected = new EventEmitter<DropboxFile>();
   @Output() folderEnqueueRequested = new EventEmitter<DropboxFile>();
@@ -51,7 +48,8 @@ export class FileBrowserComponent implements OnInit, OnDestroy {
 
   constructor(
     private dropboxService: DropboxService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private fileUtilService: FileUtilService,
   ) { }
 
   ngOnInit(): void {
@@ -71,28 +69,10 @@ export class FileBrowserComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadFiles(path: string): void {
-    this.isLoading = true;
-    this.currentPath = path;
-    this.updateBreadcrumbs(path);
-
-    console.log(`Loading files from path: ${path}`);
-
-    this.dropboxService.listFolder(path, true).subscribe({
-      next: (files) => {
-        console.log(`Received ${files.length} files from Dropbox for path: ${path}`);
-        this.files = this.sortFiles(files);
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error loading files:', error);
-        this.notificationService.showError('Error loading folder contents');
-        this.isLoading = false;
-      }
-    });
-  }
-
-  sortFiles(files: DropboxFile[]): DropboxFile[] {
+  /**
+   * Sort files with folders first, then alphabetically
+   */
+  private sortFiles(files: DropboxFile[]): DropboxFile[] {
     return files.sort((a, b) => {
       if (a.is_folder === b.is_folder) {
         return a.name.localeCompare(b.name);
@@ -101,23 +81,163 @@ export class FileBrowserComponent implements OnInit, OnDestroy {
     });
   }
 
-  updateBreadcrumbs(path: string): void {
+  /**
+   * Filter files to show only audio files and folders
+   */
+  private filterAudioFilesAndFolders(files: DropboxFile[]): DropboxFile[] {
+    return files.filter(file =>
+      file.is_folder || this.fileUtilService.isAudioFile(file.name)
+    );
+  }
+
+  /**
+   * Generate breadcrumbs from path
+   */
+  private generateBreadcrumbs(path: string): { name: string; path: string }[] {
     if (path === '' || path === '/') {
-      this.breadcrumbs = [{ name: 'Root', path: '/' }];
-      return;
+      return [{ name: 'Root', path: '/' }];
     }
 
     const parts = path.split('/').filter(p => p);
-    this.breadcrumbs = [{ name: 'Root', path: '/' }];
+    const breadcrumbs = [{ name: 'Root', path: '/' }];
 
     let currentPath = '';
     for (let i = 0; i < parts.length; i++) {
       currentPath += '/' + parts[i];
-      this.breadcrumbs.push({
+      breadcrumbs.push({
         name: parts[i],
         path: currentPath
       });
     }
+
+    return breadcrumbs;
+  }
+
+  /**
+   * Update breadcrumbs based on current path
+   */
+  private updateBreadcrumbs(path: string): void {
+    this.breadcrumbs = this.generateBreadcrumbs(path);
+  }
+
+  /**
+   * Extract folder name from path for display
+   */
+  private getDisplayNameFromPath(path: string): string {
+    if (!path) return '';
+
+    const pathParts = path.split('/').filter(p => p);
+    return pathParts.length > 0 ? pathParts[pathParts.length - 1] : 'Root';
+  }
+
+  /**
+   * Get display name for scan path
+   */
+  getScanPathDisplayName(): string {
+    return this.getDisplayNameFromPath(this.scanProgress.currentPath);
+  }
+
+  /**
+   * Check if a specific folder is being scanned
+   */
+  isThisFolderBeingScanned(folderPath: string): boolean {
+    return this.currentlyScannedFolder === folderPath && this.scanProgress.isScanning;
+  }
+
+  /**
+   * Check if a folder is currently being enqueued
+   */
+  isFolderBeingEnqueued(folderPath: string): boolean {
+    return this.enqueuingFolders.has(folderPath);
+  }
+
+  /**
+   * Normalize path for consistency
+   */
+  private normalizePath(path: string): string {
+    if (path === '/') {
+      return '';
+    }
+    return path;
+  }
+
+  /**
+   * Validate file for selection
+   */
+  canSelectFile(file: DropboxFile): boolean {
+    return !file.is_folder && this.fileUtilService.isAudioFile(file.name);
+  }
+
+  /**
+   * Validate folder for enqueueing
+   */
+  canEnqueueFolder(file: DropboxFile): boolean {
+    return file.is_folder;
+  }
+
+  /**
+   * Get file type icon
+   */
+  getFileIcon(file: DropboxFile): string {
+    if (file.is_folder) {
+      return '📁';
+    } else if (this.fileUtilService.isAudioFile(file.name)) {
+      return '🎵';
+    } else {
+      return '📄';
+    }
+  }
+
+  /**
+   * Get file CSS classes based on type
+   */
+  getFileClasses(file: DropboxFile): string[] {
+    const classes: string[] = ['file-item'];
+
+    if (file.is_folder) {
+      classes.push('folder-item');
+    } else if (this.fileUtilService.isAudioFile(file.name)) {
+      classes.push('audio-item');
+    }
+
+    return classes;
+  }
+
+  /**
+   * Check if breadcrumb is the current one
+   */
+  isBreadcrumbCurrent(index: number): boolean {
+    return index === this.breadcrumbs.length - 1;
+  }
+
+  /**
+   * Process and filter files for display
+   */
+  private processFilesForDisplay(files: DropboxFile[]): DropboxFile[] {
+    // First filter to only show relevant files
+    const filtered = this.filterAudioFilesAndFolders(files);
+    // Then sort them
+    return this.sortFiles(filtered);
+  }
+
+  /**
+   * Loads files from a path
+   */
+  loadFiles(path: string): void {
+    this.isLoading = true;
+    this.currentPath = this.normalizePath(path);
+    this.updateBreadcrumbs(path);
+
+    this.dropboxService.listFolder(path, true).subscribe({
+      next: (files) => {
+        this.files = this.processFilesForDisplay(files);
+        this.isLoading = false;
+      },
+      error: (error) => {
+        this.notificationService.showError('Error loading folder contents');
+        this.isLoading = false;
+      }
+    });
   }
 
   navigateTo(path: string): void {
@@ -127,21 +247,26 @@ export class FileBrowserComponent implements OnInit, OnDestroy {
   openItem(file: DropboxFile): void {
     if (file.is_folder) {
       this.loadFiles(file.path_display);
-    } else if (this.isAudioFile(file.name)) {
+    } else if (this.canSelectFile(file)) {
       this.fileSelected.emit(file);
     }
   }
 
   /**
-   * Requests to enqueue all audio files from a folder
-   * @param folder The folder to enqueue all files from
-   * @param event The click event
+   * Check if file is audio using service
    */
+  isAudioFile(filename: string): boolean {
+    return this.fileUtilService.isAudioFile(filename);
+  }
+
+  /**
+   * Requests to enqueue all audio files from a folder
+  */
   enqueueAllFromFolder(folder: DropboxFile, event: Event): void {
     // Prevent the folder from being opened when clicking the enqueue button
     event.stopPropagation();
 
-    if (!folder.is_folder) {
+    if (!this.canEnqueueFolder(folder)) {
       return;
     }
 
@@ -159,38 +284,5 @@ export class FileBrowserComponent implements OnInit, OnDestroy {
     if (this.currentlyScannedFolder === folderPath) {
       this.currentlyScannedFolder = '';
     }
-  }
-
-  /**
-   * Checks if a specific folder is the one currently being scanned
-   * @param folderPath The path of the folder to check
-   * @returns True if this folder is currently being scanned, false otherwise
-   */
-  isThisFolderBeingScanned(folderPath: string): boolean {
-    return this.currentlyScannedFolder === folderPath && this.scanProgress.isScanning;
-  }
-
-  /**
-   * Gets the display name for the current scan path
-   */
-  getScanPathDisplayName(): string {
-    if (!this.scanProgress.currentPath) {
-      return '';
-    }
-
-    // Extract just the folder name from the full path
-    const pathParts = this.scanProgress.currentPath.split('/').filter(p => p);
-    return pathParts.length > 0 ? pathParts[pathParts.length - 1] : 'Root';
-  }
-
-  isAudioFile(filename: string): boolean {
-    if (!filename) return false;
-
-    const audioExtensions = [
-      '.mp3', '.wav', '.ogg', '.m4a', '.flac', '.aac'
-    ];
-
-    const extension = filename.substring(filename.lastIndexOf('.')).toLowerCase();
-    return audioExtensions.includes(extension);
   }
 }

@@ -19,7 +19,7 @@
   <!-- Breadcrumbs -->
   <div class="breadcrumbs">
     <span *ngFor="let crumb of breadcrumbs; let last = last">
-      <a (click)="navigateTo(crumb.path)" [class.active]="last">{{crumb.name}}</a>
+      <a (click)="loadFiles(crumb.path)" [class.active]="last">{{crumb.name}}</a>
       <span *ngIf="!last"> / </span>
     </span>
   </div>
