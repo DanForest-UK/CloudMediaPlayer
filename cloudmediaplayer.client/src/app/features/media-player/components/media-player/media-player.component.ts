@@ -85,41 +85,214 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
   private hasInitialSyncCompleted = false;
 
   /**
-   * Perform initial sync when app starts or user authenticates
+   * Check if should perform initial sync based on connection status and sync state
    */
-  private performInitialSync(): void {
-    if (this.hasInitialSyncCompleted) return;
+  shouldPerformInitialSync(): boolean {
+    return !this.hasInitialSyncCompleted && navigator.onLine;
+  }
 
-    if (navigator.onLine) {
-      console.log('Performing initial playlist sync...');
-      this.playlistService.syncPlaylists().subscribe({
-        next: () => {
-          console.log('Initial sync completed successfully');
-          this.loadSavedPlaylists(); // Refresh the UI with synced playlists
-          this.notificationService.showSuccess('Playlists synced with Dropbox');
-          this.hasInitialSyncCompleted = true;
-        },
-        error: (error: any) => {
-          console.error('Initial sync failed:', error);
-          this.notificationService.showError('Error syncing playlists with Dropbox');
-          this.hasInitialSyncCompleted = true; // Don't retry automatically
-        }
-      });
+  /**
+   * Create playlist item from file using the playlist service
+   */
+  createPlaylistItemFromFile(file: DropboxFile): PlaylistItem {
+    return this.playlistService.createPlaylistItem(file, file.name);
+  }
+
+  /**
+   * Check if should auto-play based on current playback state
+   * Auto-play happens when not currently playing and no track is selected
+   */
+  shouldAutoPlay(): boolean {
+    return !this.isPlaying && this.currentPlaylistIndex === -1;
+  }
+
+  /**
+   * Validate playlist save conditions and return validation result
+   */
+  validatePlaylistSave(): { canSave: boolean; error?: string } {
+    if (this.playlist.length === 0) {
+      return { canSave: false, error: 'Cannot save an empty playlist' };
+    }
+    return { canSave: true };
+  }
+
+  /**
+   * Get playlist name for save operation, prompting user if needed
+   */
+  getPlaylistNameForSave(): string | null {
+    let name = this.currentPlaylistName;
+
+    // If it's a new playlist or default name, prompt for name
+    if (!this.currentPlaylistId || name === 'New Playlist' || name === 'Restored Session') {
+      name = prompt('Enter playlist name:', name) || name;
+      if (!name.trim()) return null;
+    }
+
+    return name;
+  }
+
+  /**
+   * Check for playlist name conflicts with existing playlists
+   */
+  hasPlaylistNameConflict(name: string): boolean {
+    return this.playlistService.playlistNameExists(name, this.currentPlaylistId || undefined);
+  }
+
+  /**
+   * Confirm playlist name conflict resolution with user
+   */
+  confirmNameConflictResolution(name: string): boolean {
+    return confirm(`A playlist named "${name}" already exists. Overwrite it?`);
+  }
+
+  /**
+   * Get appropriate save notification message based on sync status
+   */
+  getSaveNotificationMessage(name: string, wasSynced: boolean): string {
+    if (wasSynced) {
+      return `Playlist "${name}" saved and synced to Dropbox`;
     } else {
-      console.log('App is offline, skipping initial sync');
-      this.hasInitialSyncCompleted = true;
+      return `Playlist "${name}" saved locally`;
     }
   }
 
   /**
-   * Load all saved playlists from storage
+   * Handle playlist removal during playback with proper index management
+   */
+  handlePlaylistItemRemoval(index: number): void {
+    if (index < 0 || index >= this.playlist.length) {
+      return;
+    }
+
+    // If we're removing the currently playing song
+    if (index === this.currentPlaylistIndex) {
+      this.playlist.splice(index, 1);
+
+      // If there are more songs in the playlist
+      if (this.playlist.length > 0) {
+        // If we removed the last song, go to the previous one
+        if (this.currentPlaylistIndex >= this.playlist.length) {
+          this.currentPlaylistIndex = this.playlist.length - 1;
+        }
+        // Play the song at the current position (next song, or last if we were at the end)
+        this.playPlaylistItem(this.currentPlaylistIndex);
+      } else {
+        // No more songs in playlist
+        this.stopMedia();
+        this.currentPlaylistIndex = -1;
+      }
+    } else {
+      // Remove the song
+      this.playlist.splice(index, 1);
+
+      // Adjust current index if we removed a song before the currently playing one
+      if (index < this.currentPlaylistIndex) {
+        this.currentPlaylistIndex--;
+      }
+    }
+
+    this.saveCurrentPlaylistState();
+  }
+
+  /**
+   * Shuffle playlist 
+   */
+  shufflePlaylistItems(): void {
+    if (this.playlist.length <= 1) {
+      return;
+    }
+
+    // Fisher-yates shuffle
+    for (let i = this.playlist.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [this.playlist[i], this.playlist[j]] = [this.playlist[j], this.playlist[i]];
+    }
+  }
+
+  /**
+   * Reconstruct file object from playlist item for synced playlists that may only have paths
+   */
+  reconstructFileFromPlaylistItem(item: PlaylistItem): PlaylistItem {
+    // If the item only has a path (from Dropbox), reconstruct the file object
+    if (!item.file.name && item.file.path_display) {
+      const pathParts = item.file.path_display.split('/');
+      const fileName = pathParts[pathParts.length - 1];
+      return {
+        ...item,
+        file: {
+          ...item.file,
+          name: fileName,
+          id: item.file.path_display, // Use path as ID
+          is_folder: false
+        }
+      };
+    }
+    return item;
+  }
+
+  /**
+   * Get appropriate load success notification message based on item count
+   */
+  getLoadSuccessMessage(playlistName: string, itemCount: number): string {
+    if (itemCount > 0) {
+      return `Loaded playlist "${playlistName}" with ${itemCount} songs`;
+    } else {
+      return `Loaded empty playlist "${playlistName}"`;
+    }
+  }
+
+  /**
+   * Check if can navigate to previous track in playlist
+   */
+  canNavigateToPrevious(): boolean {
+    return this.currentPlaylistIndex > 0;
+  }
+
+  /**
+   * Check if can navigate to next track in playlist
+   */
+  canNavigateToNext(): boolean {
+    return this.currentPlaylistIndex < this.playlist.length - 1;
+  }
+
+  /**
+   * Check if should stop playback at end of playlist
+   */
+  shouldStopAtPlaylistEnd(): boolean {
+    return this.currentPlaylistIndex >= this.playlist.length - 1;
+  }
+
+  /**
+   * Perform initial sync when app starts or user authenticates
+   */
+  private performInitialSync(): void {
+    if (this.hasInitialSyncCompleted || !this.shouldPerformInitialSync()) return;
+
+    console.log('Performing initial playlist sync...');
+    this.playlistService.syncPlaylists().subscribe({
+      next: () => {
+        console.log('Initial sync completed successfully');
+        this.loadSavedPlaylists(); // Refresh the UI with synced playlists
+        this.notificationService.showSuccess('Playlists synced with Dropbox');
+        this.hasInitialSyncCompleted = true;
+      },
+      error: (error: any) => {
+        console.error('Initial sync failed:', error);
+        this.notificationService.showError('Error syncing playlists with Dropbox');
+        this.hasInitialSyncCompleted = true; // Don't retry automatically
+      }
+    });
+  }
+
+  /**
+   * Load all saved playlists from storage and update UI
    */
   private loadSavedPlaylists(): void {
     this.savedPlaylists = this.playlistService.getSavedPlaylists();
   }
 
   /**
-   * Restore the last current playlist state
+   * Restore the last current playlist state from previous session
    */
   private restoreCurrentPlaylist(): void {
     const restored = this.playlistService.loadCurrentPlaylist();
@@ -131,14 +304,14 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Save current playlist state for auto-restore
+   * Save current playlist state for auto-restore in next session
    */
   private saveCurrentPlaylistState(): void {
     this.playlistService.saveCurrentPlaylist(this.playlist, this.currentPlaylistIndex);
   }
 
   /**
-   * Get current playlist item by index
+   * Get current playlist item by index, returns null if invalid
    */
   get currentPlaylistItem(): PlaylistItem | null {
     if (this.currentPlaylistIndex >= 0 && this.currentPlaylistIndex < this.playlist.length) {
@@ -158,14 +331,14 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
    * Check if we can play the previous track
    */
   get canPlayPrevious(): boolean {
-    return this.currentPlaylistIndex > 0;
+    return this.canNavigateToPrevious();
   }
 
   /**
    * Check if we can play the next track
    */
   get canPlayNext(): boolean {
-    return this.currentPlaylistIndex < this.playlist.length - 1;
+    return this.canNavigateToNext();
   }
 
   /**
@@ -209,15 +382,14 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
   private enqueueAllFromFolder(folder: DropboxFile): void {
     this.dropboxService.collectAllAudioFilesRecursively(folder.path_display).subscribe(
       audioFiles => {
-        const playlistItems: PlaylistItem[] = audioFiles.map(file => ({
-          file: file,
-          displayName: `${file.name}`
-        }));
+        const playlistItems: PlaylistItem[] = audioFiles.map(file =>
+          this.createPlaylistItemFromFile(file)
+        );
 
         this.playlist.push(...playlistItems);
         this.saveCurrentPlaylistState();
 
-        if (!this.isPlaying && playlistItems.length > 0 && this.currentPlaylistIndex === -1) {
+        if (this.shouldAutoPlay() && playlistItems.length > 0) {
           this.playPlaylistItem(0);
         }
 
@@ -239,19 +411,16 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Adds a song to the playlist 
+   * Adds a song to the playlist with auto-play logic
    */
   private addToPlaylist(file: DropboxFile): void {
-    const playlistItem: PlaylistItem = {
-      file: file,
-      displayName: `${file.name}`
-    };
+    const playlistItem = this.createPlaylistItemFromFile(file);
 
     this.playlist.push(playlistItem);
     this.saveCurrentPlaylistState();
 
-    // Play if playlist was empty
-    if (!this.isPlaying && this.playlist.length === 1) {
+    // Play if playlist was empty and should auto-play
+    if (this.shouldAutoPlay()) {
       this.playPlaylistItem(0);
     }
 
@@ -269,7 +438,7 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
    * Handle remove item request from PlaylistComponent
    */
   onRemoveItemRequested(index: number): void {
-    this.removeFromPlaylist(index);
+    this.handlePlaylistItemRemoval(index);
   }
 
   /**
@@ -368,7 +537,7 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Plays a specific item from the playlist
+   * Plays a specific item from the playlist by index
    */
   private playPlaylistItem(index: number): void {
     if (index < 0 || index >= this.playlist.length) {
@@ -381,10 +550,10 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Plays the next song in the playlist
+   * Plays the next song in the playlist or stops if at end
    */
   private playNext(): void {
-    if (this.currentPlaylistIndex < this.playlist.length - 1) {
+    if (this.canNavigateToNext()) {
       this.playPlaylistItem(this.currentPlaylistIndex + 1);
     } else {
       this.stopMedia();
@@ -392,56 +561,18 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Plays the previous song in the playlist
+   * Plays the previous song in the playlist if available
    */
   private playPrevious(): void {
-    if (this.currentPlaylistIndex > 0) {
+    if (this.canNavigateToPrevious()) {
       this.playPlaylistItem(this.currentPlaylistIndex - 1);
     }
   }
 
   /**
-   * Removes an item from the playlist
-   */
-  private removeFromPlaylist(index: number): void {
-    if (index < 0 || index >= this.playlist.length) {
-      return;
-    }
-    // If we're removing the currently playing song
-    if (index === this.currentPlaylistIndex) {
-      this.playlist.splice(index, 1);
-
-      // If there are more songs in the playlist
-      if (this.playlist.length > 0) {
-        // If we removed the last song, go to the previous one
-        if (this.currentPlaylistIndex >= this.playlist.length) {
-          this.currentPlaylistIndex = this.playlist.length - 1;
-        }
-        // Play the song at the current position (next song, or last if we were at the end)
-        this.playPlaylistItem(this.currentPlaylistIndex);
-      } else {
-        // No more songs in playlist
-        this.stopMedia();
-        this.currentPlaylistIndex = -1;
-      }
-    } else {
-      // Remove the song
-      this.playlist.splice(index, 1);
-
-      // Adjust current index if we removed a song before the currently playing one
-      if (index < this.currentPlaylistIndex) {
-        this.currentPlaylistIndex--;
-      }
-    }
-
-    this.saveCurrentPlaylistState();
-  }
-
-  /**
-   * Clears the entire playlist
+   * Clears the entire playlist and resets state
    */
   private clearPlaylist(): void {
-
     this.playlist = [];
     this.currentPlaylistIndex = -1;
     this.currentPlaylistId = null;
@@ -451,25 +582,16 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Shuffles the playlist 
+   * Shuffles the playlist and starts playing from beginning
    */
   private shufflePlaylist(): void {
-    if (this.playlist.length <= 1) {
-      return;
-    }
-
-    // Randomise
-    for (let i = this.playlist.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [this.playlist[i], this.playlist[j]] = [this.playlist[j], this.playlist[i]];
-    }
-
+    this.shufflePlaylistItems();
     this.playPlaylistItem(0);
     this.saveCurrentPlaylistState();
   }
 
   /**
-   * Create a new empty playlist
+   * Create a new empty playlist and reset state
    */
   private createNewPlaylist(): void {
     this.clearPlaylist();
@@ -478,25 +600,21 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Save the current playlist (with Dropbox sync if enabled)
+   * Save the current playlist with Dropbox sync if enabled
    */
   private saveCurrentPlaylist(): void {
-    if (this.playlist.length === 0) {
-      this.notificationService.showError('Cannot save an empty playlist');
+    const validation = this.validatePlaylistSave();
+    if (!validation.canSave) {
+      this.notificationService.showError(validation.error!);
       return;
     }
 
-    let name = this.currentPlaylistName;
-
-    // If it's a new playlist or default name, prompt for name
-    if (!this.currentPlaylistId || name === 'New Playlist' || name === 'Restored Session') {
-      name = prompt('Enter playlist name:', name) || name;
-      if (!name.trim()) return;
-    }
+    const name = this.getPlaylistNameForSave();
+    if (!name) return;
 
     // Check for name conflicts (excluding current playlist)
-    if (this.playlistService.playlistNameExists(name, this.currentPlaylistId || undefined)) {
-      if (!confirm(`A playlist named "${name}" already exists. Overwrite it?`)) {
+    if (this.hasPlaylistNameConflict(name)) {
+      if (!this.confirmNameConflictResolution(name)) {
         return;
       }
     }
@@ -508,11 +626,8 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
         this.currentPlaylistName = savedPlaylist.name;
         this.loadSavedPlaylists();
 
-        if (savedPlaylist.syncStatus === 'synced') {
-          this.notificationService.showSuccess(`Playlist "${name}" saved and synced to Dropbox`);
-        } else {
-          this.notificationService.showSuccess(`Playlist "${name}" saved locally`);
-        }
+        const message = this.getSaveNotificationMessage(name, savedPlaylist.syncStatus === 'synced');
+        this.notificationService.showSuccess(message);
       },
       error: (error: any) => {
         console.error('Error saving playlist:', error);
@@ -522,11 +637,12 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Save the current playlist as a new playlist
+   * Save the current playlist as a new playlist with different name/ID
    */
   private saveCurrentPlaylistAs(): void {
-    if (this.playlist.length === 0) {
-      this.notificationService.showError('Cannot save an empty playlist');
+    const validation = this.validatePlaylistSave();
+    if (!validation.canSave) {
+      this.notificationService.showError(validation.error!);
       return;
     }
 
@@ -535,7 +651,7 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
 
     // Check for name conflicts
     if (this.playlistService.playlistNameExists(name)) {
-      if (!confirm(`A playlist named "${name}" already exists. Overwrite it?`)) {
+      if (!this.confirmNameConflictResolution(name)) {
         return;
       }
     }
@@ -546,7 +662,6 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
         this.currentPlaylistId = savedPlaylist.id;
         this.currentPlaylistName = savedPlaylist.name;
         this.loadSavedPlaylists();
-
       },
       error: (error: any) => {
         console.error('Error saving playlist:', error);
@@ -556,7 +671,7 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Load a saved playlist
+   * Load a saved playlist by ID and start playback
    */
   private loadPlaylist(playlistId: string): void {
     const savedPlaylist = this.playlistService.loadPlaylist(playlistId);
@@ -569,23 +684,7 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
     this.stopMedia();
 
     // Load the playlist - note that items from Dropbox might only have paths
-    this.playlist = savedPlaylist.items.map(item => {
-      // If the item only has a path (from Dropbox), reconstruct the file object
-      if (!item.file.name && item.file.path_display) {
-        const pathParts = item.file.path_display.split('/');
-        const fileName = pathParts[pathParts.length - 1];
-        return {
-          ...item,
-          file: {
-            ...item.file,
-            name: fileName,
-            id: item.file.path_display, // Use path as ID
-            is_folder: false
-          }
-        };
-      }
-      return item;
-    });
+    this.playlist = savedPlaylist.items.map(item => this.reconstructFileFromPlaylistItem(item));
 
     this.currentPlaylistId = savedPlaylist.id;
     this.currentPlaylistName = savedPlaylist.name;
@@ -596,14 +695,14 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
     // Auto-start playback if the playlist has songs
     if (this.playlist.length > 0) {
       this.playPlaylistItem(0);
-      this.notificationService.showSuccess(`Loaded playlist "${savedPlaylist.name}" with ${this.playlist.length} songs`);
-    } else {
-      this.notificationService.showSuccess(`Loaded empty playlist "${savedPlaylist.name}"`);
     }
+
+    const message = this.getLoadSuccessMessage(savedPlaylist.name, this.playlist.length);
+    this.notificationService.showSuccess(message);
   }
 
   /**
-   * Delete a saved playlist (with Dropbox sync if enabled)
+   * Delete a saved playlist with Dropbox sync if enabled
    */
   private deletePlaylist(playlistId: string): void {
     const playlist = this.savedPlaylists.find(p => p.id === playlistId);
@@ -630,7 +729,7 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Rename a saved playlist (with Dropbox sync if enabled)
+   * Rename a saved playlist with Dropbox sync if enabled
    */
   private renamePlaylist(playlistId: string, newName: string): void {
     if (this.playlistService.playlistNameExists(newName, playlistId)) {
@@ -657,7 +756,7 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Force sync a specific playlist
+   * Force sync a specific playlist to Dropbox
    */
   private forceSyncPlaylist(playlistId: string): void {
     this.playlistService.forceSyncPlaylist(playlistId).subscribe({
@@ -678,7 +777,7 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Plays media from a Dropbox file
+   * Plays media from a Dropbox file by getting temporary link
    */
   private playMedia(file: DropboxFile): void {
     this.isLoading = true;
@@ -701,7 +800,7 @@ export class MediaPlayerComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Stops media playback
+   * Stops media playback and clears media URL
    */
   private stopMedia(): void {
     this.isPlaying = false;
