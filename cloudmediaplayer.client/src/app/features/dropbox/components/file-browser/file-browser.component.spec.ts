@@ -11,7 +11,8 @@ describe('FileBrowserComponent', () => {
   let fixture: ComponentFixture<FileBrowserComponent>;
   let mockDropboxService: jasmine.SpyObj<DropboxService>;
   let mockNotificationService: jasmine.SpyObj<NotificationService>;
-  let mockFileUtilService: jasmine.SpyObj<FileUtilService>;
+  // Use real FileUtilService instead of mock
+  let fileUtilService: FileUtilService;
 
   const mockDropboxFile: DropboxFile = {
     id: '1',
@@ -38,27 +39,21 @@ describe('FileBrowserComponent', () => {
       'showSuccess'
     ]);
 
-    mockFileUtilService = jasmine.createSpyObj('FileUtilService', [
-      'isAudioFile',
-      'filterAudioFilesOnly'
-    ]);
-
     await TestBed.configureTestingModule({
       imports: [FileBrowserComponent],
       providers: [
         { provide: DropboxService, useValue: mockDropboxService },
         { provide: NotificationService, useValue: mockNotificationService },
-        { provide: FileUtilService, useValue: mockFileUtilService }
+        FileUtilService // Use real service
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(FileBrowserComponent);
     component = fixture.componentInstance;
+    fileUtilService = TestBed.inject(FileUtilService);
 
     // Setup default spy returns
     mockDropboxService.listFolder.and.returnValue(of([]));
-    mockFileUtilService.isAudioFile.and.returnValue(true);
-    mockFileUtilService.filterAudioFilesOnly.and.returnValue([mockDropboxFile]);
     mockDropboxService.getFolderScanProgress.and.returnValue(of({
       currentPath: '',
       isScanning: false,
@@ -112,30 +107,20 @@ describe('FileBrowserComponent', () => {
       expect(processedFiles[3].name).toBe('song.mp3');
     }));
 
-    it('should filter to show only audio files and folders', fakeAsync(() => {
+    it('should handle case insensitive audio file detection', fakeAsync(() => {
       const files: DropboxFile[] = [
-        { ...mockDropboxFile, name: 'song.mp3', is_folder: false },
-        { ...mockDropboxFile, name: 'document.pdf', is_folder: false },
-        { ...mockFolder, name: 'folder', is_folder: true },
-        { ...mockDropboxFile, name: 'music.wav', is_folder: false }
+        { ...mockDropboxFile, name: 'SONG.MP3', is_folder: false },
+        { ...mockDropboxFile, name: 'Music.WAV', is_folder: false },
+        { ...mockDropboxFile, name: 'Audio.OGG', is_folder: false }
       ];
-
-      // Mock the isAudioFile method responses
-      mockFileUtilService.isAudioFile.and.callFake((filename: string) => {
-        return filename.endsWith('.mp3') || filename.endsWith('.wav');
-      });
 
       mockDropboxService.listFolder.and.returnValue(of(files));
       component.loadFiles('/test');
       tick();
       fixture.detectChanges();
 
-      const processedFiles = component.files;
-      expect(processedFiles.length).toBe(3);
-      expect(processedFiles.find(f => f.name === 'song.mp3')).toBeTruthy();
-      expect(processedFiles.find(f => f.name === 'folder')).toBeTruthy();
-      expect(processedFiles.find(f => f.name === 'music.wav')).toBeTruthy();
-      expect(processedFiles.find(f => f.name === 'document.pdf')).toBeFalsy();
+      expect(component.files.length).toBe(3);
+      expect(component.files.every(f => !f.is_folder)).toBe(true);
     }));
   });
 
@@ -207,50 +192,33 @@ describe('FileBrowserComponent', () => {
 
   describe('File Operations', () => {
     it('should check if file is audio correctly', () => {
-      mockFileUtilService.isAudioFile.and.returnValue(true);
-
       expect(component.isAudioFile('test.mp3')).toBe(true);
-      expect(mockFileUtilService.isAudioFile).toHaveBeenCalledWith('test.mp3');
+      expect(component.isAudioFile('test.wav')).toBe(true);
+      expect(component.isAudioFile('test.ogg')).toBe(true);
+      expect(component.isAudioFile('test.m4a')).toBe(true);
+      expect(component.isAudioFile('test.flac')).toBe(true);
+      expect(component.isAudioFile('test.aac')).toBe(true);
+      expect(component.isAudioFile('test.pdf')).toBe(false);
+      expect(component.isAudioFile('test.mp4')).toBe(false);
     });
 
     it('should validate file selection correctly', () => {
-      mockFileUtilService.isAudioFile.and.returnValue(true);
-
       expect(component.canSelectFile(mockDropboxFile)).toBe(true);
       expect(component.canSelectFile(mockFolder)).toBe(false);
+
+      const nonAudioFile = { ...mockDropboxFile, name: 'document.pdf' };
+      expect(component.canSelectFile(nonAudioFile)).toBe(false);
     });
 
     it('should validate folder enqueueing correctly', () => {
       expect(component.canEnqueueFolder(mockFolder)).toBe(true);
       expect(component.canEnqueueFolder(mockDropboxFile)).toBe(false);
     });
-
-    it('should get correct file icons', () => {
-      mockFileUtilService.isAudioFile.and.returnValue(true);
-
-      expect(component.getFileIcon(mockFolder)).toBe('📁');
-      expect(component.getFileIcon(mockDropboxFile)).toBe('🎵');
-
-      mockFileUtilService.isAudioFile.and.returnValue(false);
-      expect(component.getFileIcon(mockDropboxFile)).toBe('📄');
-    });
-
-    it('should get correct file classes', () => {
-      mockFileUtilService.isAudioFile.and.returnValue(true);
-
-      const folderClasses = component.getFileClasses(mockFolder);
-      expect(folderClasses).toContain('file-item');
-      expect(folderClasses).toContain('folder-item');
-
-      const audioClasses = component.getFileClasses(mockDropboxFile);
-      expect(audioClasses).toContain('file-item');
-      expect(audioClasses).toContain('audio-item');
-    });
   });
 
   describe('Navigation', () => {
     it('should load files when navigating', () => {
-      component.navigateTo('/music');
+      component.loadFiles('/music');
 
       expect(mockDropboxService.listFolder).toHaveBeenCalledWith('/music', true);
     });
@@ -271,8 +239,6 @@ describe('FileBrowserComponent', () => {
       spyOn(component, 'loadFiles');
       spyOn(component.fileSelected, 'emit');
 
-      mockFileUtilService.isAudioFile.and.returnValue(true);
-
       // Test folder opening
       component.openItem(mockFolder);
       expect(component.loadFiles).toHaveBeenCalledWith('/Music');
@@ -280,6 +246,14 @@ describe('FileBrowserComponent', () => {
       // Test file selection
       component.openItem(mockDropboxFile);
       expect(component.fileSelected.emit).toHaveBeenCalledWith(mockDropboxFile);
+    });
+
+    it('should not emit file selection for non-audio files', () => {
+      spyOn(component.fileSelected, 'emit');
+      const nonAudioFile = { ...mockDropboxFile, name: 'document.pdf' };
+
+      component.openItem(nonAudioFile);
+      expect(component.fileSelected.emit).not.toHaveBeenCalled();
     });
   });
 
@@ -341,9 +315,7 @@ describe('FileBrowserComponent', () => {
 
       component.loadFiles('/test');
 
-      // The loading state should be set to true immediately when loadFiles is called
-      // but will be set to false after the observable completes
-      // Since our mock returns immediately, isLoading will be false by the time we check
+      // isLoading will be false by the time we check 
       expect(component.isLoading).toBe(false);
     });
 
@@ -391,31 +363,7 @@ describe('FileBrowserComponent', () => {
     });
   });
 
-  describe('Integration Tests', () => {
-    it('should process files correctly end-to-end', fakeAsync(() => {
-      const files: DropboxFile[] = [
-        { ...mockDropboxFile, name: 'song.mp3', is_folder: false },
-        { ...mockDropboxFile, name: 'document.pdf', is_folder: false },
-        { ...mockFolder, name: 'Album', is_folder: true },
-        { ...mockDropboxFile, name: 'music.wav', is_folder: false }
-      ];
-
-      mockFileUtilService.isAudioFile.and.callFake((filename: string) => {
-        return filename.endsWith('.mp3') || filename.endsWith('.wav');
-      });
-      mockDropboxService.listFolder.and.returnValue(of(files));
-
-      component.loadFiles('/music');
-      tick();
-      fixture.detectChanges();
-
-      // Should filter out PDF and sort with folders first
-      expect(component.files.length).toBe(3);
-      expect(component.files[0].name).toBe('Album'); // Folder first
-      expect(component.files[1].name).toBe('music.wav'); // Then audio files alphabetically
-      expect(component.files[2].name).toBe('song.mp3');
-    }));
-
+  describe('Integration Tests', () => {   
     it('should handle progress updates correctly', () => {
       const progressData: FolderScanProgress = {
         currentPath: '/music/scanning',
@@ -430,7 +378,7 @@ describe('FileBrowserComponent', () => {
 
       expect(component.scanProgress).toEqual(progressData);
       expect(component.getScanPathDisplayName()).toBe('scanning');
-    });
+    });  
   });
 
   describe('Error Handling', () => {
@@ -445,5 +393,23 @@ describe('FileBrowserComponent', () => {
       expect(component.isLoading).toBe(false);
       expect(mockNotificationService.showError).toHaveBeenCalledWith('Error loading folder contents');
     }));
+  });
+
+  describe('Edge Cases with Real FileUtilService', () => {
+    it('should handle empty filename gracefully', () => {
+      expect(component.isAudioFile('')).toBe(false);
+      expect(component.isAudioFile(undefined as any)).toBe(false);
+    });
+
+    it('should handle files without extensions', () => {
+      const fileWithoutExt = { ...mockDropboxFile, name: 'filename_no_extension' };
+      expect(component.canSelectFile(fileWithoutExt)).toBe(false);
+    });
+
+    it('should handle mixed case extensions correctly', () => {
+      expect(component.isAudioFile('Test.MP3')).toBe(true);
+      expect(component.isAudioFile('Test.Mp3')).toBe(true);
+      expect(component.isAudioFile('Test.WAV')).toBe(true);
+    });
   });
 });

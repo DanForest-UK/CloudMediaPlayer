@@ -174,35 +174,8 @@ export class FileBrowserComponent implements OnInit, OnDestroy {
   canEnqueueFolder(file: DropboxFile): boolean {
     return file.is_folder;
   }
-
-  /**
-   * Get file type icon
-   */
-  getFileIcon(file: DropboxFile): string {
-    if (file.is_folder) {
-      return '📁';
-    } else if (this.fileUtilService.isAudioFile(file.name)) {
-      return '🎵';
-    } else {
-      return '📄';
-    }
-  }
-
-  /**
-   * Get file CSS classes based on type
-   */
-  getFileClasses(file: DropboxFile): string[] {
-    const classes: string[] = ['file-item'];
-
-    if (file.is_folder) {
-      classes.push('folder-item');
-    } else if (this.fileUtilService.isAudioFile(file.name)) {
-      classes.push('audio-item');
-    }
-
-    return classes;
-  }
-
+   
+    
   /**
    * Check if breadcrumb is the current one
    */
@@ -214,9 +187,7 @@ export class FileBrowserComponent implements OnInit, OnDestroy {
    * Process and filter files for display
    */
   private processFilesForDisplay(files: DropboxFile[]): DropboxFile[] {
-    // First filter to only show relevant files
     const filtered = this.filterAudioFilesAndFolders(files);
-    // Then sort them
     return this.sortFiles(filtered);
   }
 
@@ -239,11 +210,10 @@ export class FileBrowserComponent implements OnInit, OnDestroy {
       }
     });
   }
-
-  navigateTo(path: string): void {
-    this.loadFiles(path);
-  }
-
+  
+  /**
+   * Selects an item or opens a folder
+   */
   openItem(file: DropboxFile): void {
     if (file.is_folder) {
       this.loadFiles(file.path_display);
