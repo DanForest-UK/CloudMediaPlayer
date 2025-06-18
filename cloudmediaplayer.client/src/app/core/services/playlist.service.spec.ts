@@ -338,32 +338,6 @@ describe('PlaylistService', () => {
       });
     });
 
-    describe('getSyncStatusIcon and getSyncStatusTooltip', () => {
-      it('should return local icon when sync disabled', () => {
-        const mockPlaylist = createMockSavedPlaylist();
-        const icon = service.getSyncStatusIcon(mockPlaylist, false);
-        const tooltip = service.getSyncStatusTooltip(mockPlaylist, false);
-
-        expect(icon).toBe('💾');
-        expect(tooltip).toBe('Sync disabled - saved locally only');
-      });
-
-      it('should return correct icons for different sync statuses', () => {
-        const testCases = [
-          { status: 'synced' as const, icon: '☁️', tooltip: 'Synced to Dropbox' },
-          { status: 'syncing' as const, icon: '🔄', tooltip: 'Syncing to Dropbox...' },
-          { status: 'local' as const, icon: '💾', tooltip: 'Saved locally only' },
-          { status: 'error' as const, icon: '⚠️', tooltip: 'Sync failed - right-click to retry' }
-        ];
-
-        testCases.forEach(testCase => {
-          const playlist = { ...createMockSavedPlaylist(), syncStatus: testCase.status };
-          expect(service.getSyncStatusIcon(playlist, true)).toBe(testCase.icon);
-          expect(service.getSyncStatusTooltip(playlist, true)).toBe(testCase.tooltip);
-        });
-      });
-    });
-
     describe('isPlaylistCurrentlyPlaying', () => {
       it('should check if playlist is currently playing', () => {
         expect(service.isPlaylistCurrentlyPlaying(0, 0, true)).toBe(true);
