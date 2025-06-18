@@ -5,7 +5,7 @@
       <button class="playlist-dropdown-btn"
               (click)="toggleDropdown($event)"
               [class.active]="showDropdown">
-        {{ getCurrentPlaylistDisplay() }}
+        {{ currentPlaylistName }} ({{ playlist.length }} songs)
         <span class="dropdown-arrow">{{ showDropdown ? '▲' : '▼' }}</span>
       </button>
 
@@ -35,8 +35,8 @@
         <div class="sync-settings-section">
           <div class="dropdown-label">Sync Settings</div>
           <label class="sync-checkbox-container">
-            <input type="checkbox" 
-                   [checked]="syncSettings.enabled" 
+            <input type="checkbox"
+                   [checked]="syncSettings.enabled"
                    (change)="toggleSyncEnabled()"
                    class="sync-checkbox">
             <span class="sync-checkbox-label">Sync playlists to Dropbox</span>
@@ -47,10 +47,29 @@
         <div class="dropdown-divider"></div>
         <div class="sync-status-section">
           <div class="sync-status-display">
-            <span class="sync-icon" [class.syncing]="syncStatus.isSyncing">
-              {{ getSyncStatusHeaderIcon() }}
+            <span class="sync-icon"
+                  [class.syncing]="syncStatus.isSyncing"
+                  [class.offline]="!syncStatus.isOnline"
+                  [class.error]="syncStatus.error !== null">
+              <ng-container *ngIf="!syncSettings.enabled">💾</ng-container>
+              <ng-container *ngIf="syncSettings.enabled && syncStatus.isSyncing">⏳</ng-container>
+              <ng-container *ngIf="syncSettings.enabled && !syncStatus.isSyncing && syncStatus.isOnline && !syncStatus.error">☁️</ng-container>
+              <ng-container *ngIf="syncSettings.enabled && !syncStatus.isSyncing && !syncStatus.isOnline">📴</ng-container>
+              <ng-container *ngIf="syncSettings.enabled && syncStatus.error">⚠️</ng-container>
             </span>
-            <span class="sync-text">{{ getSyncStatusDisplay() }}</span>
+            <span class="sync-text">
+              <ng-container *ngIf="!syncSettings.enabled">Sync disabled</ng-container>
+              <ng-container *ngIf="syncSettings.enabled && syncStatus.isSyncing">Syncing...</ng-container>
+              <ng-container *ngIf="syncSettings.enabled && !syncStatus.isSyncing && syncStatus.lastSync">
+                Last synced {{ syncStatus.lastSync | date:'short' }}
+              </ng-container>
+              <ng-container *ngIf="syncSettings.enabled && !syncStatus.isSyncing && !syncStatus.lastSync">
+                Ready to sync
+              </ng-container>
+              <ng-container *ngIf="syncSettings.enabled && syncStatus.error">
+                Sync error: {{ syncStatus.error }}
+              </ng-container>
+            </span>
           </div>
         </div>
 
@@ -69,8 +88,24 @@
               <span class="playlist-count">({{ savedPlaylist.items.length }} songs)</span>
             </span>
             <span class="sync-status-icon"
-                  [title]="getSyncStatusTooltip(savedPlaylist)">
-              {{ getSyncStatusIcon(savedPlaylist) }}
+                  [ngClass]="{
+                    'synced': savedPlaylist.syncStatus === 'synced',
+                    'error': savedPlaylist.syncStatus === 'error',
+                    'local': savedPlaylist.syncStatus === 'local',
+                    'syncing': savedPlaylist.syncStatus === 'syncing',
+                    'sync-disabled': !syncSettings.enabled
+                  }"
+                  [title]="!syncSettings.enabled ? 'Sync disabled - stored locally' :
+                           savedPlaylist.syncStatus === 'synced' ? 'Synced to Dropbox' :
+                           savedPlaylist.syncStatus === 'syncing' ? 'Syncing to Dropbox...' :
+                           savedPlaylist.syncStatus === 'local' ? 'Stored locally only' :
+                           savedPlaylist.syncStatus === 'error' ? 'Sync failed - click to retry' :
+                           'Unknown status'">
+              <ng-container *ngIf="!syncSettings.enabled">💾</ng-container>
+              <ng-container *ngIf="syncSettings.enabled && savedPlaylist.syncStatus === 'synced'">☁️</ng-container>
+              <ng-container *ngIf="syncSettings.enabled && savedPlaylist.syncStatus === 'syncing'">⏳</ng-container>
+              <ng-container *ngIf="syncSettings.enabled && savedPlaylist.syncStatus === 'local'">💾</ng-container>
+              <ng-container *ngIf="syncSettings.enabled && savedPlaylist.syncStatus === 'error'">⚠️</ng-container>
             </span>
             <span class="context-menu-indicator" *ngIf="currentPlaylistId === savedPlaylist.id">●</span>
           </button>
@@ -104,7 +139,7 @@
     </button>
     <button class="context-menu-item"
             (click)="forceSyncPlaylist()"
-            *ngIf="contextMenuPlaylistId && canForceSyncPlaylist(contextMenuPlaylistId)">
+            *ngIf="contextMenuPlaylistId && syncSettings.enabled">
       <span class="context-icon">🔄</span>
       Force Sync
     </button>

@@ -69,19 +69,56 @@ export class PlaylistComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Subscribe to sync status
-    this.syncStatusSubscription = this.playlistService.getSyncStatus().subscribe(
-      status => this.syncStatus = status
-    );
+    this.syncStatusSubscription = this.playlistService.getSyncStatus().subscribe({
+      next: status => this.syncStatus = status,
+      error: error => console.error('Error loading sync status:', error)
+    });
 
     // Subscribe to sync settings
-    this.syncSettingsSubscription = this.playlistService.getSyncSettings().subscribe(
-      settings => this.syncSettings = settings
-    );
+    this.syncSettingsSubscription = this.playlistService.getSyncSettings().subscribe({
+      next: settings => this.syncSettings = settings,
+      error: error => console.error('Error loading sync settings:', error)
+    });
   }
 
   ngOnDestroy(): void {
     this.syncStatusSubscription?.unsubscribe();
     this.syncSettingsSubscription?.unsubscribe();
+  }
+
+  /**
+   * Check if a playlist item is currently playing
+   */
+  isCurrentlyPlaying(index: number): boolean {
+    return index === this.currentPlaylistIndex && this.isPlaying;
+  }
+
+  /**
+   * Check if dropdown should show save options
+   */
+  canSavePlaylist(): boolean {
+    return this.playlist.length > 0;
+  }
+
+  /**
+   * Check if playlist controls should be enabled
+   */
+  canManagePlaylist(): boolean {
+    return this.playlist.length > 0;
+  }
+
+  /**
+   * Check if an element is part of playlist selector
+   */
+  isPlaylistSelectorElement(element: HTMLElement): boolean {
+    return !!element.closest('.playlist-selector');
+  }
+
+  /**
+   * Find playlist by ID
+   */
+  findPlaylistById(id: string): SavedPlaylist | null {
+    return this.savedPlaylists.find(p => p.id === id) || null;
   }
 
   /**
@@ -164,11 +201,22 @@ export class PlaylistComponent implements OnInit, OnDestroy {
   renamePlaylist(): void {
     if (!this.contextMenuPlaylistId) return;
 
-    const playlist = this.savedPlaylists.find(p => p.id === this.contextMenuPlaylistId);
+    const playlist = this.findPlaylistById(this.contextMenuPlaylistId);
     if (!playlist) return;
 
     const newName = prompt('Enter new playlist name:', playlist.name);
     if (newName && newName.trim() !== playlist.name) {
+      // Simple validation inline
+      if (!newName.trim()) {
+        alert('Playlist name cannot be empty');
+        return;
+      }
+
+      if (newName.trim().length > 255) {
+        alert('Playlist name is too long');
+        return;
+      }
+
       this.renamePlaylistRequested.emit({
         id: this.contextMenuPlaylistId,
         name: newName.trim()
@@ -196,73 +244,6 @@ export class PlaylistComponent implements OnInit, OnDestroy {
 
     this.forceSyncRequested.emit(this.contextMenuPlaylistId);
     this.closeContextMenu();
-  }
-
-  /**
-   * Get the display text for the current playlist
-   */
-  getCurrentPlaylistDisplay(): string {
-    const songCount = this.playlist.length;
-    const songText = songCount === 1 ? 'song' : 'songs';
-    return `${this.currentPlaylistName} (${songCount} ${songText})`;
-  }
-
-  /**
-   * Get sync status icon for a playlist
-   */
-  getSyncStatusIcon(playlist: SavedPlaylist): string {
-    if (!this.syncSettings.enabled) return '💾'; // Always local when sync disabled
-
-    switch (playlist.syncStatus) {
-      case 'synced': return '☁️';
-      case 'syncing': return '🔄';
-      case 'local': return '💾';
-      case 'error': return '⚠️';
-      default: return '💾';
-    }
-  }
-
-  /**
-   * Get sync status tooltip for a playlist
-   */
-  getSyncStatusTooltip(playlist: SavedPlaylist): string {
-    if (!this.syncSettings.enabled) return 'Sync disabled - saved locally only';
-
-    switch (playlist.syncStatus) {
-      case 'synced': return 'Synced to Dropbox';
-      case 'syncing': return 'Syncing to Dropbox...';
-      case 'local': return 'Saved locally only';
-      case 'error': return 'Sync failed - right-click to retry';
-      default: return 'Unknown sync status';
-    }
-  }
-
-  /**
-   * Get the sync status display for the header
-   */
-  getSyncStatusDisplay(): string {
-    if (!this.syncSettings.enabled) return 'Sync Disabled';
-    if (!this.syncStatus.isOnline) return 'Offline';
-    if (this.syncStatus.isSyncing) return 'Syncing...';
-    if (this.syncStatus.error) return 'Sync Error';
-    if (this.syncStatus.lastSync) {
-      const timeDiff = Date.now() - this.syncStatus.lastSync.getTime();
-      const minutes = Math.floor(timeDiff / 60000);
-      if (minutes < 1) return 'Just synced';
-      if (minutes < 60) return `Synced ${minutes}m ago`;
-      return 'Synced recently';
-    }
-    return 'Not synced';
-  }
-
-  /**
-   * Get the sync status icon for the header
-   */
-  getSyncStatusHeaderIcon(): string {
-    if (!this.syncSettings.enabled) return '📱';
-    if (!this.syncStatus.isOnline) return '📱';
-    if (this.syncStatus.isSyncing) return '🔄';
-    return '☁️';
   }
 
   /**
@@ -300,26 +281,9 @@ export class PlaylistComponent implements OnInit, OnDestroy {
   onDocumentClick(event: Event): void {
     // Only close if we're not clicking on the dropdown button or its contents
     const target = event.target as HTMLElement;
-    if (!target.closest('.playlist-selector')) {
+    if (!this.isPlaylistSelectorElement(target)) {
       this.closeDropdown();
       this.closeContextMenu();
     }
-  }
-
-  /**
-   * Check if a playlist can be force synced
-   */
-  canForceSyncPlaylist(playlistId: string): boolean {
-    if (!this.syncSettings.enabled) return false;
-
-    const playlist = this.savedPlaylists.find(p => p.id === playlistId);
-    return playlist ? playlist.syncStatus !== 'synced' : false;
-  }
-
-  /**
-   * Checks if a playlist item is currently playing
-   */
-  isCurrentlyPlaying(index: number): boolean {
-    return this.isPlaying && this.currentPlaylistIndex === index;
   }
 }

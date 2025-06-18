@@ -119,22 +119,7 @@ export class PlaylistService {
     return `${name} (${songCount} ${songText})`;
   }
 
-  /**
-   * Get sync status icon for a playlist
-   */
-  getSyncStatusIcon(playlist: SavedPlaylist, syncEnabled: boolean): string {
-    if (!syncEnabled) return '💾'; // Always local when sync disabled
-
-    switch (playlist.syncStatus) {
-      case 'synced': return '☁️';
-      case 'syncing': return '🔄';
-      case 'local': return '💾';
-      case 'error': return '⚠️';
-      default: return '💾';
-    }
-  }
-
-  /**
+   /**
    * Get sync status tooltip for a playlist
    */
   getSyncStatusTooltip(playlist: SavedPlaylist, syncEnabled: boolean): string {
