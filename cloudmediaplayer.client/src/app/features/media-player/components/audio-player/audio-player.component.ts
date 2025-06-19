@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
  * - Audio element and playback controls
  * - Display of currently playing track
  * - Player control buttons (previous, next)
+ * - Auto-advance when songs finish
  */
 @Component({
   selector: 'app-audio-player',
@@ -33,19 +34,24 @@ export class AudioPlayerComponent implements AfterViewInit, OnChanges {
   @Output() songEnded = new EventEmitter<void>();
 
   ngAfterViewInit(): void {
-    // Set up the audio element event listener for when song ends
+    // Use setTimeout to ensure the view is fully initialized
+    setTimeout(() => {
+      this.setupAudioEventListeners();
+    }, 0);
+  }
+
+  private setupAudioEventListeners(): void {
+    // Set up the audio element event listeners
     const mediaElement = this.mediaPlayerRef?.nativeElement;
     if (mediaElement) {
+      // Auto-advance when song ends
       mediaElement.onended = () => {
         this.songEnded.emit();
       };
 
-      // Listen for when user manually stops/pauses the audio
-      mediaElement.onpause = () => {
-        // Only emit stop if the audio has ended or been manually stopped
-        if (mediaElement.ended || mediaElement.currentTime === 0) {
-          this.stopRequested.emit();
-        }
+      // Handle audio loading errors
+      mediaElement.onerror = (e: Event) => {
+        console.error('Audio load error:', e);
       };
     }
   }
@@ -69,6 +75,9 @@ export class AudioPlayerComponent implements AfterViewInit, OnChanges {
     if (!mediaElement) {
       return;
     }
+
+    // Ensure event listeners are set up (in case they weren't ready before)
+    this.setupAudioEventListeners();
 
     // If we have a new media URL, load it
     if (this.mediaUrl) {

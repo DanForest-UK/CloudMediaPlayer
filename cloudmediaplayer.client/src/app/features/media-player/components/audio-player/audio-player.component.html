@@ -1,13 +1,14 @@
-<div *ngIf="isPlaying" class="player-section">
-  <div class="now-playing">
-    <h3>Now Playing: {{ currentTrackName || 'Unknown' }}</h3>
+<div class="player-section" [class.hidden]="!isPlaying && !mediaUrl">
+  <div *ngIf="isPlaying || mediaUrl" class="now-playing">
+    <h3>{{ isPlaying ? 'Now Playing: ' + (currentTrackName || 'Unknown') : 'Paused: ' + (currentTrackName || 'Unknown') }}</h3>
     <div class="player-controls">
       <button class="btn-secondary" (click)="playPrevious()" [disabled]="!canPlayPrevious">Previous</button>
       <button class="btn-secondary" (click)="playNext()" [disabled]="!canPlayNext">Next</button>
     </div>
   </div>
   <div class="media-wrapper">
-    <audio #mediaPlayer controls class="media-element">
+    <!-- Audio element should always exist, even when not playing -->
+    <audio #mediaPlayer controls class="media-element" [style.display]="(isPlaying || mediaUrl) ? 'block' : 'none'">
       <source [src]="mediaUrl" type="audio/mpeg">
       Your browser does not support the audio element.
     </audio>
