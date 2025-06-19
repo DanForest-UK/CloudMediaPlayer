@@ -8,7 +8,6 @@ import { CommonModule } from '@angular/common';
  * - Audio element and playback controls
  * - Display of currently playing track
  * - Player control buttons (previous, next)
- * - Auto-advance when songs finish
  */
 @Component({
   selector: 'app-audio-player',

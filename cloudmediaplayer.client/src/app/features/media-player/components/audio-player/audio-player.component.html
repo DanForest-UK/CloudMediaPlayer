@@ -6,8 +6,7 @@
       <button class="btn-secondary" (click)="playNext()" [disabled]="!canPlayNext">Next</button>
     </div>
   </div>
-  <div class="media-wrapper">
-    <!-- Audio element should always exist, even when not playing -->
+  <div class="media-wrapper">   
     <audio #mediaPlayer controls class="media-element" [style.display]="(isPlaying || mediaUrl) ? 'block' : 'none'">
       <source [src]="mediaUrl" type="audio/mpeg">
       Your browser does not support the audio element.
