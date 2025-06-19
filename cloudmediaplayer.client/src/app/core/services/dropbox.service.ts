@@ -17,7 +17,7 @@ export { AuthState, FolderScanProgress } from '../../shared/models';
   providedIn: 'root'
 })
 export class DropboxService {
-  // Replace with your Dropbox app key
+  // Replace with your Dropbox app key if you dont want the default one (limited API usage)
   private readonly CLIENT_ID = 'd2s6qo646n1vfoa';
 
   // Dropbox API endpoints
